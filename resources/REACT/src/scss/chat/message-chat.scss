@@ -1,0 +1,81 @@
+@import "../variable";
+@import "../mixin";
+
+.component-message-chat{
+  padding-top: 5px;
+  @include clearfix();
+
+  &.typing-chat-messsage{
+    display: none;
+    &.show{
+      display: block;
+    }
+  }
+  .chat-group{
+    @include clearfix();
+
+    &.by-me{
+        
+      .avatar{
+        display: none!important;
+      }
+      .message-content{
+        
+        .text{
+          @include render-gradient(210deg, $gray-100, $gray-500)
+        }
+      }
+    }
+
+    .avatar{
+      max-width: 40px;
+      max-height: 40px;
+      margin: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      float: left;
+
+
+      img{
+        width: 100%;
+      }
+    }
+    .message-content{
+      padding-left: 50px;
+
+      .IMAGE{
+        text-align: center;
+        .wrapper-attachment{
+          padding: 5px;
+          display: inline-block;
+          max-width: 200px;
+        }
+      }
+      .EMOJI{
+        padding: 10px;
+        background: none!important
+      }
+      .text{
+        padding: 10px;
+        border-radius: 15px;
+        white-space: pre;
+        word-break: break-all;
+        @include render-gradient(135deg, $gray-100, $purple);
+
+        &.EMOJI{
+          background: transparent !important;
+          font-size: 35px;
+          padding: 0 10px;
+        }
+      }
+    }
+    .typing-message{
+      .text{
+        background: transparent!important;
+      }
+      .typing-text{
+        font-size: 10px;
+      }
+    }
+  }
+}

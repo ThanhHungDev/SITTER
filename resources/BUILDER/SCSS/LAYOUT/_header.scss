@@ -1,0 +1,79 @@
+.header_container{
+    height: 100px;
+    width: calc($container-1 - 20px);
+    padding-left: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $black-light;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    border-top: none;
+    .nav-logo{
+        height: 100px;
+        display: flex;
+        align-items: center;
+        a {
+            .link-img{
+                width: 100px;
+            }
+        }
+        .site-name {
+            margin-left: 10px;
+            padding-top: 16px;
+            align-self: flex-start;
+        }
+    }
+    .nav-link{
+        display: flex;
+
+        a {
+            border-left: 1px solid #cccccc;
+            text-decoration: none;
+            color: $black-light;
+            .nav-button-link{
+                height: 86px;                
+                width: 100px;
+                padding: 7px 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                align-items: center;
+                font-weight: normal;
+                span {
+                    line-height: 18px;
+                    text-align: center;
+                }
+                .icon-img{
+                    width: 25px;
+                }
+                .icon-img.username {
+                    width: 37px;
+                }
+                .icon-img.flow{
+                    width: 43px;
+                }
+                .icon-img.faq{
+                    width: 31px;
+                }
+                &.register{
+                    background-color: #fc6536;
+                    font-weight: bold;
+                }
+                &.login{
+                    background-color: #fcd036;
+                    font-weight: bold;
+                }             
+                    
+            }
+        }
+    }
+}
+.header-top-page{
+    *,
+    &:after,
+    &:before {
+        box-sizing: content-box!important;
+    }
+}

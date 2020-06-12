@@ -1,0 +1,102 @@
+.wapper-parent{
+    width: 780px;
+    margin: 50px auto;
+    .w100p{
+        width: 100%;
+    }
+    .fw-normal{
+        font-weight: normal!important;
+    }
+    .text-danger{
+        color: red;
+    }
+    .head{
+        background: #2dc187;
+        h3{
+            font-size: 20px;
+            color: #fff;
+            margin: 0;
+            padding: 5px 15px;
+        }
+    }
+    .note{
+        p{
+            color: #333333;
+            font-size: 15px;
+            padding: 15px;
+            margin: 0;
+        }
+    }
+    .bg-form{
+        background-color: #efffc7;
+        .explain-content{
+            padding-left: 15px;
+            p{
+                font-size: 16px;
+                line-height: 20px;
+                margin-bottom: 0;
+            }
+        }
+        .input-label{
+            background: #d4ffc7;
+            font-size: 18px;
+            line-height: 20px;
+            color: #06784b;
+            padding: 15px;
+        }
+        .input-content{
+            padding: 15px;
+            max-width: 510px;
+            input, textarea, select, option{
+                border: 1px solid #aaaaaa;
+                background-color: #fffef9;
+                font-size: 16px;
+                padding: 10px;
+            }
+            .input-sub-content{
+                padding-bottom: 15px;
+                label{
+                    font-size: 16px;
+                    color: #333;
+                    font-weight: 600;
+                }
+                .input-db-content{
+                    display: flex;
+                    input{
+                        width: 240px;
+                        &:nth-child(1){
+                            margin-right: 30px;
+                        }
+                    }
+                }
+                .year_select{
+                    min-width: 60px;
+                }
+            }
+            p{
+                line-height: 20px;
+                font-size: 16px;
+                margin-top: 0;
+                font-weight: unset;
+            }
+            textarea{
+                width: 100%;
+
+            }
+            .type_certificate{
+                min-width: 328px;
+            }
+            select{
+                // background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #ddd;
+                // -webkit-appearance: none;
+            }
+            
+        }
+    }
+    input[type='radio'], input[type='checkbox']{
+        width: 16px;
+        height: 16px;
+        border-radius: unset;
+    }
+    
+}

@@ -1,0 +1,200 @@
+
+
+/**
+* display
+*/
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+:focus {
+  outline: 0 !important;
+  text-decoration: none !important;
+}
+.d-none {
+  display: none !important;
+}
+
+.d-inline-block {
+  display: inline-block !important;
+}
+.d-block {
+  display: block !important;
+}
+.d-table {
+  display: table !important;
+}
+.d-table-row {
+  display: table-row !important;
+}
+.d-table-cell {
+  display: table-cell !important;
+}
+.d-flex {
+  display: -ms-flexbox !important;
+  display: flex !important;
+}
+
+.d-inline-flex {
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
+}
+
+
+.italic {
+	font-style: italic!important
+}
+
+.not-italic {
+	font-style: normal!important
+}
+
+.uppercase {
+	text-transform: uppercase!important
+}
+
+.lowercase {
+	text-transform: lowercase!important
+}
+
+.capitalize {
+	text-transform: capitalize!important
+}
+
+.normal-case {
+	text-transform: none!important
+}
+
+.underline {
+	text-decoration: underline!important
+}
+
+.line-through {
+	text-decoration: line-through!important
+}
+
+.no-underline {
+	text-decoration: none!important
+}
+
+/**************************************************/
+
+.font-hairline {
+	font-weight: 100!important
+}
+
+.font-thin {
+	font-weight: 200!important
+}
+
+.font-light {
+	font-weight: 300!important
+}
+
+.font-normal {
+	font-weight: 400!important
+}
+
+.font-medium {
+	font-weight: 500!important
+}
+
+.font-semibold {
+	font-weight: 600!important
+}
+
+.font-bold {
+	font-weight: 700!important
+}
+
+.font-extrabold {
+	font-weight: 800!important
+}
+
+.font-black {
+	font-weight: 900!important
+}
+//// text aline 
+.text-center{
+	text-align: center;
+}
+.text-right{
+	text-align: right;
+}
+.text-left{
+	text-align: left;
+}
+
+
+
+//// margin AUTO  
+.vertical-align-middle{
+	vertical-align: middle;
+}
+.mg-auto{
+	margin-left: auto;
+	margin-right: auto
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+.border {
+  border: 1px solid #dee2e6!important;
+}
+.border-top {
+  border-top: 1px solid #dee2e6!important;
+}
+.border-right {
+  border-right: 1px solid #dee2e6!important;
+}
+.border-bottom {
+  border-bottom: 1px solid #dee2e6!important;
+}
+.border-left {
+  border-left: 1px solid #dee2e6!important;
+}
+
+@each $name, $color in $custom-colors {
+  .text-color-#{""+$name} {
+    color: $color;
+  }
+}
+@each $name, $color in $custom-colors {
+  
+  .border-color-#{""+$name} {
+    border-color: $color;
+  }
+}
+@each $name, $color in $custom-colors {
+  
+  .bg-color-#{""+$name} {
+    background-color: $color;
+  }
+}
+
+@each $width in $custom-width {
+  .w-#{$width} {
+    width: $width;
+  }
+}
+
+@each $name, $font-size in $custom-font-size {
+  .text-#{""+$name} {
+    font-size: $font-size
+  }
+}
+
+body.neo-scroll {
+  overflow: hidden;
+}
+
+input, select, textarea, option{
+  &:focus{
+    border: 1px solid #aaaaaa;
+    outline: none;
+  }
+}
