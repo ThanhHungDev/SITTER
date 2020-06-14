@@ -3,6 +3,7 @@
 import CONFIG from "../config"
 import Peer from "peerjs"
 import { setterUser, setterChannels, addMessage, addMessageSendToMe, setterSocket } from "../action"
+import config from "../config"
 
 
 /// config global variable
@@ -28,10 +29,31 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
             console.log(response, " lỗi không thể tạo access token")
             throw new Error("token refesh không đúng")
         }
-        var userLogin = response.data
+        
+        var tokensUser = { 
+            expire: response.data.expire,
+            period: response.data.period,
+            tokenAccess: response.data.tokenAccess,
+            tokenRefesh: response.data.tokenRefesh
+        }
+        var userLogin = { ... response.data.user, tokens : tokensUser }
         localStorage.setItem('user', JSON.stringify(userLogin))
         instanceComponent.props.dispatch(setterUser(userLogin))
-        console.log(response, "getAccessTokenByRefesh")
+        return { auth: userLogin, detect }
+    })
+    .then( dataFetchChannel => {
+
+        var data = { access: dataFetchChannel.auth.tokens.tokenAccess, ...dataFetchChannel.detect }
+        console.log(data, "fetchChannelMessage in getAccessTokenByRefesh")
+        return fetchChannelMessage( data )
+    })
+    .then( dataChannel => {
+        if( !dataChannel ){
+            alert( "fetch channel có lỗi ")
+            return false
+        }
+        instanceComponent.props.dispatch(setterChannels(dataChannel))
+        return true
     })
     .catch(error => {
         alert(error.message)
@@ -41,16 +63,16 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
 
 
 export function resfeshTokenIfExpire( auth, instanceChat ){
-    console.log( auth )
+    console.log( auth, "auth in resfeshTokenIfExpire" )
     var diff = ((new Date).getTime() - new Date(auth.tokens.period).getTime()) / 1000
     if (diff >= auth.tokens.expire) {
         /// fetch new token
         var dataRefesh = { 
-            userId: auth._id, 
+            userId: auth.id, 
             refesh: auth.tokens.tokenRefesh, 
             detect: this.props.client 
         }
-        console.log(dataRefesh, "refesh token vì hết hạn")
+        console.log(dataRefesh, "refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn ")
         resfeshTokenExpire(dataRefesh, instanceChat)
     }
 }
@@ -180,7 +202,7 @@ function fetchChannelMessage( data ) {
         alert("エラーが発生しました。しばらくしてからもう一度お試しください")
         return false
     }
-    return fetch(CONFIG.SERVER.ASSET() + '/api/user/channel-message', {
+    return fetch(CONFIG.SERVER.ASSET() + '/api/channels', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
@@ -210,7 +232,7 @@ function fetchChannelMessage( data ) {
 
 const peer = new Peer({ 
     host: '127.0.0.1',
-    port: 9000,
+    port: config.SERVER.PEER_PORT,
     path: '/myapp'
 })
 
@@ -284,7 +306,7 @@ function socketListenner( socket, instanceApp ){
         var { user, message, style, attachment, channel, detect } = data 
         if (typeof(Storage) !== 'undefined') {
             var userLocal = JSON.parse(localStorage.getItem('user'))
-            if( userLocal && userLocal._id == user ){
+            if( userLocal && userLocal.id == user ){
                 var { browser, browserMajorVersion, browserVersion, os, osVersion } = detect
                 var clientServerSend = { browser, browserVersion, browserMajorVersion, os, osVersion }
                 var { client } = instanceApp.props
@@ -305,7 +327,7 @@ function socketListenner( socket, instanceApp ){
         var { user, channel } = data 
         if (typeof(Storage) !== 'undefined') {
             var userLocal = JSON.parse(localStorage.getItem('user'))
-            if( userLocal && userLocal._id == user ){
+            if( userLocal && userLocal.id == user ){
                 return false
             }else{
                 console.log("cos theer show typing ")

@@ -77,7 +77,7 @@ var peerServer = null
 if(PORT == 443){
     server = http.createServer(options, app)
     peerServer = PeerServer({
-        port: 9000,
+        port: CONFIG.SERVER.PEER_PORT,
         path: '/myapp',
         ssl: {
             key: fs.readFileSync(path.join(__dirname, 'create-ssl/server.key')),
@@ -86,7 +86,7 @@ if(PORT == 443){
     })
 }else{
     server = http.createServer(app)
-    peerServer = PeerServer({ port: 9000, path: '/myapp' })
+    peerServer = PeerServer({ port: CONFIG.SERVER.PEER_PORT, path: '/myapp' })
 }
 const io     = socket(server)
 server.listen(PORT,  () => {

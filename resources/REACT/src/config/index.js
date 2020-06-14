@@ -1,12 +1,14 @@
-var local = "localhost",
-  local_ip = "127.0.0.1",
-  local_port = 3000
+var local      = "localhost",
+    local_ip   = "127.0.0.1",
+    local_port = 8000,
+    peer_port  = 7000
 
 export default {
   SERVER: {
     PORT: local_port,
     DOMAIN: local,
     IP: local_ip,
+    PEER_PORT : peer_port,
     PROTOCOL: function () {
       if (local_port == 443) {
         return "https://"

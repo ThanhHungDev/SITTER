@@ -6,12 +6,16 @@ var router                = express.Router()
 
 
 var { refesh }                       = require("../controller/user"),
-    { get_channel_message }          = require("../controller/channel"),
+    { channels, findOneOrCreate }             = require("../controller/channel"),
+
     { VALIDATE_REFESH }              = require("../middleware/request/refesh"),
-    { VALIDATE_GET_CHANNEL_MESSAGE } = require("../middleware/request/get-channel-message")
+    { VALIDATE_GET_CHANNEL_MESSAGE } = require("../middleware/request/get-channel-message"),
+    { VALIDATE_CREATE_CHANNEL }      = require("../middleware/request/find-or-create-channel")
     
 
 
 router.post('/refesh', [ VALIDATE_REFESH ], refesh)
-router.post('/channel-message', [VALIDATE_GET_CHANNEL_MESSAGE], get_channel_message )
-module.exports = router;
+router.post('/channels', [ VALIDATE_GET_CHANNEL_MESSAGE ], channels )
+router.post('/channel', [ VALIDATE_CREATE_CHANNEL ], findOneOrCreate )
+
+module.exports = router
