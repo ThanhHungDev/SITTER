@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import TYPE from "../../action/type.js"
-import '../../../../scss/react/client/page/chat/message-chat.scss'
+import '../../scss/chat/message-chat.scss'
 import CONFIG from "../../config"
 
 class MessageChat extends Component{

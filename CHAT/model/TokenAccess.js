@@ -12,9 +12,6 @@ const TokenAccessSchema = new Schema({
     user: { 
         type   : String,
     },
-    online : {
-        type: Boolean
-    },
     period: {
         type : Date
     },

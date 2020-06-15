@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 // import SideBarChat from "./SideBarChat.jsx"
-// import ListMessage from "./ListMessage.jsx"
+import ListMessage from "./ListMessage.jsx"
 import { connect } from "react-redux"
 import { changeChannelActive } from "../../action"
 import { getAccessTokenByRefesh, resfeshTokenIfExpire, 
@@ -29,7 +29,7 @@ class Chat extends Component {
             var refesh = TOKEN_REFESH_DOM.getAttribute('data-refesh'),
                 userId = TOKEN_REFESH_DOM.getAttribute('data-user')
             if( userId && refesh ){
-                refesh = "e5b9dad721957039ae4f87cfd6c72380"
+
                 getAccessTokenByRefesh( userId, refesh, detect, instanceChat )
             }
         }
@@ -53,9 +53,8 @@ class Chat extends Component {
             <div className="component-chat">
                 <div className="bg-chat-temalate">
                     <div className="wrapper-page-chat">
-                        {/* <SideBarChat />
-                        <ListMessage /> */}
-                        hung chat
+                        {/* {/* <SideBarChat /> */}
+                        <ListMessage />
                         
                     </div>
                 </div>

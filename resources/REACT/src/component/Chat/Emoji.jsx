@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import "../../../../scss/react/client/page/chat/emoji.scss"
+import "../../scss/chat/emoji.scss"
 
 class Emoji extends Component {
 

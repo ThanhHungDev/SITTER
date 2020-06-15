@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import ListEmoji from "./ListEmoji.jsx";
-import "../../../../scss/react/client/page/chat/input-send-chat.scss";
+import "../../scss/chat/input-send-chat.scss";
 import config from "../../config/index.js"
 import { sendMessageToChannel, saveBlobToServer, sendTypingMessageToChannel } from "../../library/helper.js"
 

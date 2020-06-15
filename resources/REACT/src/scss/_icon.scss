@@ -5150,12 +5150,12 @@ $hero-icons: (
 
 @font-face {
 	font-family: "HERO Icons";
-	src: url("/font/IconFont/webfont.eot?v=1.4.57");
-  src: url("/font/IconFont/webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), 
-  url("/font/IconFont/webfont.woff2?v=1.4.57") format("woff2"), 
-  url("/font/IconFont/webfont.woff?v=1.4.57") format("woff"), 
-  url("/font/IconFont/webfont.ttf?v=1.4.57") format("truetype"), 
-  url("/font/IconFont/webfont.svg?v=1.4.57") format("svg");
+	src: url("http://localhost:8000/font/IconFont/webfont.eot?v=1.4.57");
+  src: url("http://localhost:8000/font/IconFont/webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), 
+  url("http://localhost:8000/font/IconFont/webfont.woff2?v=1.4.57") format("woff2"), 
+  url("http://localhost:8000/font/IconFont/webfont.woff?v=1.4.57") format("woff"), 
+  url("http://localhost:8000/font/IconFont/webfont.ttf?v=1.4.57") format("truetype"), 
+  url("http://localhost:8000/font/IconFont/webfont.svg?v=1.4.57") format("svg");
 	font-weight: normal;
 	font-style: normal;
 }

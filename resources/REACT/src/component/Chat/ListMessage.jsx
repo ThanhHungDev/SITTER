@@ -4,7 +4,7 @@ import HeadInfo from "./HeadInfo.jsx"
 import MessageChat from "./MessageChat.jsx"
 import InputSendChat from "./InputSendChat.jsx"
 import MessageChatTyping from "./MessageChatTyping.jsx"
-import "../../../../scss/react/client/page/chat/list-message.scss"
+import "../../scss/chat/list-message.scss"
 
 class ListMessage extends Component {
 
@@ -24,15 +24,15 @@ class ListMessage extends Component {
   }
   render() {
     
-    console.log("render lại ListMessage")
-    var { users } = this.props
-    var userActiveChat = users.find( user => user.isActive );
+    console.log("render ListMessage")
+    var { channels } = this.props
+    var channelActiveChat = channels.find( channel => channel.isActive );
 
-    if( userActiveChat ){
-      var { typing } = userActiveChat
+    if( channelActiveChat ){
+      var { typing } = channelActiveChat
     }
     
-    var messages = userActiveChat && userActiveChat.message;
+    var messages = channelActiveChat && channelActiveChat.message;
 
     var { myinfo } = this.props
     return (
@@ -40,9 +40,15 @@ class ListMessage extends Component {
         <HeadInfo />
         <div className="wrapper-list-message" id="js-scroll-to-bottom">
           { messages && messages.map( 
-            (message , key) => <MessageChat key={"message-chat" + key + userActiveChat.id} myinfo={myinfo} message={message} toUser={userActiveChat} /> 
+            (message , key) => 
+            <MessageChat 
+              key={"message-chat" + key + channelActiveChat.id} 
+              myinfo={myinfo} 
+              message={message} 
+              toUser={channelActiveChat} 
+            /> 
           )}
-          <MessageChatTyping toUser={userActiveChat} />
+          <MessageChatTyping toUser={channelActiveChat} />
         </div>
         <InputSendChat />
       </div>
@@ -51,7 +57,7 @@ class ListMessage extends Component {
 }
 let mapStateToProps = (state) => {
   return {
-    users: state.userChat
+    channels: state.userChat
   }
 }
 export default connect(mapStateToProps)(ListMessage);

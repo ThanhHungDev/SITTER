@@ -107,6 +107,10 @@ ChannelSchema.statics.channelsMessage = function ( _userId ) {
             var userOfChannel = users.find(user => user.id == idUser)
             if( userOfChannel ){
                 channel.user =  userOfChannel.toJSONFor()
+                channel.isActive = (index == 0)
+            }
+            if( !channel.message.length ){
+                channel.message.push({type:false,content:"こんにどうすれば手助けできますか？ ", style: "", attachment: []})
             }
         })
         return channels
