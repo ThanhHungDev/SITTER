@@ -4,7 +4,8 @@ import React, { Component } from "react";
 // import ListMessage from "./ListMessage.jsx"
 import { connect } from "react-redux"
 import { changeChannelActive } from "../../action"
-import { getAccessTokenByRefesh, resfeshTokenIfExpire, fetchChannelMessage } from "../../library/service.js"
+import { getAccessTokenByRefesh, resfeshTokenIfExpire, 
+    fetchChannelMessage, createChannel } from "../../library/service.js"
 import '../../scss/chat/chat.scss'
 class Chat extends Component {
 
@@ -38,6 +39,12 @@ class Chat extends Component {
         console.log("chat page index componentDidUpdate")
     }
 
+    // <button onClick={this.createChannelData}>click create channel</button>
+    // createChannelData = event => {
+    //     console.log(JSON.stringify(this.props.detect))
+    //     createChannel( 2, 5, "00f004f5236799f14067e68633c9b2f5", this.props.detect)
+    // }
+
 
     render() {
         console.log("render lại Chat")
@@ -49,6 +56,7 @@ class Chat extends Component {
                         {/* <SideBarChat />
                         <ListMessage /> */}
                         hung chat
+                        
                     </div>
                 </div>
             </div>

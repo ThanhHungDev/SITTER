@@ -2,7 +2,6 @@ var Channel     = require("../model/Channel"),
     TokenAccess = require("../model/TokenAccess"),
     CONFIG      = require("../config"),
     Postgre     = require("../model/Postgre.js")
-const User = require("../model/User")
 
 /// chưa sửa lại 
 module.exports.findOneOrCreate = function( req, res ){
@@ -83,7 +82,7 @@ module.exports.channels = function( req, res ){
         errors : [ req.error ] }
         return res.end(JSON.stringify(response))
     }
-    // var lteDate = new Date((new Date).getTime() - (CONFIG.TimeExpireAccessToken * 1000) ) , period: { $gte: lteDate }
+    
     TokenAccess.findOne({ token: access })
     .then( token => {
         if( !token ){
@@ -98,15 +97,17 @@ module.exports.channels = function( req, res ){
         return Channel.channelsMessage( token.user )
     })
     .then( channels => {
-        response = { code: 200, message: res.__("get channel succcess"), internal_message: res.__("get channel succcess"), 
+        if( !channels ){
+            throw new Error("không có channel")
+        }
+        response = { code: 200, message: "get channel succcess", internal_message: "get channel succcess", 
         data : channels }
         return res.end(JSON.stringify(response))
     })
     .catch( error => {
         console.log( { error, access, ...detect }, "oject không thể chứng thực fetch channel")
         response = { code: 500, message: error.message, 
-            internal_message: error.message, 
-            errors : [ { message : error } ] }
+            internal_message: error.message }
         return res.end(JSON.stringify(response))
     })
 }
@@ -122,33 +123,36 @@ function getNameChanelByUserId( userId1, userId2 ){
             throw new Error("không tìm thấy user getNameChanelByUserId")
         }
         var roles = [ 
-            CONFIG.CHANNEL.ROLE_USER.sitter, 
-            CONFIG.CHANNEL.ROLE_USER.employer,
-            CONFIG.CHANNEL.ROLE_USER.admin
+            parseInt(CONFIG.CHANNEL.ROLE_USER.sitter), 
+            parseInt(CONFIG.CHANNEL.ROLE_USER.employer),
+            parseInt(CONFIG.CHANNEL.ROLE_USER.admin)
         ]
-        if( !roles.includes(user1.role_id) ){
+        var role_user1 = parseInt(user1.role_id),
+            role_user2 = parseInt(user2.role_id)
+            
+        if( !roles.includes(role_user1) ){
             throw new Error("không tìm thấy user getNameChanelByUserId")
         }
-        if( !roles.includes(user2.role_id) ){
+        if( !roles.includes(role_user2) ){
             throw new Error("không tìm thấy user getNameChanelByUserId")
         }
-        if( user1.role_id == user2.role_id ){
+        if( role_user1 == role_user2 ){
             throw new Error("không tìm thấy user getNameChanelByUserId")
         }
         var channelName = [ CONFIG.CHANNEL.SINGLE_PREFIX, null, null, null ]
         /// channel : 0 = prefix, 1 = sitter, 2 = employer, 3 = admin
-        if( user1.role_id == CONFIG.CHANNEL.ROLE_USER.sitter ){
+        if( role_user1 == CONFIG.CHANNEL.ROLE_USER.sitter ){
             channelName[1] = user1.id
-        }else if( user1.role_id == CONFIG.CHANNEL.ROLE_USER.employer ){
+        }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.employer ){
             channelName[2] = user1.id
-        }else if( user1.role_id == CONFIG.CHANNEL.ROLE_USER.admin ){
+        }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.admin ){
             channelName[3] = user1.id
         }
-        if( user2.role_id == CONFIG.CHANNEL.ROLE_USER.sitter ){
+        if( role_user2 == CONFIG.CHANNEL.ROLE_USER.sitter ){
             channelName[1] = user2.id
-        }else if( user2.role_id == CONFIG.CHANNEL.ROLE_USER.employer ){
+        }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.employer ){
             channelName[2] = user2.id
-        }else if( user2.role_id == CONFIG.CHANNEL.ROLE_USER.admin ){
+        }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.admin ){
             channelName[3] = user2.id
         }
         return channelName.join("-")

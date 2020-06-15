@@ -21,7 +21,7 @@ class TokenRefeshesTable extends Migration
                 $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('CASCADE');
                 $table->string('token', 255)->nullable();
-                $table->string('detect', 255)->nullable();
+                $table->text('detect')->nullable();
                 $table->timestamps();
             });
         }

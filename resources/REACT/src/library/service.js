@@ -115,6 +115,32 @@ export function caller( channelInfor, user, client ){
 }
 
 
+
+// export function createChannel( localUserId, referenceUserId, refesh, detect ) {
+//     console.log("createChannel")
+//     var data = { localUserId, referenceUserId, refesh, ... detect}
+//     fetch(CONFIG.SERVER.ASSET() + '/api/channel', {
+//         method: 'POST',
+//         body: JSON.stringify(data),
+//         headers: {
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(res => res.json())
+//     .then(response => {
+//         if (response.code != 200) {
+//             console.log(response, " lỗi không thể tạo access token")
+//             throw new Error("token refesh không đúng")
+//         }
+        
+//         console.log( response )
+//     })
+//     .catch(error => {
+//         alert(error.message)
+//         return false
+//     })
+// }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -215,6 +241,7 @@ function fetchChannelMessage( data ) {
             console.log(JSON.stringify(response.data), "data fetch channel có lỗi")
             throw new Error("エラーが発生しました。しばらくしてからもう一度お試しください")
         }
+        console.log( response , "/api/channels")
         return response.data
     })
     .catch(error => {
