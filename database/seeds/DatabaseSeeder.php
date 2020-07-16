@@ -34,85 +34,11 @@ class DatabaseSeeder extends Seeder
                 'active'              => true,
                 'deleted'             => false,
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => date('Y-m-d H:i:s'),
+                'admin_confirm' => 1
             ]);
 
-        ///user supper admin
-        DB::table('users')->insert(
-            [
-                'avatar'              => '/uploads/avatar.jpg',
-                'email'               => 'thanhhung.code@gmail.com',
-                'password'            => bcrypt('123456789'),
-                'first_name'          => 'test first name',
-                'last_name'           => 'last name',
-                'first_name_furigana' => 'first_name_furigana',
-                'last_name_furigana'  => 'last_name_furigana',
-                'birth_date'          => Carbon::create('1995', '06', '26'),
-                'gender'              => 1,
-                'post_code'           => '900-0012',
-                'pref'                => 'pref',
-                'town'                => 'town',
-                'address'             => 'address',
-                'phone'               => '08033870674',
-                'role_id'             => '1',
-                'token_verify'        => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                'active'              => true,
-                'deleted'             => false,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            
-        ///user supper admin
-        DB::table('users')->insert(
-
-            [
-                'avatar'              => '/uploads/avatar.jpg',
-                'email'               => 'buitoan.code@gmail.com',
-                'password'            => bcrypt('123456789'),
-                'first_name'          => 'test first name toan',
-                'last_name'           => 'last name',
-                'first_name_furigana' => 'first_name_furigana',
-                'last_name_furigana'  => 'last_name_furigana',
-                'birth_date'          => Carbon::create('1995', '06', '26'),
-                'gender'              => 1,
-                'post_code'           => '900-0012',
-                'pref'                => 'pref',
-                'town'                => 'town',
-                'address'             => 'address',
-                'phone'               => '08033870674',
-                'role_id'             => '1',
-                'token_verify'        => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                'active'              => true,
-                'deleted'             => false,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            
-        ///user supper admin
-        DB::table('users')->insert(
-            [
-                'avatar'              => '/uploads/avatar.jpg',
-                'email'               => 'minhtri.code@gmail.com',
-                'password'            => bcrypt('123456789'),
-                'first_name'          => 'test first name trí',
-                'last_name'           => 'last name',
-                'first_name_furigana' => 'first_name_furigana',
-                'last_name_furigana'  => 'last_name_furigana',
-                'birth_date'          => Carbon::create('1995', '06', '26'),
-                'gender'              => 1,
-                'post_code'           => '900-0012',
-                'pref'                => 'pref',
-                'town'                => 'town',
-                'address'             => 'address',
-                'phone'               => '08033870674',
-                'role_id'             => '1',
-                'token_verify'        => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                'active'              => true,
-                'deleted'             => false,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]
-        );
+        
 
         $experiences = array(
             "保育士",
@@ -152,7 +78,6 @@ class DatabaseSeeder extends Seeder
             'お泊まり保育',
             '絵、工作レッスン',
             'ペットのお世話',
-            'ペットのお世話',
             '障がい児',
             'お子様の撮影',
             '爪きり',
@@ -180,22 +105,6 @@ class DatabaseSeeder extends Seeder
             'user_id'    => 1,
             'token'      => "hung2fefb83a1a9d0f6b7c0280707a388005",
             'detect'     => "sfsfdsdfsd",
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-        DB::table('token_refeshes')->insert(
-        [
-            'user_id'    => 1,
-            'token'      => "hung2fefb83a1a9d0f6b7c0280707a388005",
-            'detect'     => "sfsfdsdfsd",
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-        DB::table('token_refeshes')->insert(
-        [
-            'user_id'    => 3,
-            'token'      => "hung2fefb83a1a9d0f6b7c0280707a388005",
-            'detect'     => "vgfdgdfg",
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);

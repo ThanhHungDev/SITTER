@@ -34,7 +34,7 @@ module.exports = {
   ],
   output: {
     filename: 'js/' + namePage + '.bundle.js',
-    path: path.join(__dirname, "/dist"),
+    path: path.join(__dirname, "/../../public/chat"),
     publicPath: '/',
   },
   module: {

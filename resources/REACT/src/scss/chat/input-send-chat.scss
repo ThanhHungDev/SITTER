@@ -5,7 +5,7 @@
   border: 1px solid $gray-200;
   border-left: none;
   position: relative;
-  padding: 5px 80px 0 50px;
+  padding: 5px 80px 0 80px;
   
   textarea{
     width: 100%!important;
@@ -46,9 +46,9 @@
       left: 10px;
     }
 
-    // &.file{
-    //   left: 35px;
-    // }
+    &.file{
+      left: 45px;
+    }
     &.send{
       display: inline-block;
       z-index: 1;

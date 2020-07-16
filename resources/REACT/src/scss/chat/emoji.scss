@@ -13,6 +13,7 @@
   opacity: 0;
   visibility: hidden;
   height: 0;
+  @include clearfix();
   &.first-show{
     animation-duration: 1s;
     animation-fill-mode: both;
@@ -29,14 +30,14 @@
   }
 }
 .component-emoji{
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
+  float: left;
   text-align: center;
-  display: inline-block;
-  vertical-align: middle;
+  display: block;
   cursor: pointer;
   line-height: 24px;
-  font: normal normal normal 24px/1 "HERO Icons";
+    font: normal normal normal 24px/1 "HERO Icons";
   text-rendering: auto;
   line-height: inherit;
   -webkit-font-smoothing: antialiased;

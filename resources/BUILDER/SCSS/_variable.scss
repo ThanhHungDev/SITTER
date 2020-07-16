@@ -303,6 +303,15 @@ $font-weight-900: 900 !default;
 $font-kazgopro-regular : "KozGoPro-Regular";
 $font-family-base: $font-kazgopro-regular !default;
 
+//font
+@font-face {
+  font-family: 'KozGoPro-Bold';
+  src: url('/font/KozGoPro/KozGoPro-Bold.otf');
+}
+$font-kazgopro-bold : "KozGoPro-Bold";
+$font-family-bold: $font-kazgopro-bold !default;
+
+
 $max-screen-width: 100vw; //1480px
 $container-1: 100vw;
 $container-2: 1080px;
@@ -611,3 +620,10 @@ $font-sawarabi-mincho-regular : "Sawarabi-Mincho-Regular";
 /// font 
 $font-family-sans-serif:      Arial, Helvetica, sans-serif !default;
 $font-family-base:            "Times New Roman", Times, serif !default;
+
+
+
+
+//// calendar
+$calendar_background_color: #b4fbdf;
+$calendar_border_color: #2dc187;

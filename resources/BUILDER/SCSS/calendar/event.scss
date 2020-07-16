@@ -1,0 +1,42 @@
+.calendar-wrapper-calendar{
+
+    .calendar-has-event{
+        .calendar-event{
+            background-color: #06784b;
+            color: $white;
+            display: block;
+            font-size: 11px;
+    
+            i{
+                display: block;
+                font-style: normal;
+                line-height: 1.2;
+                &:first-child{
+                    padding: 5px 0 0;
+                }
+                &:nth-child(2n){
+                    font-size: 8px;
+                }
+                &:last-child{
+                    padding: 0 0 2px;
+                }
+            }
+        }
+    }
+    .calendar-event{
+        display: block;
+        background-color: #ededed;
+        width: 100%;
+        min-height: 45px;
+
+        &.event-over{
+            background-color: #fc6536;
+        }
+        &.event-new{
+            background-color: $custom-green;
+        }
+        &.event-update{
+            background-color: $custom-brown;
+        }
+    }
+}

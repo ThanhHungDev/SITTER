@@ -1,74 +1,43 @@
 import React, { Component } from "react";
 import { connect } from "react-redux"
 import "../../scss/chat/head-info.scss"
-
+import CONFIG from "../../config"
 class HeadInfo extends Component {
 
-	renderTextEndTimeonline = time => {
-
-		var endTime = new Date(time.replace(/-/g, "/"))
-		var timeNow = new Date
-
-		var diffTime = Math.abs(timeNow - endTime)
-		diffTime = parseInt(diffTime)
-
-		var diffTimeMinute = Math.round(diffTime / (1000 * 60))
-
-		if (diffTimeMinute >= 60) {
-
-			var diffTimeHour = Math.round(diffTimeMinute / 60)
-			if ((diffTimeHour / 24) < 1) {
-				return diffTimeHour + "時間前にアクティブ"
-			}
-			return Math.round(diffTimeHour / 24) + "日前にアクティブ"
-		} else {
-			return "アクティブ" + diffTimeMinute + "分前"
-		}
+	componentDidUpdate(){
+		////set height component
+        var sidebar = document.getElementsByClassName("component-sidebar-chat")
+        if(sidebar.length){
+            var messages = document.getElementsByClassName("component-list-message")
+            if(messages.length){
+                sidebar[0].style.height = messages[0].clientHeight + "px";  
+            }
+        }
 	}
-
-	handleCallerClick = event => {
-		console.log("render lại head ìon")
-		var { userChat } = this.props
-		var userActiveChat = userChat.find(user => user.isActive)
-
-		if (!userActiveChat) {
-			alert("failling, you can f5 page")
-			return null
-		}
-
-		caller(userActiveChat, this.props.user, this.props.client)
-	}
-
+	
 	render() {
 
-		console.log("render lại head ìon")
+		console.log("render head chat")
 		var { channels } = this.props
 		var channelActive = channels.find(channel => channel.isActive)
 
 		if (!channelActive) {
 			return null
 		}
+		var textOnline =  channelActive.user.online ? "オンライン" : "オフライン"
 
-		var timeOnline = ''
-		if ( channelActive.isOnline ){
-
-			timeOnline = "オンライン"
-		} else {
-
-			timeOnline = 123; //this.renderTextEndTimeonline(channelActive.timeEndOnline)
-		}
-
+		
 
 		return (
 			<div className="component-head-info">
 
 				<div className="user-active-chat">
 					<figure className="state-avatar active-online">
-						<img src={channelActive.avatar} alt="" />
+						<img src={CONFIG.SERVER_PHP.URL + channelActive.user.avatar} alt="" />
 					</figure>
 					<div className="text-info">
-						<span className="name">{channelActive.name}</span>
-						<span className={(channelActive.isOnline ? "active-now" : '') + " time-online"}>{timeOnline}</span>
+						<span className="name">{channelActive.user.first_name + " " +channelActive.user.last_name}</span>
+						<span className={(channelActive.user.online ? "active-now" : '') + " time-online"}>{textOnline}</span>
 					</div>
 				</div>
 			</div>

@@ -1,735 +1,834 @@
 'use trick'
 function Calendar() {
 
-    this.selector     = null;
-    this.dateLoop     = 1;
-    this.dateLoopTemp = 0;
+    this.isCalendarSelector = false
+    this.selector           = null
+    this.inputEventData     = null
+    this.dateLoop           = 1
+    this.dateLoopTemp       = 0
 
-    this.srcPlus = BASE_URL + 'image/icon/plus.png';
+    this.toDay        = new Date()
+    this.currentDate  = this.toDay.getDate()
+    this.currentMonth = this.toDay.getMonth()
+    this.currentYear  = this.toDay.getFullYear()
 
-    this.toDay        = new Date();
-    this.currentDate  = this.toDay.getDate();
-    this.currentMonth = this.toDay.getMonth();
-    this.currentYear  = this.toDay.getFullYear();
-
-    this.indexDate   = new Date();
-    this.selectDate  = this.toDay.getDate();
-    this.selectMonth = this.toDay.getMonth();
-    this.selectYear  = this.toDay.getFullYear();
+    this.indexDate   = new Date() 
+    this.selectDate  = this.toDay.getDate()
+    this.selectMonth = this.toDay.getMonth()
+    this.selectYear  = this.toDay.getFullYear()
 
     this.firstDay = (new Date(this.selectYear, this.selectMonth)).getDay()
 
-    this.labelDays  = ["su", "mo", "tu", "we", "th", "fr", "sa"];
-    this.labelYear  = 'year';
-    this.labelMonth = 'month';
+    this.labelDays  = ["日", "月", "火", "水", "木", "金", "土"]
+    this.labelYear  = '年'
+    this.labelMonth = '月'
+    this.TEXT_PREV  = '<i class="fas fa-chevron-left"></i>'
+    this.TEXT_NEXT  = '<i class="fas fa-chevron-right"></i>'
 
-    this.modalEvent = 'js-modal-event';
+    this.data = {}
+    this.canPickDrag = true
+    this.isDrag      = false
+    this.dragBegin   = null 
+    this.dragEnd     = null
 
-    this.data = {};
+    this.attributeDate = 'data-date'
 
-    this.classCell       = 'calendar-cell';
-    this.classRow        = 'calendar-row';
-    this.classInToday    = 'calendar-today';
-    this.classInSunday   = 'calendar-sunday';
-    this.classInSatday   = 'calendar-satday';
-    this.classWrapperRow = 'calendar-wrapper-row position-relative';
-    this.classHeader     = 'calendar-table-header';
-    this.classTable      = 'calendar-table'
-    this.classFooter     = 'calendar-footer';
-    this.classLabelHeader= 'calendar-list-header calendar-row';
-    this.classCellDate   = 'calendar-cell-date';
-    this.classCellDisable= 'calendar-cell-disable';
-    this.classCellEvent  = 'calendar-cell-event';
-    this.classCellHasEvent  = 'calendar-cell-has-event'
-    this.classImagePlus  = 'calendar-cell-image-plus';
+    this.classWrapperCalendar = 'calendar-wrapper-calendar'
+    this.classWrapperRowCell  = 'calendar-wrapper-row-cell'
+    this.classRow             = 'calendar-row'
+    this.classInToday         = 'calendar-today'
+    this.classInSunday        = 'calendar-sunday'
+    this.classInSatday        = 'calendar-satday'
+    this.classHeader          = 'calendar-header'
+    this.classTitleDay        = 'calendar-title-day'
+    this.classBody            = 'calendar-body'
+    this.classFooter          = 'calendar-footer'
+    this.classCell            = 'calendar-cell'
+    this.classCellDisable     = 'calendar-cell-disable'
+    this.classPicked          = 'calendar-picked'
+    this.classCellDate        = 'calendar-cell-date'
+    this.classNext            = 'calendar-next'
+    this.classPrev            = 'calendar-prev'
+    this.classCellEvent       = 'calendar-event'
+    this.classCellHasEvent    = 'calendar-has-event'
 
-    this.canPickDrag = true;
-    this.isDrag      = false;
-    this.dragBegin   = null;
-    this.dragEnd     = null;
+    //// class modal
+    this.classModal          = 'calendar-modal'
+    this.classModalHeader    = 'calendar-modal-header'
+    this.classModalClose     = 'calendar-modal-close'
+    this.classModalBody      = 'calendar-modal-body'
+    this.classModalFooter    = 'calendar-modal-footer'
+    this.classModalBodyTitle = 'calendar-modal-body-title'
 
-    this.labelModalHeader = 'calendar';
+    this.wrapperCheckBox     = 'calendar--wrapper__checkbox'
+    this.wrapperInput        = 'calendar--wrapper__input'
+
+    this.idModalTextTime        = 'js-modal-header__text'
+    this.idModalCalendar        = 'js-modal-calendar'
+    this.idModalHourBegin       = 'js-hour-begin'
+    this.idModalHourEnd         = 'js-hour-end'
+    this.idModalMinuteBegin     = 'js-minute-begin'
+    this.idModalMinuteEnd       = 'js-minute-end'
+    this.idModalCheckFirst      = 'js-modal-check-first'
+    this.idModalCheckLast       = 'js-modal-check-last'
+    this.idModalButtonNew       = 'js-modal-button-new'
+    this.idModalButtonEdit      = 'js-modal-button-edit'
+    this.idModalButtonDelete    = 'js-modal-button-delete'
+    this.idModalButtonTimeClose = 'js-modal-button-time-close'
+    this.idModalButtonGotoChat  = 'js-modal-button-chat'
+    this.typeNumber             = 'number'
+    this.nameModalHourBegin     = 'hour_begin'
+    this.nameModalHourEnd       = 'hour_end'
+    this.nameModalMinuteBegin   = 'minute_begin'
+    this.nameModalMinuteEnd     = 'minute_end'
+    /// settter function create modal 
+    this.createModal = null
+
+    this.eventBeforeOpenModel = null
+    this.eventAfterOpenModel  = null
+
+    this.setBeforeOpenModel = function( _function ){
+
+        this.eventBeforeOpenModel = _function
+    }
+    this.setAfterOpenModel = function( _function ){
+        
+        this.eventAfterOpenModel = _function
+    }
+    this.setCreateModel = function( _function ){
+        
+        this.createModal = _function
+    }
 
     this.setLabelDays = function(_labelDays){
 
-        this.labelDays = _labelDays;
-    }
-    this.setLabelModalHeader = function(_labelModalHeader){
-
-        this.labelModalHeader = _labelModalHeader;
+        this.labelDays = _labelDays
     }
     this.setLabelMonth = function(_labelMonth){
 
-        this.labelMonth = _labelMonth;
+        this.labelMonth = _labelMonth
     }
     this.setLabelYear = function(_labelYear){
 
-        this.labelYear = _labelYear;
+        this.labelYear = _labelYear
     }
     this.setCurrentDay = function( _day ){
 
-        this.toDay        = _day;
-        this.currentDate  = this.toDay.getDate();
-        this.currentMonth = this.toDay.getMonth();
-        this.currentYear  = this.toDay.getFullYear();
+        this.toDay        = _day
+        this.currentDate  = this.toDay.getDate()
+        this.currentMonth = this.toDay.getMonth()
+        this.currentYear  = this.toDay.getFullYear()
+        this.firstDay     = (new Date(this.selectYear, this.selectMonth)).getDay()
     }
-
     this.setSelectIndexDay = function( _day ){
 
-        this.indexDate   = _day;
-        this.selectDate  = this.indexDate.getDate();
-        this.selectMonth = this.indexDate.getMonth();
-        this.selectYear  = this.indexDate.getFullYear();
+        this.indexDate   = _day
+        this.selectDate  = this.indexDate.getDate()
+        this.selectMonth = this.indexDate.getMonth()
+        this.selectYear  = this.indexDate.getFullYear()
         this.firstDay    = (new Date(this.selectYear, this.selectMonth)).getDay()
     }
     this.setSelectMonth = function( _month ){
 
-        this.indexDate   = new Date(this.selectYear, _month, 1 );
-        this.selectDate  = this.indexDate.getDate();
-        this.selectMonth = this.indexDate.getMonth();
-        this.selectYear  = this.indexDate.getFullYear();
+        this.indexDate   = new Date(this.selectYear, _month, 1 )
+        this.selectDate  = this.indexDate.getDate()
+        this.selectMonth = this.indexDate.getMonth()
+        this.selectYear  = this.indexDate.getFullYear()
         this.firstDay    = (new Date(this.selectYear, this.selectMonth)).getDay()
     }
     this.setSelectYear = function( _year ){
 
-        this.indexDate   = new Date( _year, this.selectMonth, 1 );
-        this.selectDate  = this.indexDate.getDate();
-        this.selectMonth = this.indexDate.getMonth();
-        this.selectYear  = this.indexDate.getFullYear();
+        this.indexDate   = new Date( _year, this.selectMonth, 1 )
+        this.selectDate  = this.indexDate.getDate()
+        this.selectMonth = this.indexDate.getMonth()
+        this.selectYear  = this.indexDate.getFullYear()
         this.firstDay    = (new Date(this.selectYear, this.selectMonth)).getDay()
+    }
+    this.setNewCalendarSelector = function( _is_selctor ){
+
+        this.isCalendarSelector = _is_selctor
     }
     this.setElementDraw = function(_selector){
 
-        this.selector = _selector;
+        this.selector = _selector
     }
-    this.setModalEvent = function( _selector ){
+    this.numDayInMonth = function (iMonth, iYear) {
 
-        this.modalEvent = _selector;
+        return 32 - new Date(iYear, iMonth, 32).getDate()
     }
-    // check how many days in a month code
-    this.daysInMonth = function (iMonth, iYear) {
+    this.setEventData = function(_event){
 
-        return 32 - new Date(iYear, iMonth, 32).getDate();
+        this.data = _event
     }
-
-    this.setEventDefault = function(_event){
-
-        this.data = _event;
+    this.setInputEventData = function( _inputEvent ){
+        this.inputEventData = _inputEvent
     }
+    this.formatZeroBefore = function(number){
+        number = parseInt(number)
+        if (isNaN(number)) { return "00" }
 
-    this.draw = function(){
-
-        var table           = document.createElement("div");
-            table.className = this.classTable;
-        var header          = this.createHeader();
-        
-        table.appendChild(header);
-
-        var tableBody = this.createCells();
-        table.appendChild(tableBody);
-
-        var footer = this.createFooter();
-        table.appendChild(footer);
-        
-        if( this.selector ){
-            this.selector.innerHTML = '';
-            this.selector.appendChild(table);
+        if (number < 10) {
+            number = "0" + number
         }
-
-        var instance = this;
-        window.onmouseup = function (event) {
-            if (event.which === 3) {
-                //prevent RIGHT mouse click
-                return;
-            }
-            
-            instance.isDrag = false;
-            /// show popup create event 
-            let classPicked = 'picked';
-            if($("." + classPicked).length){
-                instance.openModalCreateEvent(instance, null)
-            }
-        };
+        return number
     }
+    this.checkToday = function(){
 
-    this.openModalCreateEvent = function(instance, date){
-
-        let classPicked = 'picked';
-        var dates       = [];
-
-        if(!date){
-            /// thực hiện multi select
-            $("." + instance.classCell + "." + classPicked).each(function(index, ele){
-
-                dates.push($(ele).attr('data-date'));
-                $(ele).removeClass(classPicked);
-            });
-        }else{
-            dates = [ date ]
-            $("." + classPicked).each(function(index, ele){
-
-                $(ele).removeClass(classPicked);
-            });
-        }
-
-        document.getElementById('js-time-event-year').value  = instance.selectYear;
-        document.getElementById('js-time-event-month').value  = instance.selectMonth + 1
-        if(dates.length > 1 ){
-            document.getElementById('js-time-event-date-from').value  = dates[0];
-            document.getElementById('js-time-event-date-from').classList.remove("d-none");
-            document.getElementById('js-time-event-date-to').value  = dates[dates.length - 1]
-            document.getElementById('js-time-event-date-to').classList.remove("d-none");
-
-            //// format 1 date hidden
-            document.getElementById('js-time-event-date').classList.add("d-none");
-        }else{
-            document.getElementById('js-time-event-date').value  = dates[0];
-            document.getElementById('js-time-event-date').classList.remove("d-none");
-
-            /// format multi date hidden
-            document.getElementById('js-time-event-date-from').classList.add("d-none");
-            document.getElementById('js-time-event-date-to').classList.add("d-none");
-        }
+        return this.dateLoop === this.currentDate && 
+        this.selectYear  === this.currentYear &&
+        this.selectMonth === this.currentMonth
+    }
+    this.checkSunDay = function(){
+        var dayNumber = this.dateLoop
+        var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber )
         
-        $("#" + instance.modalEvent).modal({
-            escapeClose: false,
-            clickClose: false,
-            showClose: false
-        });
-        var btnAccept = document.getElementById(instance.modalEvent).getElementsByClassName('js-accept-event')[0];
+        
+        return theDateLoop.getDay() == 0
+    }
+    this.checkSatDay = function(){
+        var dayNumber = this.dateLoop
+        var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber )
+        
+        return theDateLoop.getDay() == 6
+    }
+    this.leftThanToday = function (){
+        
+        var indexDay = new Date(this.selectYear, this.selectMonth, this.dateLoop ).getTime(),
+        today = new Date(this.currentYear, this.currentMonth, this.currentDate ).getTime()
+        return indexDay < today
+    }
+    this.setPickDrag = function ( _pick ) {
 
-        btnAccept.onclick = function(){
-            instance.handleBtnAccept(instance, dates)
-        };
+        this.canPickDrag = _pick
     }
 
     this.createHeader = function(){
 
-        header           = document.createElement("div");
-        header.className = this.classHeader;
+        var instance         = this
+        var header           = document.createElement("div")
+            header.className = this.classHeader
 
-        titleHead           = document.createElement("div");
-        titleHead.className = 'calendar-title-pannel position-relative';
-
-        headerIcon           = document.createElement("span");
-        headerIcon.className = "title-modal-header";
-
-        headerIconImg           = document.createElement("img");
-        headerIconImg.src = BASE_URL + 'image/icon/schedule-hover.png';
-
-        headerIcon.appendChild(headerIconImg);
-
-        
-
-        TextTitleHead = document.createTextNode(this.selectYear  + this.labelYear + " " + 
-                            ( this.selectMonth + 1 ) + this.labelMonth + " "
-                            + this.labelModalHeader);
-        titleHead.appendChild(headerIcon);
-        titleHead.appendChild(TextTitleHead);
-        
-
-        header.appendChild(titleHead);
-
-        return header;
-    }
-
-    this.createFooter = function(){
-
-        var footer       = document.createElement("div");
-
-        footer.appendChild(this.drawFooter());
-
-        return footer;
-    }
-    this.drawFooter = function(){
-        var instance = this;
-        var footer           = document.createElement("ul");
-            footer.className = this.classFooter;
-
-        var PREV = "<<";
-        var NEXT = ">>";
-
-        var TAG_PREV           = document.createElement("li");
-            TAG_PREV.innerHTML = PREV;
+        /// setting button prev
+        var TAG_PREV           = document.createElement("span")
+            TAG_PREV.className = this.classPrev
+            TAG_PREV.innerHTML = this.TEXT_PREV
             TAG_PREV.onclick = function() {
 
-              instance.setSelectMonth(instance.selectMonth - 1 );
-              instance.draw();
-          }
-
-        footer.appendChild(TAG_PREV);
-
-        
-        var YEAR_PREV = this.selectYear - 1;
-        var TAG_YEAR_PREV           = document.createElement("li");
-            TAG_YEAR_PREV.innerHTML = YEAR_PREV+ " " + this.labelYear;
-            TAG_YEAR_PREV.onclick = function() {
-
-                instance.setSelectYear(YEAR_PREV);
+                instance.setSelectMonth(instance.selectMonth - 1 )
                 instance.draw();
             }
+        header.appendChild(TAG_PREV)
 
-        footer.appendChild(TAG_YEAR_PREV);
+        var TAG_TEXT_DATE_INDEX = document.createElement("span")
+            TAG_TEXT_DATE_INDEX = document.createTextNode(
+                this.selectYear  + this.labelYear + " " + 
+                ( this.selectMonth + 1 ) + this.labelMonth + " "
+            )
+        header.appendChild(TAG_TEXT_DATE_INDEX)
 
-        for(let month = 0; month < 12; month ++ ){
-
-            var link  = document.createElement("li");
-            link.innerHTML =  ( month + 1 )+ this.labelMonth;
-            if( month == this.selectMonth ){
-                link.classList.add('active-footer');
-            }
-            link.onclick = function() {
-
-                instance.setSelectMonth(month);
-                instance.draw();
-            }
-            
-            footer.appendChild(link);
-        }
-
-        var YEAR_NEXT = this.selectYear + 1;
-        var TAG_YEAR_NEXT           = document.createElement("li");
-            TAG_YEAR_NEXT.innerHTML = YEAR_NEXT + " " + this.labelYear;
-            TAG_YEAR_NEXT.onclick = function() {
-
-                instance.setSelectYear(YEAR_NEXT);
-                instance.draw();
-            }
-
-        footer.appendChild(TAG_YEAR_NEXT);
-
-        var TAG_NEXT           = document.createElement("li");
-            TAG_NEXT.innerHTML = NEXT;
+        ////setting button next
+        var TAG_NEXT           = document.createElement("span");
+            TAG_NEXT.className = this.classNext
+            TAG_NEXT.innerHTML = this.TEXT_NEXT
             TAG_NEXT.onclick = function() {
 
-              instance.setSelectMonth(instance.selectMonth + 1 );
-              instance.draw();
+                instance.setSelectMonth(instance.selectMonth + 1 )
+                instance.draw()
             }
+        header.appendChild(TAG_NEXT)
 
-        footer.appendChild(TAG_NEXT);
+        return header
+    }
+    this.pickData = function(instance){
 
-        return footer;
+        $("." + instance.classPicked).removeClass(instance.classPicked);
+        
+        let beginDate = parseInt(instance.dragBegin);
+        let endDate   = parseInt(instance.dragEnd);
+
+        if(parseInt(beginDate) > parseInt(endDate) ){
+            let temp      = parseInt(beginDate)
+                beginDate = parseInt(endDate)
+                endDate   = temp
+        }
+        
+        for (let selectLoop = beginDate; selectLoop <= endDate; selectLoop++) {
+
+            var domPicked = $("." + instance.classCell + '['+instance.attributeDate+'='+selectLoop+']:not(.'+instance.classCellDisable+')');
+            domPicked.addClass(instance.classPicked)
+        }
+    }
+    this.createEventDrag = function(instance, cell ){
+
+        if( window.innerWidth < 768 ){
+
+            cell.ontouchstart = function (event) {
+                
+                if (event.which === 3) {
+                    //prevent RIGHT mouse click
+                    return;
+                }
+                instance.isDrag = true
+                
+                var cell = $(event.target);
+                if(!cell.hasClass(instance.classCell)){
+                    cell = cell.closest("." + instance.classCell);
+                }
+    
+                if(cell && cell.attr(instance.attributeDate)){
+                    
+                    instance.dragBegin = cell.attr(instance.attributeDate)
+                    instance.dragEnd   = cell.attr(instance.attributeDate)
+                    console.log("ontouchstart cell ", instance.dragBegin)
+                    instance.pickData(instance)
+                }
+            }
+    
+            cell.ontouchmove = function (event) {
+                
+                if(instance.isDrag){
+                    var cell = $(event.target);
+                    if(!cell.hasClass(instance.classCell)){
+                        cell = cell.closest("." + instance.classCell);
+                    }
+                    
+                    if(cell && cell.attr(instance.attributeDate)){
+                        
+                        instance.dragEnd = cell.attr(instance.attributeDate)
+                        console.log(event, "ontouchmove cell " + instance.dragEnd)
+                        instance.pickData(instance)
+                    }
+                }
+            }
+            cell.ontouchend = function (event) {
+                
+                if (event.which === 3) {
+                    //prevent RIGHT mouse click
+                    return;
+                }
+    
+                instance.isDrag = false
+                
+                var cell = $(event.target);
+                if(!cell.hasClass(instance.classCell)){
+                    cell = cell.closest("." + instance.classCell);
+                }
+                
+                if(cell && cell.attr(instance.attributeDate)){
+                        
+                    instance.dragEnd = cell.attr(instance.attributeDate)
+                    console.log(event ,"ontouchend cell " + instance.dragEnd)
+                    instance.pickData(instance)
+                }
+            }
+        }else{
+
+            cell.onmousedown = function (event) {
+                if (event.which === 3) {
+                    //prevent RIGHT mouse click
+                    return;
+                }
+                instance.isDrag = true
+                
+                var cell = $(event.target);
+                if(!cell.hasClass(instance.classCell)){
+                    cell = cell.closest("." + instance.classCell);
+                }
+    
+                if(cell && cell.attr(instance.attributeDate)){
+                    
+                    instance.dragBegin = cell.attr(instance.attributeDate)
+                    instance.dragEnd   = cell.attr(instance.attributeDate)
+                    instance.pickData(instance)
+                }
+            }
+    
+            cell.onmouseover = function (event) {
+                
+                if(instance.isDrag){
+                    var cell = $(event.target);
+                    if(!cell.hasClass(instance.classCell)){
+                        cell = cell.closest("." + instance.classCell);
+                    }
+                    
+                    if(cell && cell.attr(instance.attributeDate)){
+                        
+                        instance.dragEnd = cell.attr(instance.attributeDate)
+                        instance.pickData(instance)
+                    }
+                }
+            }
+            cell.onmouseup = function (event) {
+                if (event.which === 3) {
+                    //prevent RIGHT mouse click
+                    return;
+                }
+    
+                instance.isDrag = false
+                
+                var cell = $(event.target);
+                if(!cell.hasClass(instance.classCell)){
+                    cell = cell.closest("." + instance.classCell);
+                }
+                
+                if(cell && cell.attr(instance.attributeDate)){
+                        
+                    instance.dragEnd = cell.attr(instance.attributeDate)
+                    instance.pickData(instance)
+                }
+            }
+        }
+        
+        
+        
+        return cell
+    }
+    this.checkDateHaveEvent = function( year, month, day ){
+
+        return typeof this.data[year] != 'undefined' &&
+        typeof this.data[year][month] != 'undefined' &&
+        typeof this.data[year][month][day] != 'undefined'
+    }
+    this.overrideEvent = function( dates, event ){
+        event.class = 'event-new'
+        
+        for (var iOverride = 0; iOverride < dates.length; iOverride++){
+            var day                = dates[iOverride],
+                numberCurrentDate  = this.formatZeroBefore(day),
+                numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
+                numberCurrentYear  = this.formatZeroBefore(this.selectYear)
+            if(this.data){
+                if ( Object.entries(this.data).length === 0 ) {
+                    this.data = {}
+                }
+                if (this.data[numberCurrentYear] == undefined) {
+                    this.data[numberCurrentYear] = {}
+                }
+                if( this.data[numberCurrentYear][numberCurrentMonth] == undefined) {
+                    this.data[numberCurrentYear][numberCurrentMonth] = {}
+                }
+                this.data[numberCurrentYear][numberCurrentMonth][numberCurrentDate] = event
+                
+            }
+        }
+        this.draw()
+    }
+    this.updateEvent = function( day, event ){
+
+        event.class = 'event-update'
+        var numberCurrentDate  = this.formatZeroBefore(day),
+            numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
+            numberCurrentYear  = this.formatZeroBefore(this.selectYear)
+        if(this.data){
+            
+            var dateInEvent = this.checkDateHaveEvent( numberCurrentYear, numberCurrentMonth, numberCurrentDate )
+            if( dateInEvent ){
+                
+                this.data[numberCurrentYear][numberCurrentMonth][numberCurrentDate] = event
+            }
+        }
+        this.draw()
     }
 
+    this.deleteEvent = function( day ){
+        var numberCurrentDate  = this.formatZeroBefore(day),
+            numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
+            numberCurrentYear  = this.formatZeroBefore(this.selectYear)
+        if(this.data){
+            
+            var dateInEvent = this.checkDateHaveEvent( numberCurrentYear, numberCurrentMonth, numberCurrentDate )
+            if( dateInEvent ){
+                
+                delete this.data[numberCurrentYear][numberCurrentMonth][numberCurrentDate]
+                if( !Object.keys(this.data[numberCurrentYear][numberCurrentMonth]).length ){
+
+                    delete this.data[numberCurrentYear][numberCurrentMonth]
+                }
+                if( !Object.keys(this.data[numberCurrentYear]).length ){
+
+                    delete this.data[numberCurrentYear]
+                }
+            }
+        }
+        this.draw()
+    }
+
+    this.drawEventToDate = function(cell, date){
+        var numberCurrentDate  = this.formatZeroBefore(date.getDate()),
+            numberCurrentMonth = this.formatZeroBefore(date.getMonth() + 1),
+            numberCurrentYear  = this.formatZeroBefore(date.getFullYear())
+        /// khi thanh niên không có thư viện lodash
+        if(this.data){
+            
+            var contentEvent = '',
+                classEvent   = ''
+            var dateInEvent = this.checkDateHaveEvent( numberCurrentYear, numberCurrentMonth, numberCurrentDate )
+            if( dateInEvent ){
+                
+                var event = this.data[numberCurrentYear][numberCurrentMonth][numberCurrentDate]
+                contentEvent =  '<i>' + event.start + '</i>' 
+                                + '<i> | </i>'
+                                + '<i>' + event.finish + '</i>'
+                cell.classList.add(this.classCellHasEvent)
+                classEvent = event.class
+            }
+            var textEvent           = document.createElement("span")
+                textEvent.innerHTML = contentEvent
+            textEvent.classList.add(this.classCellEvent)
+            if(classEvent) textEvent.classList.add(classEvent)
+            cell.appendChild(textEvent)
+        }
+        return cell
+    }
     this.createCell = function(i, j){
 
-        var cell           = document.createElement("div");
-            cell.className = this.classCell ;
-            cell.setAttribute('data-date', this.dateLoop);
+        var cell           = document.createElement("div")
+            cell.className = this.classCell
 
         if (i === 0 && j < this.firstDay && this.dateLoopTemp == 0) {
-            cell.classList.add(this.classCellDisable);
-            var firstDateOfMonth = new Date(this.selectYear, this.selectMonth, 1);
-            firstDateOfMonth.setDate(firstDateOfMonth.getDate() - this.firstDay + j );
+            /// cell disable before
+
+            cell.classList.add(this.classCellDisable)
+            var dateDisable = new Date(this.selectYear, this.selectMonth, 1)
+            dateDisable.setDate(dateDisable.getDate() - this.firstDay + j )
             
-            var textCell           = document.createElement("span");
-                textCell.className = this.classCellDate;
+            var textCell           = document.createElement("span")
+                textCell.className = this.classCellDate
 
-                textCell.innerHTML = (firstDateOfMonth.getMonth() + 1) + "/" + firstDateOfMonth.getDate();
-            cell.appendChild(textCell);
-
+                textCell.innerHTML = dateDisable.getDate()
+            cell.appendChild(textCell)
+            cell.setAttribute(this.attributeDate, dateDisable.getDate())
+            cell = this.drawEventToDate(cell, dateDisable )
         }
-        else if ( this.dateLoopTemp == 1 || this.dateLoop > this.daysInMonth(this.selectMonth, this.selectYear)) {
+        else if ( this.dateLoopTemp == 1 || this.dateLoop > this.numDayInMonth(this.selectMonth, this.selectYear)) {
 
+            /// cell disable after
             if(this.dateLoopTemp == 0){
-                this.dateLoopTemp = 1;
+                this.dateLoopTemp = 1
                 this.dateLoop = 1
             }
-            cell.classList.add(this.classCellDisable);
+            cell.classList.add(this.classCellDisable)
 
-            var textCell           = document.createElement("span");
-            textCell.className = this.classCellDate;
-                textCell.innerHTML = (this.selectMonth + 2) + "/" + this.dateLoop;
-            cell.appendChild(textCell);
+            var textCell           = document.createElement("span")
+                textCell.className = this.classCellDate
+                textCell.innerHTML = this.dateLoop
+            cell.appendChild(textCell)
+            cell.setAttribute(this.attributeDate, this.dateLoop)
+            cell = this.drawEventToDate(cell, new Date(this.selectYear, this.selectMonth + 1 , this.dateLoop))
             
-            this.dateLoop++;
+            this.dateLoop++
 
         } else {
 
             if(this.canPickDrag){
                 cell = this.createEventDrag(this, cell);
             }
-            
 
-            var textCell           = document.createElement("span");
-            textCell.className = this.classCellDate;
-                textCell.innerHTML = (this.selectMonth + 1) + "/" + this.dateLoop;
-            cell.appendChild(textCell);
+            var textCell           = document.createElement("span")
+                textCell.className = this.classCellDate
+                textCell.innerHTML = this.dateLoop
+            cell.appendChild(textCell)
+            cell.setAttribute(this.attributeDate, this.dateLoop)
+            cell = this.drawEventToDate(cell, new Date(this.selectYear, this.selectMonth, this.dateLoop))
+            // cell = this.setEventCellOnClick(cell, this.dateLoop)
 
-
-            cell = this.drawEventToDate(cell);
-            cell = this.drawPlusButton(cell, this.dateLoop);
-            
+            if(this.isCalendarSelector && this.leftThanToday() ){
+                cell.classList.add(this.classCellDisable)
+            }
             // color today's date
             if(this.checkToday()){
-                cell.classList.add(this.classInToday);
+                cell.classList.add(this.classInToday)
             }
             // color sunday
             if(this.checkSunDay()){
-                cell.classList.add(this.classInSunday);
+                cell.classList.add(this.classInSunday)
             }
             // color satDay
             if(this.checkSatDay()){
-                cell.classList.add(this.classInSatday);
+                cell.classList.add(this.classInSatday)
             }
 
-            this.dateLoop++;
+            this.dateLoop++
         }
-        return cell;
-    }
-    this.createEventDrag = function(instance, cell ){
         
-        cell.onmousedown = function (event) {
-            if (event.which === 3) {
-                //prevent RIGHT mouse click
-                return;
-            }
+        return cell
+    }
+    this.createCells = function(){
 
-            instance.isDrag = true;
+        var wrapperBody           = document.createElement("div")
 
-            let attributeDataDate = 'data-date';
-            
-            var cell = $(event.target);
-            if(!cell.hasClass(instance.classCell)){
-                cell = cell.closest("." + instance.classCell);
-            }
+        var titleDays           = document.createElement("div")
+            titleDays.className = this.classTitleDay
+        
+        for(var head = 0; head < this.labelDays.length; head++){
 
-            if(cell && cell.attr(attributeDataDate)){
+            var thead           = document.createElement("div")
+                thead.className = this.classCell
+
+            var textCell           = document.createElement("span")
+                textCell.className = this.classCellDate
+                textCell.innerHTML =  this.labelDays[head]
+
+            thead.appendChild(textCell)
+            /// add cell of thead into titleDays
+            titleDays.appendChild(thead)
+        }
+        wrapperBody.appendChild(titleDays)
+
+
+        var row_table           = document.createElement("div")
+            row_table.className = this.classWrapperRowCell
+        // creating all cells
+        for (let i = 0; i < 6; i++) {
+            // creates a table row
+            var row           = document.createElement("div")
+                row.className = this.classRow
+
+            //creating individual cells, filing them up with data.
+            for (let j = 0; j < 7; j++) {
+                var dataCell = this.createCell(i , j)
                 
-                instance.dragBegin = cell.attr(attributeDataDate);
-                instance.dragEnd = cell.attr(attributeDataDate);
-                instance.pickData(instance)
+                row.appendChild(dataCell)
             }
-        };
 
-        cell.onmouseover = function (event) {
-            
-            let attributeDataDate = 'data-date';
+            // appending each row into calendar body.
+            row_table.appendChild(row)
+        }
+        wrapperBody.appendChild(row_table)
 
-            if(instance.isDrag){
-                var cell = $(event.target);
-                if(!cell.hasClass(instance.classCell)){
-                    cell = cell.closest("." + instance.classCell);
+        //// reset dateLoop to 1
+        this.dateLoop = 1
+        //// reset dateLoopTemp to 1
+        this.dateLoopTemp = 0
+        return wrapperBody
+    }
+
+    this.createFooter = function(){
+
+        var footer       = document.createElement("div")
+        footer.className = this.classFooter
+
+        var spanFirst = document.createElement("SPAN")
+        spanFirst.innerHTML = '予約可能'
+
+        var spanLast = document.createElement("SPAN")
+        spanLast.innerHTML = '一部の日程・時間で可能'
+
+        footer.appendChild( spanFirst )
+        footer.appendChild( spanLast )
+
+        return footer
+    }
+
+
+    this.newModalPopup = function( dates ){
+
+        if( this.isCalendarSelector ){
+
+            if( document.getElementById(this.idModalCalendar) ){
+                document.getElementById(this.idModalCalendar).classList.add('new')
+
+                this.selector.classList.add('modal-open')
+    
+                document.getElementById(this.idModalButtonNew).classList.remove('d-none')
+                document.getElementById(this.idModalButtonEdit).classList.add('d-none')
+                document.getElementById(this.idModalButtonDelete).classList.add('d-none')
+    
+                var headerText = document.getElementById(this.idModalTextTime)
+                if( headerText ){
+                    if( dates[0] == dates[dates.length - 1]){
+                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日(火)"
+                    }else{
+                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日(火) - "
+                        + (this.selectMonth + 1) + "月" + dates[dates.length - 1] + "日(火)"
+                    }                 
                 }
-                
-                if(cell && cell.attr(attributeDataDate)){
+            }
+        }
+        
+    }
+    this.updateModalPopup = function( dates ){
+
+        if( this.isCalendarSelector ){
+            if( dates.length == 1 ){
+            
+                var day = dates[0]
+                var numberCurrentDate  = this.formatZeroBefore(day),
+                    numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
+                    numberCurrentYear  = this.formatZeroBefore(this.selectYear),
+                    event              = this.data[numberCurrentYear][numberCurrentMonth][numberCurrentDate]
+                    starts             = event.start.split(':'),
+                    hourStart          = starts[0],
+                    minStart           = starts[1],
+                    ends               = event.finish.split(':'),
+                    hourEnd            = ends[0],
+                    minEnd             = ends[1]
+    
+                var checkboxFirst = document.getElementById(this.idModalCheckFirst),
+                    checkboxLast  = document.getElementById(this.idModalCheckLast)
                     
-                    instance.dragEnd = cell.attr(attributeDataDate);
-                    instance.pickData(instance)
+                    checkboxFirst.checked = ( event.type && event.type.indexOf(",1,") != -1 )
+                    checkboxLast.checked  = ( event.type && event.type.indexOf(",2,") != -1 )
+        
+                document.getElementById(this.idModalHourBegin).value   = hourStart
+                document.getElementById(this.idModalMinuteBegin).value = minStart
+                document.getElementById(this.idModalHourEnd).value     = hourEnd
+                document.getElementById(this.idModalMinuteEnd).value   = minEnd
+    
+                var headerText = document.getElementById(this.idModalTextTime)
+                if( headerText ){
+    
+                    headerText.innerHTML = numberCurrentDate + "月" + numberCurrentMonth + "日(火)"
                 }
-                
-                
             }
-        };
-        cell.onmouseup = function (event) {
-            if (event.which === 3) {
-                //prevent RIGHT mouse click
-                return;
-            }
+    
+            if( document.getElementById(this.idModalCalendar) ){
 
-            let attributeDataDate = 'data-date';
-
-            instance.isDrag = false;
-            
-            var cell = $(event.target);
-            if(!cell.hasClass(instance.classCell)){
-                cell = cell.closest("." + instance.classCell);
-            }
-
-            
-
-            if(cell && cell.attr(attributeDataDate)){
-                    
-                instance.dragEnd = cell.attr(attributeDataDate);
-                instance.pickData(instance)
-            }
-        };
-        
-        return cell;
-    }
-    this.pickData = function(instance){
-
-        let attributeDataDate = 'data-date';
-        let classPicked       = 'picked';
-
-        $("." + classPicked).removeClass(classPicked);
-        
-        let beginDate = parseInt(instance.dragBegin);
-        let endDate   = parseInt(instance.dragEnd);
-
-        if(parseInt(beginDate) > parseInt(endDate) ){
-            let temp      = parseInt(beginDate);
-                beginDate = parseInt(endDate);
-                endDate   = temp;
-        }
-        
-        for (let selectLoop = beginDate; selectLoop <= endDate; selectLoop++) {
-
-            var domPicked = $("." + instance.classCell + '['+attributeDataDate+'='+selectLoop+']:not(.'+instance.classCellDisable+')');
-            domPicked.addClass(classPicked);
-                
-        }
-    }
-
-    this.setInstanceToGlobal = function(VariableGlobal){
-         
-        VariableGlobal = this;
-    }
-
-    this.drawPlusButton = function(cell, date){
-        var instance = this;
-
-        var textPlus           = document.createElement("span");
-        textPlus.classList.add(this.classImagePlus);
-        textPlus.onclick = function(){
-            /// show popup
-            if(!instance.modalEvent){
-                alert('modal not setting');
-                return false;
-            }
-            
-            
-            instance.openModalCreateEvent(instance, date)
-        }
-
-
-        var imgPlus     = document.createElement("img");
-            imgPlus.src = this.srcPlus;
-
-        textPlus.appendChild(imgPlus);
-
-        cell.appendChild(textPlus);
-
-        return cell;
-    }
-    this.setInitDataDate = function(date){
-        if(typeof this.data[this.selectYear]  == 'undefined'){
-
-            this.data[this.selectYear] = {};
-
-            this.data[this.selectYear]
-            [this.formatZeroBefore(this.selectMonth + 1)] = {};
-
-            this.data[this.selectYear]
-            [this.formatZeroBefore(this.selectMonth + 1)]
-            [this.formatZeroBefore(date)] = [];
-        }
-        
-        if( typeof this.data[this.selectYear]
-        [this.formatZeroBefore(this.selectMonth + 1)] == 'undefined' ){
-
-            this.data[this.selectYear]
-            [this.formatZeroBefore(this.selectMonth + 1)] = {};
-            
-            this.data[this.selectYear]
-            [this.formatZeroBefore(this.selectMonth + 1)]
-            [this.formatZeroBefore(date)] = [];
-
-        }
-        if( typeof this.data[this.selectYear]
-        [this.formatZeroBefore(this.selectMonth + 1)]
-        [this.formatZeroBefore(date)] == 'undefined' ){
-
-            this.data[this.selectYear]
-            [this.formatZeroBefore(this.selectMonth + 1)]
-            [this.formatZeroBefore(date)] = [];
-        }
-    }
-    this.handleBtnAccept = function(instance, dates){
-        
-        var start = this.formatZeroBefore(document.getElementById('js-time-event-begin-h').value) 
-                    + ':' 
-                    + this.formatZeroBefore(document.getElementById('js-time-event-begin-m').value);
-        var end = this.formatZeroBefore(document.getElementById('js-time-event-end-h').value) 
-                    + ':' 
-                    + this.formatZeroBefore(document.getElementById('js-time-event-end-m').value)
-
-        var evt = { 
-            'start': start ,
-            'end'  : end,
-            'type' : document.getElementById('js-type').value,
-            'memo' : document.getElementById('js-memo').value
-        };
-
-        if(dates.length == 0 ){
-            alert('no have date select')
-            return false
-        }else{
-            
-            for (let index = 0; index < dates.length; index++) {
-                const date = dates[index];
-                instance.setInitDataDate(date);
-                
-                instance.data[instance.selectYear]
-                [instance.formatZeroBefore(instance.selectMonth + 1)]
-                [instance.formatZeroBefore(date)].push(evt)
+                this.selector.classList.add('modal-open')
+                document.getElementById(this.idModalCalendar).classList.add('update')
+    
+                document.getElementById(this.idModalButtonNew).classList.add('d-none')
+                document.getElementById(this.idModalButtonEdit).classList.remove('d-none')
+                document.getElementById(this.idModalButtonDelete).classList.remove('d-none')
             }
         }
         
-        $.modal.close();
-        
-        document.getElementById('js-time-event-date').classList.remove("d-none");
-
-        /// format multi date hidden
-        document.getElementById('js-time-event-date-from').classList.add("d-none");
-        document.getElementById('js-time-event-date-to').classList.add("d-none");
-
-        instance.draw();
     }
+    this.modelClose = function(){
+        var modal = document.getElementById( this.idModalCalendar ) 
+        if( modal ){
+            modal.classList.add("d-none")
+        }
+        if( this.isCalendarSelector ){
+            
+            if( document.getElementById(this.idModalCalendar) ){
+                this.selector.classList.remove('modal-open')
 
-    this.drawEventToDate = function(cell){
-        if(this.data){
-            if(typeof this.data[this.selectYear] != 'undefined'){
+                document.getElementById(this.idModalCalendar).classList.remove('new')
+                document.getElementById(this.idModalCalendar).classList.remove('update')
+    
+                document.getElementById(this.idModalButtonNew).classList.add('d-none')
+                document.getElementById(this.idModalButtonEdit).classList.add('d-none')
+                document.getElementById(this.idModalButtonDelete).classList.add('d-none')
+            }
+    
+            if( this.inputEventData ){
+                this.inputEventData.value = JSON.stringify(this.data)
+            }
+        }
+        
+    }
+    this.openModalCreateEvent = function(instance){
+        
 
-                if(typeof this.data[this.selectYear][this.formatZeroBefore(this.selectMonth + 1)] != 'undefined'){
+        var dates = null
+        if( this.setBeforeOpenModel ){
+            dates = this.eventBeforeOpenModel( instance )
+        }
 
-                    if(typeof this.data[this.selectYear][this.formatZeroBefore(this.selectMonth + 1)][this.formatZeroBefore(this.dateLoop)] != 'undefined'){
-
-                        var dataEvents = this.data[this.selectYear][this.formatZeroBefore(this.selectMonth + 1)][this.formatZeroBefore(this.dateLoop)];
-                        for(var eventLoop = 0; eventLoop < dataEvents.length; eventLoop++ ){
-
-                            var eventIndex = dataEvents[eventLoop];
-                            var textEvent           = document.createElement("p");
-                            textEvent.classList.add(this.classCellEvent);
-                            textEvent.innerHTML = eventIndex.start + '-' + eventIndex.end + " " + eventIndex.type;
-                            
-                            cell.classList.add(this.classCellHasEvent);
-                            cell.appendChild(textEvent);
-                        } 
+        /// create modal
+        var updateModal = false
+        if( dates && dates.length ){
+            /// chỉ chọn 1 ngày 
+            if( dates.length == 1 ){
+                var date = dates[0]
+                /// check if data in event data => update 
+                if(this.data){
+                    if(this.checkDateHaveEvent(
+                        this.formatZeroBefore( this.selectYear ), 
+                        this.formatZeroBefore( this.selectMonth + 1 ), 
+                        this.formatZeroBefore(date)
+                    )){
+                        updateModal = true
                     }
                 }
             }
         }
-        return cell
-    }
-    this.formatZeroBefore = function(number){
-        if (number < 10) {
-            number = "0" + number;
-        }
-        return number;
-    }
-    this.checkToday = function(){
 
-        if (    this.dateLoop === this.currentDate && 
-                this.selectYear  === this.currentYear &&
-                this.selectMonth === this.currentMonth
-        ) {
-            return true;
+        if( updateModal ){
+            this.updateModalPopup( dates )
+        }else{
+            this.newModalPopup( dates )
         }
-        return false;
-    }
-    this.checkSunDay = function(){
-        var dayNumber = this.dateLoop;
-        var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber );
         
-        if( theDateLoop.getDay() == 0 ){
-            return true;
-        }
-        return false;
-    }
-    this.checkSatDay = function(){
-        var dayNumber = this.dateLoop;
-        var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber );
-        
-        if( theDateLoop.getDay() == 6 ){
-            return true;
-        }
-        return false;
-    }
-    this.createCells = function(){
+        document.getElementById(this.idModalCalendar).classList.remove("d-none")
 
-        var wrapperRow = document.createElement("div");
-        wrapperRow.className = this.classWrapperRow;
 
-        var wrapperRowTableHeade = document.createElement("div");
-        wrapperRowTableHeade.className = "calendar-wrapper-table-cell";
-        
-
-        titleHeading           = document.createElement("div");
-        titleHeading.className = this.classLabelHeader;
-
-        for(var head = 0; head < this.labelDays.length; head++){
-
-            var thead  = document.createElement("div");
-            thead.className = this.classCell;
-
-            var textCell           = document.createElement("span");
-                textCell.className = this.classCellDate;
-                textCell.innerHTML =  this.labelDays[head];
-
-            thead.appendChild(textCell);
-
+        if( this.setAfterOpenModel && dates ){
             
+            this.eventAfterOpenModel( instance , dates )
+        }
+    }
+
+    this.draw = function(){
+        /// create wrapper calendar
+        var calendar           = document.createElement("div")
+            calendar.className = this.classWrapperCalendar
+        /// create header
+        var headerCalendar = this.createHeader()
+        /// add header calendar dom into calendar dom
+        calendar.appendChild(headerCalendar)
+        /// create calendar body
+        var tableBody = this.createCells()
+        calendar.appendChild(tableBody)
+        /// create header
+        var footerCalendar  = this.createFooter()
+        /// create modal 
+        var modal = null
+        if( this.createModal ){
             
-            titleHeading.appendChild(thead);
+            modal = this.createModal(this)
+            calendar.appendChild(modal)
         }
-        wrapperRowTableHeade.appendChild(titleHeading);
-        wrapperRow.appendChild(wrapperRowTableHeade);
-
-
-
-
-        prevHead           = document.createElement("div");
-        prevHead.className = 'calendar-prev-page';
-        prevImg           = document.createElement("img");
-        prevImg.className = 'calendar-prev-img';
-        prevImg.src = BASE_URL + 'image/icon/calendar-prev.png';
-        prevHead.appendChild(prevImg);
-
-        var _month_prevHead = this.selectMonth - 1 ;
-        let instance = this;
-        prevHead.onclick = function() {
-
-            instance.setSelectMonth(_month_prevHead);
-            instance.draw();
-        }
-
         
-
-        wrapperRow.appendChild(prevHead);
-
-        var row_table = document.createElement("div");
-            row_table.className = 'calendar-wrapper-table-cell';
-        // creating all cells
-        for (let i = 0; i < 6; i++) {
-            // creates a table row
-            var row = document.createElement("div");
-            row.className = this.classRow;
-
-            //creating individual cells, filing them up with data.
-            for (let j = 0; j < 7; j++) {
-                var dataCell = this.createCell(i , j);
+        if( this.selector ){
+            this.selector.innerHTML = ''
+            this.selector.appendChild(calendar)
+            this.selector.appendChild(footerCalendar)
+        }
+        if( this.canPickDrag ){
+            var instance = this;
+            if( window.innerWidth < 767 ){
                 
-                row.appendChild(dataCell);
+                window.ontouchend = function (event) {
+                    console.log("21323123 ontouchend")
+                    if (event.which === 3) {
+                        //prevent RIGHT mouse click
+                        return
+                    }
+                    
+                    instance.isDrag = false
+                    /// show popup create event 
+                    let classPicked = instance.classPicked
+                    if(document.getElementsByClassName(classPicked).length){
+    
+                        var modal = document.getElementById(instance.idModalCalendar)
+                        if( modal && modal.classList.contains('d-none') ){
+                            instance.openModalCreateEvent(instance)
+                        }
+                    }
+                }
+            }else{
+                window.onmouseup = function (event) {
+                    if (event.which === 3) {
+                        //prevent RIGHT mouse click
+                        return
+                    }
+                    
+                    instance.isDrag = false
+                    /// show popup create event 
+                    let classPicked = instance.classPicked
+                    if(document.getElementsByClassName(classPicked).length){
+    
+                        var modal = document.getElementById(instance.idModalCalendar)
+                        if( modal && modal.classList.contains('d-none') ){
+                            instance.openModalCreateEvent(instance)
+                        }
+                    }
+                }
             }
-
-            // appending each row into calendar body.
-            row_table.appendChild(row); 
         }
-        wrapperRow.appendChild(row_table); 
-
-        nextFooter           = document.createElement("div");
-        nextFooter.className = 'calendar-next-page';
-        nextImg           = document.createElement("img");
-        nextImg.className = 'calendar-next-img';
-        nextImg.src = BASE_URL + 'image/icon/calendar-next.png';
-        nextFooter.appendChild(nextImg);
-
-        var _month_nextFooter = this.selectMonth + 1;
-        
-        nextFooter.onclick = function() {
-
-            instance.setSelectMonth(_month_nextFooter);
-            instance.draw();
-        }
-
-        wrapperRow.appendChild(nextFooter);
-
-        //// reset dateLoop to 1
-        this.dateLoop = 1;
-        //// reset dateLoopTemp to 1
-        this.dateLoopTemp = 0;
-        return wrapperRow;
-    }
-};
+    }  
+    
+}
 

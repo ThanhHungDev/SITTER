@@ -26,13 +26,15 @@ class CreateUsersTable extends Migration
                 $table->string('first_name_furigana', 255)->nullable();
                 $table->string('last_name_furigana', 255)->nullable();
                 $table->date('birth_date');
-                $table->enum('gender', [ 0, 1, 2 ])->default(0); /// enum not boolean
+                $table->integer('gender')->default(0); /// enum not boolean
                 $table->string('post_code', 20)->nullable();
                 $table->string('pref', 100)->nullable();
                 $table->string('town', 100)->nullable();
                 $table->string('address', 255 )->nullable();
                 $table->string('phone', 20)->nullable();
-                $table->enum('role_id', [ 1, 2, 3 ]);
+                $table->integer('role_id');
+                $table->boolean('online')->default(0);
+                $table->string('socket_id')->nullable();
                 $table->string('token_verify')->nullable();
                 $table->boolean('active')->default(false);
                 $table->boolean('deleted')->default(false);

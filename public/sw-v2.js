@@ -11,7 +11,7 @@ const PRECACHE_URLS = [
     'js/index.bundle.js',
     'index.html',
     'style.css',
-    'jquery.min.js'
+    'library/jquery.min.js'
 ];
 /// resource will change data time
 const RUNTIME_URLS_IGNORE = [

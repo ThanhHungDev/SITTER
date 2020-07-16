@@ -1,0 +1,127 @@
+
+
+@import "../variable";
+@import "../mixin";
+
+.component-user-chat-sidebar{
+  position: relative;
+  background-color: #efffc7;
+    .none-read-message{
+      position: absolute;
+      right: 15px;
+      border-radius: 50%;
+      padding: 3px 6px;
+      bottom: 30%;
+      font-size: 11px;
+      line-height: 1;
+      font-style: normal;
+      background-color: $green;
+      color: $gray-200;
+    }
+
+  .user-chat{
+    min-height: 50px;
+    position: relative;
+    padding: 10px 5px;
+    cursor: pointer;
+
+    &.active-message {
+      background-color: #06784b;
+      .text-info{
+        color: $custom-white;
+      }
+    }
+    &.active{
+
+      .state-avatar{
+        border-color: $green;
+
+        &:after{
+          background-color: $green
+        }
+      }
+    }
+
+    .state-avatar{
+      position: absolute;
+      top: 50%;
+      display: block;
+      padding: 0;
+      width: 50px;
+      height    : 50px;
+      min-width : 50px;
+      min-height: 50px;
+      margin: 0;
+      overflow: hidden;
+      // border-radius: 50%;
+      box-sizing: border-box;
+      border: 1px solid $gray-400;
+      @include render-transform(translateY(-50%));
+
+      &:after{
+        content: '.';
+        color: transparent;
+        position: absolute;
+        top: 0;
+        left: 5px;
+        z-index: 5;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: $gray-500;
+        @include render-transform(translateX(-50%));
+      }
+      
+
+      img{
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        min-height: 50px;
+      }
+    }
+    .text-info{
+      display: block;
+      padding: 0 0 0 55px;
+      color: $custom-stylish-color;
+
+      .name{
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .last-message{
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+
+
+@include Responsive(SM){
+
+
+  .component-user-chat-sidebar{
+    
+
+    .user-chat{
+
+      &.active-message {
+        
+        background-color: $gray-500;
+      }
+      .text-info{
+        width: 10px;
+        overflow: hidden;
+        padding: 0;
+        visibility: hidden;
+      }
+    }
+  }
+}

@@ -25,8 +25,6 @@ class SitterProfilesTable extends Migration
                 $table->string('contact_address', 255)->nullable();
                 $table->string('contact_phone', 20)->nullable();
                 $table->string('contact_relationship', 255)->nullable();
-                $table->string('continent_name', 255)->nullable();
-                $table->string('type_work')->nullable();
                 $table->boolean('publish')->default(false);
                 $table->boolean('deleted')->default(false);
                 $table->text('remark')->nullable();

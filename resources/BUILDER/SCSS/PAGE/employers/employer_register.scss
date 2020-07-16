@@ -1,0 +1,239 @@
+.container-register{
+    margin-top: 50px;
+    padding: 0px;
+    .wrapper-780{
+        max-width: 780px;
+    }
+    .wrapper-register{
+        margin: auto; 
+        .register-title{
+            background-color: #2dc187;
+            color: #fff;
+            font-size: 20px;
+            padding: 5px 20px;
+        }
+        .form-header{
+            font-size: 19px;
+            text-align: center;
+            padding-top: 10px;
+        }
+        .form-body{
+            .form-note{
+                font-size: 15px;
+                font-weight: 600;
+            }
+            .form-row{
+                display: flex;
+                padding: 0 15px;
+                flex-direction: column; 
+                .row{
+                    display: flex;
+                    flex-direction: row;
+                    -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+                    padding-left: 15px;
+                    background: #efffc7;
+                    &:first-child{
+                        background: #d4ffc7;
+                    }
+                    .label-cus{
+                        font-size: 16px;
+                        margin: auto 0;
+                        padding: 0 10px;
+                        display: block;
+                    }
+                    .btn-post-code{
+                        margin: 0 10px;
+                        width: 100px;
+                        background: #c9c9c9; 
+                        border: #c9c9c9;
+                        &:hover{
+                            background: #898989; 
+                        } 
+                        &:focus{
+                            outline: none;
+                        }
+                    }
+                    .flex-row{
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
+                    .flex-column{
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                }
+                &.flex-col{
+                    display: flex;
+                    flex-direction: column; 
+                }
+            }
+        }
+        .action-register{
+            padding-top: 50px;
+            text-align: center;
+            .btn-register{
+                padding: 6px 5px;
+                width: 180px;
+                background: #fcd036;
+                border: #fcd036;
+                &:hover{
+                    background: #f9c308;
+                }
+                &:focus{
+                    outline: none;
+                }
+            }
+        }
+        .form-policy{
+            margin-top: 50px;
+            font-size: 15px;
+            
+        }
+        .form-label{
+            display: block;
+            box-sizing: border-box;
+            padding: 7px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .note-warring{
+            color: #ff0000;
+        }
+        .form-label{
+            color: #06784b;
+        } 
+        .group-control{
+            display: flex;
+            flex-direction: row;
+            padding: 20px 0;
+            .check-policy{
+                vertical-align: middle;
+            }
+            .check-policy{
+                height: 18px;
+                width: 18px;
+            }
+            .text-info { 
+                text-decoration: none;
+                color: #06784b;
+                vertical-align: middle; 
+            }
+            .form-control{
+                width: 100%;
+                font-size: 16px;
+                padding: 9px;
+                border: 1px solid #aaaaaa;
+            }
+            .custom-radio{
+                height: 20px;
+                width: 20px;
+                margin: 0;
+            }
+            &.select-pref{
+                position: relative;
+                &::after{
+                    content: '\276f';
+                    position: absolute;
+                    top: 25px;
+                    right: 10px;
+                    @include render-transform(rotate(90deg));
+                    font-weight: 800;
+                    color: #3ebe6c;
+                    pointer-events: none;
+                }
+            }
+            input{
+                &:focus{
+                    outline: none;
+                }
+            }
+            select{
+                box-sizing: border-box;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                -ms-appearance: none;
+                appearance: none;
+                max-height: 80px;
+            }
+        }
+        .form-validate{
+            display: flex;
+            flex-direction: column;
+            .form-error{
+                margin-right: auto;
+                font-size: 13px;
+                color: red;
+            }
+        }
+        .group-row{
+            margin-right: auto;
+        }
+        .btn{
+            display: inline-block;
+            padding: 9px 5px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .form-action{
+            margin: auto 0;
+        }
+        .p-left-30{
+            padding-left: 30px;
+        }
+        .p-top-20{
+            padding-top: 20px;
+        }
+        .w-p100{
+            width: 100%;
+        }
+        .w-510{
+            width: 510px;
+        }
+        .w-240{
+            width: 240px;
+        }
+        .w-120{
+            width: 120px;
+        }
+        .w-60{
+            width: 60px;
+        }
+        .w-40{ 
+            width: 40px;
+        }
+    }
+}
+
+@include DivResponsive(515px){
+    .container-register {
+        .wrapper-register {
+            .row{
+                padding: 0 15px;
+                .group-control{
+                    width: 100%;
+                    .w-240{
+                        width: 100%;
+                    }
+                    .w-120{
+                        width: 50%;
+                    }
+                }
+                .select-pref{
+                    width: 50%;
+                    .w-120{
+                        width: 100%;
+                    }
+                }
+            }
+            .p-left-30{
+                padding: 0 0 20px 0;
+            }
+            .w-510{
+                width: 100%;
+            }
+        }
+    }
+}

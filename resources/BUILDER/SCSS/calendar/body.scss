@@ -1,0 +1,100 @@
+
+
+.calendar-wrapper-calendar{
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ and Edge */
+    user-select: none; /* Standard syntax */
+    
+    .calendar-title-day{
+        box-sizing: content-box;
+        border-left: 1px solid $white;
+        border-right: 1px solid $white;
+        margin: 0 -1px;
+        background-color: #ededed;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+
+        .calendar-cell{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -webkit-box-flex: 1;
+            flex: 1;
+            -ms-flex: 1;
+            position: relative;
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            -webkit-transition: box-shadow 200ms ease-in-out;
+            -webkit-transition: -webkit-box-shadow 200ms ease-in-out;
+            transition: -webkit-box-shadow 200ms ease-in-out;
+            transition: box-shadow 200ms ease-in-out;
+            transition: box-shadow 200ms ease-in-out, -webkit-box-shadow 200ms ease-in-out;
+            text-align: center;
+            color: #333333;
+            font-family: $font-family-bold;
+            font-size: 14px;
+
+            /** setting sun day == child 1 **/
+            &:first-child{
+                color: #ff0000;
+            }
+
+            &:last-child{
+                color: #05b4d4;
+            }
+        }
+    }
+
+    .calendar-wrapper-row-cell{
+
+        .calendar-row{
+            
+            background-color: #ededed;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            text-align: center;
+
+            .calendar-cell{
+                padding: 2px;
+                cursor: pointer;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                -webkit-box-flex: 1;
+                flex: 1;
+                background-color: #fff;
+                -ms-flex: 1;
+                position: relative;
+                -webkit-box-orient: horizontal;
+                -webkit-box-direction: normal;
+                -ms-flex-direction: row;
+                flex-direction: row;
+                -webkit-transition: box-shadow 200ms ease-in-out;
+                -webkit-transition: -webkit-box-shadow 200ms ease-in-out;
+                transition: -webkit-box-shadow 200ms ease-in-out;
+                transition: box-shadow 200ms ease-in-out;
+                transition: box-shadow 200ms ease-in-out, -webkit-box-shadow 200ms ease-in-out;
+
+                &.calendar-cell-disable{
+                    color: #c2c2c2;
+                }
+                &.calendar-picked{
+                    
+                    .calendar-event{
+                        background-color: $gray-500;
+                    }
+                }
+                &.calendar-today{
+
+                    .calendar-event{
+                        border: 1px solid $custom-primary-color-dark;
+                    }
+                }
+            }
+        }
+    }
+}

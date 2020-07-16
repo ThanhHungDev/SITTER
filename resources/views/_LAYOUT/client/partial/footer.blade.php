@@ -2,29 +2,17 @@
     <div class="container_body">
         <div class="footer-logo">
             <a  href="/">
-                <img alt="logo" class="link-img" src="{{ asset('image/logo.png') }}">
+                <img alt="logo" class="link-img" src="{{ asset('') }}image/logo.png">
             </a>
             <p class="site-name">サイト名が入ります</p>
         </div>
         <div class="footer-link">
             <ul>
                 <li>
-                    <a href="/">ホーム</a>
+                    <a href="https://www.trust-growth.co.jp/company/" target="_blank">運営会社</a>
                 </li>
                 <li>
-                    <a href="/">シッターログイン</a>
-                </li>
-                <li>
-                    <a href="/">ご利用の流れ</a>
-                </li>
-                <li>
-                    <a href="/">よくあるご質問</a>
-                </li>
-                <li>
-                    <a href="/">ログイン</a>
-                </li>
-                <li>
-                    <a href="/">新規登録</a>
+                    <a href="/">利用規約</a>
                 </li>
                 <li>
                     <a href="/">プライバシーポリシー</a>

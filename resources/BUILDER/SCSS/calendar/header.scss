@@ -1,0 +1,19 @@
+.calendar-wrapper-calendar{
+    .calendar-header{
+        padding: 10px 20px;
+        text-align: center;
+        line-height: 1.1;
+        font-size: 18px;
+        @include clearfix();
+
+        .calendar-prev{
+            float: left;
+            cursor: pointer;
+        }
+
+        .calendar-next{
+            float: right;
+            cursor: pointer;
+        }
+    }
+}

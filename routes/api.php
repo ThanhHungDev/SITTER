@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+Route::post('/upload','API\BaseController@uploadFile')->name('UPLOAD_FILE');
+Route::post('/remove-file','API\BaseController@removeFile')->name('REMOVE_FILE');

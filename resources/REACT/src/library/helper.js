@@ -413,11 +413,7 @@ export function saveBlobToServer(blob) {
         })
 }
 
-export function sendTypingMessageToChannel(channelId, access, detect, instanceComponent) {
-    var EVENT = CONFIG_EVENT
-    socket.emit(EVENT.SEND_TYPING, { channelId, access, ...detect })
-    return false
-}
+
 
 export function logout(userId, access, detect, instanceComponent) {
 

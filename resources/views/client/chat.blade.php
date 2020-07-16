@@ -5,12 +5,17 @@
     <noscript>
         You need to enable JavaScript to run this app.
     </noscript>
-    <div id="CHAT_ELEMENT" class="position-relative">loading chat...</div>
+    <div style="max-width: 1100px; margin: 50px auto;">
+
+<div class=""></div>
+        <div id="TOKEN_REFESH" data-refesh="{{ $refresh ?? null }}" data-user="{{ Auth::user()->id }}"></div>
+        <div id="CHAT_ELEMENT" class="position-relative">loading...</div>
+    </div>
 </div>
 
 @endsection
 
 @section('scripts')
-    <script type="text/javascript" src="{{ asset('/js/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
+    <script src="{{ asset('chat/js/vendors~main.index.bundle.js') }}"></script>
+    <script src="{{ asset('chat/js/index.bundle.js') }}"></script>
 @endsection

@@ -1,8 +1,10 @@
+const CONFIG = require('../config.js');
 
 
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema,
-    Postgre  = require("./Postgre.js")
+    Postgre  = require("./Postgre.js"),
+    Op       = Postgre.Sequelize.Op;
 
 const ChannelSchema = new Schema(
     {
@@ -14,111 +16,273 @@ const ChannelSchema = new Schema(
             {
                 type: String
             }
-        ]
+        ],
+        backup: {
+            type   : Boolean,
+            default: false
+        },
     }, {
     timestamps: true
 })
 
-ChannelSchema.statics.channelsMessage = function ( _userId ) {
+ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgnore ){
+    
+    _userId = _userId.toString()
+    var condition = { user: _userId } 
+    if( typeof _backup != "undefined" ){
+
+        condition.backup = _backup
+    }
+
+    if( typeof _idIgnore == "undefined" ){
+        _idIgnore = []
+    }
+    _idIgnore = _idIgnore.map( id => id.toString() )
+    _idIgnore.push( _userId )
+
     return this
     .aggregate([
-        { 
-            $match: { user: _userId }
-        },
+        { $match: condition },
         { $sort : { updatedAt : 1 } },
         { $limit : 100 },
+        { $unwind: "$user" },
+        { $match: { user: { $nin : _idIgnore }} },
         {
             $lookup: {
-                from: "messages",
-                localField: "_id",
-                foreignField: "channel",
-                as: "message"
+                from: 'messages',
+                let: { channelId: '$_id' },
+                as: "message",
+                pipeline: [
+                    { "$match": { "$expr": { "$eq": ["$$channelId", "$channel"] }}},
+                    { 
+                        $project: { 
+                            type: {
+                                $cond: {
+                                    if: { $eq: [ _userId, "$user" ] },
+                                    then: true,
+                                    else: false
+                                }
+                            }, 
+                            content   : "$body",
+                            read      : true,
+                            readAdmin : true,
+                            style     : true,
+                            attachment: true,
+                            channel   : true,
+                            createdAt : true
+                        }
+                    },
+                    { $limit : 1000 },
+                ]
             }
         },
-        { 
-            $unwind: "$user"
+        { $sort: { "_id": -1 } },
+        {   
+            $project: {
+                id : "$_id",
+                channelName: "$name",
+                user: true,
+                message: true
+            }
         },
-        { 
-            $match: { user: { $ne : _userId }}
+        
+    ])
+}
+ChannelSchema.statics.idFriendsbyUserId = function( _userId ){
+    return this
+    .aggregate([
+        { $match: { user: _userId } },
+        { $sort : { updatedAt : 1 } },
+        { $limit : 100 },
+        { $unwind: "$user" },
+        { $match: { user: { $ne : _userId }} },
+        { $project: { user: true } }
+    ])
+    .then( friends => {
+        var idFriends = []
+        friends.map( friend => {
+            idFriends.push(parseInt(friend.user))
+        })
+        return idFriends
+    })
+}
+ChannelSchema.statics.informationsFriendbyUserId = function( _userId ){
+    return this
+    .idFriendsbyUserId(_userId)
+    .then( idFriends => {
+        
+        return Postgre.USER.findAll({ where: { id: { [Op.in]: idFriends } } })
+    })
+    .then( users => {
+        
+        var inforUsers = []
+        users.map( user => {
+            inforUsers[user.id] = user.toJSONFor()
+        })
+        return inforUsers
+    })
+}
+ChannelSchema.statics.informationsFriendbyidFriends = function( idFriends ){
+
+    return Postgre.USER.findAll({ where: { id: { [Op.in]: idFriends } } })
+    .then( users => {
+        
+        var inforUsers = []
+        
+        users.map( user => {
+            inforUsers[user.id] = user.toJSONFor()
+        })
+        return inforUsers
+    })
+}
+
+ChannelSchema.statics.AdminGetInformationChannels = function( _limit, _offset ){
+    
+    return this
+    .aggregate([
+        { $match: { user: { $ne : CONFIG.ID_ADMIN.toString() } } },
+        { $sort: { "_id": 1 } },
+        { $skip: _offset },
+        { $limit : _limit },
+        {
+            $lookup: {
+                from: 'messages',
+                let: { channelId: '$_id' },
+                as: "message",
+                pipeline: [
+                    { $match: { "$expr": { "$eq": ["$$channelId", "$channel"] }}},
+                    { 
+                        $project: {
+                            user      : true,
+                            content   : "$body",
+                            adminRead : true,
+                            style     : true,
+                            attachment: true,
+                            createdAt : true
+                        }
+                    },
+                    { $sort: { "_id": -1 } },
+                    { $limit : 1 }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: 'messages',
+                let: { channelId: '$_id' },
+                as: "unread",
+                pipeline: [
+                    { $match: { "$expr": { "$eq": ["$$channelId", "$channel"] }}},
+                    { $sort: { "_id": -1 } },
+                    { $match: { readAdmin : false }},
+                    { 
+                        $project: {
+                            user      : true,
+                            content   : "$body",
+                            adminRead : true,
+                            style     : true,
+                            attachment: true,
+                            createdAt : true
+                        }
+                    },
+                ]
+            }
+        },
+        {   
+            $project: {
+                id         : "$_id",
+                channelName: "$name",
+                user       : true,
+                message    : true,
+                backup     : true,
+                unread     : true,
+                total: true
+            }
+        },
+        
+    ])
+}
+
+
+ChannelSchema.statics.AdminGetTotalChannels = function(){
+    
+    return this
+    .aggregate([
+        { $match: { user: { $ne : CONFIG.ID_ADMIN.toString() } } },
+        { $group: { _id: null, count: { $sum: 1 } } },
+    ])
+}
+
+ChannelSchema.statics.AdminGetInformationUserInChannels = function( channels ){
+    
+    var idUsers = []
+    for (let iChannel = 0; iChannel < channels.length; iChannel++) {
+        const element = channels[iChannel];
+        if(element && element.user ){
+            idUsers = idUsers.concat(element.user)
+        }
+    }
+    var ids = idUsers.map( id => parseInt(id))
+
+    return Postgre.USER.findAll({ where: { id: { [Op.in]: ids } } })
+}
+
+ChannelSchema.statics.AdminToggleChannelId = function( id ){
+
+    return this.findOne({ _id: id })
+    .then( channel => {
+        if( !channel ){
+            throw new Error("không tìm thấy")
+        }
+        channel.backup = !channel.backup
+        return channel.save()
+    })
+}
+ChannelSchema.statics.adminGetMessageChat = function( _userId ){
+
+    return this
+    .aggregate([
+        { $match: { user: _userId } },
+        { $sort : { updatedAt : 1 } },
+        { $limit : 100 },
+        { $unwind: "$user" },
+        { $match: { user: { $ne : _userId }} },
+        {
+            $lookup: {
+                from: 'messages',
+                let: { channelId: '$_id' },
+                as: "message",
+                pipeline: [
+                    { "$match": { "$expr": { "$eq": ["$$channelId", "$channel"] }}},
+                    { 
+                        $project: { 
+                            type: {
+                                $cond: {
+                                    if: { $eq: [ _userId, "$user" ] },
+                                    then: true,
+                                    else: false
+                                }
+                            }, 
+                            content   : "$body",
+                            read      : true,
+                            style     : true,
+                            attachment: true,
+                            channel   : true
+                        }
+                    },
+                    { $limit : 1000 },
+                ]
+            }
         },
         {   
             $project: {
                 id : "$_id",
                 channelName: "$name",
                 user: true,
-                "message.type": {
-                    $cond: {
-                        if: { $eq: [ _userId, "$message.user" ] },
-                        then: true,
-                        else: false
-                    }
-                },
-                "message.content": true,
-                "message.style": true,
-                "message.attachment": true
+                message: true
             }
         }
-        // {
-        //     $lookup: {
-        //         from: "user_accounts",
-        //         localField: "user",
-        //         foreignField: "_id",
-        //         as: "user"
-        //     }
-        // },
     ])
-    /// channel have field online
-    // return { 
-    //     name: userChat.name, avatar: userChat.avatar, 
-    //     isOnline: true, isActive: channelActive, timeEndOnline: "2020-05-10 14:47:00", 
-    //     message: channel.message }
-    .then(lstChannel => {
-        var lstUserChat = []
-        lstChannel.map((channel, index) => {
-            var userChat = channel.user
-            // var channelActive = index == 0
-            lstUserChat.push(parseInt(userChat))
-        })
-        var Op = Postgre.Sequelize.Op;
-        return Postgre.USER.findAll(
-            { 
-                where: { 
-                    id: { [Op.in]: lstUserChat } 
-                }
-            },
-            // {
-            //     attributes: [
-            //         "id", "avatar", "first_name", "last_name",
-            //         "email", "role_id", "first_name_furigana",
-            //         "last_name_furigana", "birth_date", "gender",
-            //         "created_at", "updated_at"
-            //     ]
-            // }
-        )
-        .then( users => {
-            return { lstChannel, users }
-        })
-    })
-    .then( data => {
-        var channels = data.lstChannel
-        var users = data.users
-        channels.map((channel, index) => {
-            var idUser = channel.user
-            var userOfChannel = users.find(user => user.id == idUser)
-            if( userOfChannel ){
-                channel.user =  userOfChannel.toJSONFor()
-                channel.isActive = (index == 0)
-            }
-            if( !channel.message.length ){
-                channel.message.push({type:false,content:"こんにどうすれば手助けできますか？ ", style: "", attachment: []})
-            }
-        })
-        return channels
-    })
-    .catch( err => {
-        console.log( err.message )
-        return false
-    })
 }
 
 

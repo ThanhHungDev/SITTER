@@ -7,6 +7,21 @@ import TYPE from "../action/type.js";
 import config from "../config"
 export default function (state = userChatDefault, action) {
   switch (action.type) {
+    case TYPE.CHANNEL.ADD_USER_ONLINE:
+      return state.map( item => {
+        if(item.user.id == action.payload) {
+          return { ...item, user : { ... item.user, online : true } }
+        }
+        return { ...item }
+      })
+    case TYPE.CHANNEL.REMOVE_USER_ONLINE:
+        return state.map( item => {
+          if(item.user.id == action.payload) {
+            return { ...item, user : { ... item.user, online : false } }
+          }
+          return { ...item }
+        })
+
     case TYPE.CHAT.CHANGE_USER_CHAT_DEFAULT:
       return state.map( item => {
         if(item.id === action.payload) {
@@ -20,6 +35,15 @@ export default function (state = userChatDefault, action) {
       return state.map( channel => {
         if(channel.isActive === true) {
           return { ...channel, message : [ ...channel.message, action.payload] }
+        }
+        return channel
+      })
+    case TYPE.CHANNEL.READ_ALL_MESSAGE_CHANNEL_ACTIVE:
+      return state.map( channel => {
+        if(channel.isActive === true) {
+          var messages = channel.message
+          messages = messages.map( message => { return { ...message, read: true } })
+          return { ...channel, message : messages }
         }
         return channel
       })

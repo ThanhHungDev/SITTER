@@ -1,18 +1,43 @@
 @import "../variable";
 @import "../mixin";
 
+.left-message{
+  position: relative;
+  padding-right: 25px;
+
+  .read{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
 .component-message-chat{
   padding-top: 5px;
   @include clearfix();
 
   &.typing-chat-messsage{
     display: none;
+    padding-top: 0;
+    position: absolute;
+    top: -25px;
+    background-color: $gray-200;
+    border-radius: 8px;
+    border: 1px solid $gray-500;
+    left: 50%;
+    @include render-transform(translateX(-50%));
     &.show{
       display: block;
+    }
+    .typing-message .text{
+      line-height: 1;
+      padding: 2px 10px!important;
     }
   }
   .chat-group{
     @include clearfix();
+
+    
 
     &.by-me{
         
@@ -24,6 +49,9 @@
         .text{
           @include render-gradient(210deg, $gray-100, $gray-500)
         }
+      }
+      .EMOJI{
+        text-align: right;
       }
     }
 
@@ -43,23 +71,49 @@
     .message-content{
       padding-left: 50px;
 
+      &.typing-message{
+        padding-left: 0px;
+      }
+
       .IMAGE{
         text-align: center;
         .wrapper-attachment{
           padding: 5px;
           display: inline-block;
           max-width: 200px;
+          position: relative;
+
+          img{
+            width: 100%;
+            height: auto;
+          }
+          .download-file-attachment{
+            position: absolute;
+            top: 5%;
+            right: 5%;
+            background-color: $gray-300;
+            color: $custom-primary-color-dark;
+            border-radius: 50%;
+            padding: 3px 0;
+            border: 1px solid $custom-primary-color-dark;
+            i{
+              font-size: 24px;
+            }
+          }
         }
       }
       .EMOJI{
+        
         padding: 10px;
         background: none!important
       }
       .text{
+        line-height: 1.3;
         padding: 10px;
         border-radius: 15px;
-        white-space: pre;
+        white-space: pre-line;
         word-break: break-all;
+        // white-space: nowrap;
         @include render-gradient(135deg, $gray-100, $purple);
 
         &.EMOJI{
@@ -71,6 +125,7 @@
     }
     .typing-message{
       .text{
+        padding: 5px 10px;
         background: transparent!important;
       }
       .typing-text{

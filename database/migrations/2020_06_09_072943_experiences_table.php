@@ -18,7 +18,7 @@ class ExperiencesTable extends Migration
             Schema::create('experiences', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('name', 100);
-                $table->enum('type', [1, 2])->default(1);
+                $table->integer('type')->default(1);
                 $table->text('remark')->nullable();
                 $table->boolean('deleted')->default(false);
                 $table->timestamps();

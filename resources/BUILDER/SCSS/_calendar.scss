@@ -1,0 +1,19 @@
+/** calendar css*/
+@import "calendar/header";
+@import "calendar/body";
+@import "calendar/footer";
+@import "calendar/event";
+@import "calendar/popup";
+
+#draw-calendar{
+    max-width: 400px;
+    background-color: $calendar_background_color;
+    margin: 0 auto;
+    padding: 20px;
+
+    .calendar-wrapper-calendar{
+        background-color: $white;
+        border: 1px solid $calendar_border_color;
+        position: relative;
+    }
+}

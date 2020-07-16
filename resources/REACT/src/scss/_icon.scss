@@ -1170,8 +1170,8 @@ $hero-icons: (
   // "check-bold": F0E1E,
   // "check-box-multiple-outline": F0C51,
   // "check-box-outline": F0C52,
-  // "check-circle": F05E0,
-  // "check-circle-outline": F05E1,
+  "check-circle": F05E0,
+  "check-circle-outline": F05E1,
   // "check-decagram": F0791,
   // "check-network": F0C53,
   // "check-network-outline": F0C54,
@@ -1350,7 +1350,7 @@ $hero-icons: (
   // "cloud-check-outline": F12CC,
   // "cloud-circle": F0161,
   // "cloud-download": F0162,
-  // "cloud-download-outline": F0B7D,
+  "cloud-download-outline": F0B7D,
   // "cloud-lock": F11F1,
   // "cloud-lock-outline": F11F2,
   // "cloud-off-outline": F0164,
@@ -1981,7 +1981,7 @@ $hero-icons: (
   // "file-clock": F12E1,
   // "file-clock-outline": F12E2,
   // "file-cloud": F0217,
-  // "file-cloud-outline": F102A,
+  "file-cloud-outline": F102A,
   // "file-code": F022E,
   // "file-code-outline": F102B,
   // "file-cog": F107B,
@@ -5150,12 +5150,12 @@ $hero-icons: (
 
 @font-face {
 	font-family: "HERO Icons";
-	src: url("http://localhost:8000/font/IconFont/webfont.eot?v=1.4.57");
-  src: url("http://localhost:8000/font/IconFont/webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), 
-  url("http://localhost:8000/font/IconFont/webfont.woff2?v=1.4.57") format("woff2"), 
-  url("http://localhost:8000/font/IconFont/webfont.woff?v=1.4.57") format("woff"), 
-  url("http://localhost:8000/font/IconFont/webfont.ttf?v=1.4.57") format("truetype"), 
-  url("http://localhost:8000/font/IconFont/webfont.svg?v=1.4.57") format("svg");
+	src: url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.eot?v=1.4.57");
+  src: url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), 
+  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.woff2?v=1.4.57") format("woff2"), 
+  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.woff?v=1.4.57") format("woff"), 
+  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.ttf?v=1.4.57") format("truetype"), 
+  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.svg?v=1.4.57") format("svg");
 	font-weight: normal;
 	font-style: normal;
 }

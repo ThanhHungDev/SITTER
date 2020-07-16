@@ -9,9 +9,9 @@ module.exports.refesh = function( req, res ){
 
     var { userId, refesh, browser, browserMajorVersion, 
         browserVersion, os, osVersion } = req.body,
-        { 'user-agent': userAgent } = req.headers,
+        // { 'user-agent': userAgent } = req.headers,
         detect                      = { browser, browserMajorVersion, browserVersion, 
-                                            os, osVersion, userAgent }
+                                            os, osVersion } // userAgent
     var response = {}
     if(req.error){
         response = { code: 422, message: "入力エラーがありました", internal_message: "入力エラーがありました", 
@@ -28,25 +28,39 @@ module.exports.refesh = function( req, res ){
 
     /// kiểm tra token có trong db không
     /// lưu ý khi dùng postgree trong nodejs phải có where theo nguyên tắc của sequelize
+    console.log(userId, " userId không tìm thấy ")
     Postgre.TOKEN_REFESH.findOne({ where: { user_id: userId } }) ///, token : refesh <---- important
     .then( tokenData => {
+        
         if(!tokenData){
-            throw new Error("token refesh không đúng")
+            
+            throw new Error("トークンが失敗する")
         }
-        /// nếu có token thì save mới token refesh
-        /// sẽ không dùng token cũ
-        tokenData.token = tokenRefesh 
-        return tokenData.save()
+        /// nếu có token thì tìm token access của user theo devide
+        return TokenAccess.findOne({ user  : userId,  detect: JSON.stringify({ ...detect } ) })
     })
-    .then( tokenRefeshUpdate => {
-        /// sau khi upduate token refesh thì tạo mới 1 token access
-        var newTokenAccess = new TokenAccess({
-            token : tokenAccess,
-            user  : userId,
-            online: true,
-            detect: JSON.stringify({ ...detect } )
-        })
-        return newTokenAccess.save()
+    .then( myTokenAccess => {
+        if( myTokenAccess ){
+            /// nếu có token theo devide thì xem token này có online true không? 
+            if(myTokenAccess.online){
+                console.log("token đang đụng cùng 1 trình duyệt mở 2 tab")
+                /// lấy socket của token đã có đem emit về client đó cho client đó die
+                var socket_duplication = myTokenAccess.socket
+                console.log( "socket_duplication" , socket_duplication )
+                myTokenAccess.duplication = true
+            }
+            myTokenAccess.token  = tokenAccess
+            myTokenAccess.online = false
+        }else{
+            myTokenAccess = new TokenAccess({
+                token : tokenAccess,
+                user  : userId,
+                online: false,
+                detect: JSON.stringify({ ...detect } )
+            })
+        }
+        
+        return myTokenAccess.save()
     })
     .then(tokenAccessCreate => {
         /// lấy dữ liệu user để start mới chat
@@ -54,13 +68,14 @@ module.exports.refesh = function( req, res ){
     })
     .then( userData => {
         if( !userData ){
-            throw new Error("token refesh không đúng")
+            throw new Error("トークンが失敗する")
         }
+        
         /// hoàn tất thì đổ dữ liệu ra
         response = { 
             code: 200, 
-            message: "refesh success", 
-            internal_message: "tạo mới thành công 2 token", 
+            message: "トークン成功を作成する", 
+            internal_message: "トークン成功を作成する", 
             data : {
                 tokenRefesh,
                 tokenAccess,
@@ -76,10 +91,11 @@ module.exports.refesh = function( req, res ){
             code            : 500,
             message         : error.message,
             internal_message: error.message,
-            errors          : [{ message : error } ]
+            errors          : [{ message : error.message } ]
         }
         return res.end(JSON.stringify(response))
     });
 }
+
 
 

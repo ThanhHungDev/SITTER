@@ -2,9 +2,21 @@
 
 namespace App\FactoryModel;
 
+use App\Models\UserModel;
+use App\Models\SkillModel;
+use App\Models\GalaryModel;
 use App\Models\ChannelModel;
 use App\Models\MessageModel;
-use App\Models\UserModel;
+use App\Models\ExperienceModel;
+use App\Models\TokenRefeshModel;
+use App\Models\VerifyEmailModel;
+use App\Models\ActivitySkillModel;
+use App\Models\SitterProfileModel;
+use App\Models\EmployerProfileModel;
+use App\Models\PasswordResetModel;
+use App\Models\SitterModel;
+use App\Models\SalaryModel;
+use App\Models\ScheduleModel;
 use Illuminate\Support\Facades\DB;
 
 class BaseModel implements FactoryModelInterface{
@@ -12,8 +24,18 @@ class BaseModel implements FactoryModelInterface{
     public static $UserModel;
     public static $MessageModel;
     public static $ChannelModel;
+    public static $VerifyEmailModel;
     public static $DBModel;
-
+    public static $TokenRefeshModel;
+    public static $SitterProfileModel;
+    public static $GalaryModel;
+    public static $EmployerProfileModel;
+    public static $SkillModel;
+    public static $ExperienceModel;
+    public static $SitterModel;
+    public static $SalaryModel;
+    public static $PasswordResetModel;
+    public static $ScheduleModel;
 
     public function createUserModel(){
         
@@ -46,5 +68,100 @@ class BaseModel implements FactoryModelInterface{
         
         return self::$ChannelModel;
     }
+
+    public function createVerifyEmailModel(){
+
+        if(!self::$VerifyEmailModel){
+            self::$VerifyEmailModel = new VerifyEmailModel();
+        }
+        
+        return new VerifyEmailModel();
+    }
+
+    public function createTokenRefeshModel(){
+        
+        if(!self::$TokenRefeshModel){
+            self::$TokenRefeshModel = new TokenRefeshModel();
+        }
+        return new TokenRefeshModel();
+    }
+
+    public function createSitterProfileModel(){
+        
+        if(!self::$SitterProfileModel){
+            self::$SitterProfileModel = new SitterProfileModel();
+        }
+        return new SitterProfileModel();
+    }
+
+    public function createGalaryModel(){
+        
+        if(!self::$GalaryModel){
+            self::$GalaryModel = new GalaryModel();
+        }
+        return new GalaryModel();
+    }
+    public function createEmployerProfileModel(){
+
+        if(!self::$EmployerProfileModel){
+            self::$EmployerProfileModel = new EmployerProfileModel();
+        }
+        
+        return new EmployerProfileModel();
+    }
+
+    public function createSkillModel(){
+
+        if(!self::$SkillModel){
+            self::$SkillModel = new SkillModel();
+        }
+        
+        return new SkillModel();
+    }
+
+    public function createExperienceModel(){
+
+        if(!self::$ExperienceModel){
+            self::$ExperienceModel = new ExperienceModel();
+        }
+        
+        return new ExperienceModel();
+    }
+
+    public function createSkillActivityModel()
+    {
+        if(!self::$ExperienceModel){
+            self::$ExperienceModel = new ActivitySkillModel();
+        }
+        
+        return new ActivitySkillModel();
+    }
     
+    public function createSitterModel(){
+        if(!self::$SitterModel){
+            self::$SitterModel = new SitterModel();
+        }
+        return new SitterModel();
+    }
+
+    public function createSalaryModel(){
+        if(!self::$SalaryModel){
+            self::$SalaryModel = new SalaryModel();
+        }
+        return new SalaryModel();
+    }
+
+    public function createPasswordResetModel(){
+        if(!self::$PasswordResetModel){
+            self::$PasswordResetModel = new PasswordResetModel();
+        }
+        return new PasswordResetModel();
+    }
+
+    public function createScheduleModel(){
+        if(!self::$ScheduleModel){
+            self::$ScheduleModel = new ScheduleModel();
+        }
+        return new ScheduleModel();
+    }
 }

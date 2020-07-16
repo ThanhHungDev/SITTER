@@ -1,54 +1,97 @@
 import React, { Component } from "react"
-import { connect } from "react-redux"
-import TYPE from "../../action/type.js"
 import '../../scss/chat/message-chat.scss'
 import CONFIG from "../../config"
+import { connect } from "react-redux"
 
-class MessageChat extends Component{
+class MessageChat extends Component {
 
-  render(){
-    var { myinfo } = this.props
-    var { message } = this.props
-    var { toUser } = this.props
+    render() {
+        var { auth, message, channelActiveChat } = this.props
 
-    var userInfo = toUser
+        var myinfo = { avatar : '', name: '' }
+        if( auth && auth.id ){
+            myinfo.avatar = auth.avatar
+            myinfo.name   = auth.first_name + " " + auth.last_name
+        }
 
-    if(!toUser){
-      return null
+        if (!channelActiveChat) {
+            return null
+        }
+        var userInfo = channelActiveChat.user
+
+        if (!message.type) {
+            var typeMessage = 'left-message ';
+        } else {
+            var typeMessage = 'right-message by-me ';
+            userInfo = myinfo;
+        }
+        var { style } = message
+
+        var TIME_DIE_FILE = 24 * 60 * 60 * 1000
+        
+
+
+        return (
+            <div className="component-message-chat" >
+
+                <div className={typeMessage + "chat-group"}>
+                    <figure className="avatar">
+                        <img src={CONFIG.SERVER_PHP.URL + userInfo.avatar} alt="" />
+                    </figure>
+                    <div className="message-content">
+                        {
+                            style == "IMAGE" &&
+                            <div className={style} >
+                                {
+                                    message.attachment.map(( attachElement , index) => {
+                                        if( attachElement.type == 'img' ){
+
+                                            if( attachElement.time && attachElement.time - TIME_DIE_FILE < (new Date).getTime() ){
+                                                return (
+                                                    <div key={"wrapper-attachment" + index + attachElement.url } className="wrapper-attachment" >
+                                                        <img src={CONFIG.SERVER_PHP.URL + attachElement.url } />
+                                                        <a className="download-file-attachment" href={ CONFIG.SERVER_PHP.URL + attachElement.url } target="_blank" download>
+                                                            <i className="hero-icon hero-cloud-download-outline"></i>
+                                                        </a>
+                                                    </div>
+                                                )
+                                            }
+                                        }
+                                        return (
+                                            <div key={"wrapper-attachment" + index + CONFIG.SERVER_PHP.URL + "/image/folder.jpg" } className="wrapper-attachment">
+                                                <img src={ CONFIG.SERVER_PHP.URL + "/image/folder.jpg" } />                                                
+                                                <a className="download-file-attachment" href={ CONFIG.SERVER_PHP.URL + attachElement.url } target="_blank" download>
+                                                    <i className="hero-icon hero-cloud-download-outline"></i>
+                                                </a>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        }
+                        <div className={style + " text"} >{message.content}</div>
+                        <div className="read">
+                            { 
+                                !message.type && 
+                                (
+                                    !message.read ? 
+                                    <i className='hero-icon hero-check-circle-outline'></i>
+                                    : 
+                                    <i className='hero-icon hero-check-circle'></i>
+                                )
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        );
     }
-
-    if( !message.type ){
-      var typeMessage = 'float-left ';
-    }else{
-      var typeMessage = 'float-right by-me ';
-      userInfo = myinfo;
-    }
-    var { style } = message
-    return (
-      <div className="component-message-chat" >
-
-        <div className={ typeMessage + "chat-group" }>
-          <figure className="avatar">
-            <img src={ userInfo.avatar } alt=""/>
-          </figure>
-          <div className="message-content">
-            {
-              style == "IMAGE" && 
-              <div className={ style } >
-                { message.attachment.map( (image, index) => {
-                  return <div key={"wrapper-attachment" + index + image} className="wrapper-attachment">
-                    <img src={ CONFIG.SERVER.ASSET() + image } /> 
-                  </div>
-                })}
-              </div>
-            }
-            <div className={ style + " text" } >{ message.content }</div>
-            <div className="time">{ message.time }</div>
-          </div>
-        </div>
-
-      </div>
-    );
-  }
 }
-export default connect()(MessageChat);
+
+let mapStateToProps = (state) => {
+    return {
+        auth    : state.users
+    }
+}
+export default connect(mapStateToProps)(MessageChat)

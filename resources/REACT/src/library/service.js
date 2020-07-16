@@ -1,9 +1,11 @@
 
 
 import CONFIG from "../config"
-import Peer from "peerjs"
-import { setterUser, setterChannels, addMessage, addMessageSendToMe, setterSocket } from "../action"
-import config from "../config"
+// import Peer from "peerjs"
+import { setterUser, setterChannels, addMessage, addMessageSendToMe, 
+    setterSocket, addUserOnline, removeUserOnline, readAllMessageChannelActive } from "../action"
+// import config from "../config"
+import $ from "jquery"
 
 
 /// config global variable
@@ -12,10 +14,29 @@ var socket       = null,
     EVENT        = CONFIG_EVENT
 /// end setting variable
 
+window.onclick = function (event) {
+    if (event.target) {
+        if (event.target.classList.contains('component-emoji')) {
+            return;
+        }
+    }
+    var emojis = document.getElementById("js-emojis");
+    if (emojis) {
+        emojis.classList.remove("show");
+        setTimeout(function () {
+            if (emojis.classList.contains("show-temp")) {
+                emojis.classList.remove("show-temp");
+                emojis.classList.add("show");
+            }
+        }, 100);
+    }
+};
+
 
 export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponent ) {
     console.log("getAccessTokenByRefesh")
-    var data = { userId, refesh, ... detect}
+    var data       = { userId, refesh, ... detect },
+        tokensUser = null
     fetch(CONFIG.SERVER.ASSET() + '/api/refesh', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -26,16 +47,20 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
     .then(res => res.json())
     .then(response => {
         if (response.code != 200) {
-            console.log(response, " lỗi không thể tạo access token")
-            throw new Error("token refesh không đúng")
+            throw new Error("ログインセッションが正しくありません。 再度ログインするか、管理者に連絡してください")
         }
         
-        var tokensUser = { 
-            expire: response.data.expire,
-            period: response.data.period,
+        tokensUser = { 
+            expire     : response.data.expire,
+            period     : response.data.period,
             tokenAccess: response.data.tokenAccess,
             tokenRefesh: response.data.tokenRefesh
         }
+        console.log("setime out " + parseInt(response.data.expire) * 1000 )
+        setTimeout(function(){
+            window.location.href = CONFIG.SERVER_PHP.URL
+        }, parseInt(response.data.expire) * 1000 )
+        
         var userLogin = { ... response.data.user, tokens : tokensUser }
         localStorage.setItem('user', JSON.stringify(userLogin))
         instanceComponent.props.dispatch(setterUser(userLogin))
@@ -44,19 +69,38 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
     .then( dataFetchChannel => {
 
         var data = { access: dataFetchChannel.auth.tokens.tokenAccess, ...dataFetchChannel.detect }
-        console.log(data, "fetchChannelMessage in getAccessTokenByRefesh")
         return fetchChannelMessage( data )
     })
     .then( dataChannel => {
         if( !dataChannel ){
-            alert( "fetch channel có lỗi ")
+            alert( "ログインセッションが正しくありません。 再度ログインするか、管理者に連絡してください")
             return false
         }
-        instanceComponent.props.dispatch(setterChannels(dataChannel))
-        return true
+        
+        var hasAdminChannel = false
+        
+        if( dataChannel.length ){
+            for (let iChannel = 0; iChannel < dataChannel.length; iChannel++) {
+                var channelName = (dataChannel[iChannel]).channelName
+                if( channelName.match('SINGLE-([0-9 -]*)-1') ){
+                    hasAdminChannel = true
+                }
+            }
+        }
+
+        if(!hasAdminChannel){
+
+            return getChannelAdmin({ userId, refesh, ... detect}, tokensUser.tokenAccess)
+        }
+        return dataChannel
+    })
+    .then( dataChannel => {
+        if( dataChannel ){
+            instanceComponent.props.dispatch(setterChannels(dataChannel))
+        }
     })
     .catch(error => {
-        alert(error.message)
+        alert("ログインセッションが正しくありません。 再度ログインするか、管理者に連絡してください")
         return false
     })
 }
@@ -88,13 +132,16 @@ export function socketInitialConnect(socketIOClient, instanceApp) {
         //// set config
         socketListenner(socket, instanceApp)
         instanceApp.props.dispatch(setterSocket(socket))
+        console.log("socket connect nè socketListenner")
     });
     socket.on('disconnect', function () {
         instanceApp.props.dispatch(setterSocket(null))
         ApplicationDom && ApplicationDom.classList.add("connect-socket-error")
+        console.log("socket connect nè disconnect")
     });
     socket.on('connect_error', function () {
         ApplicationDom && ApplicationDom.classList.add("connect-socket-error")
+        console.log("socket connect nè connect_error")
     });
 }
 
@@ -114,101 +161,179 @@ export function caller( channelInfor, user, client ){
     })
 }
 
+export function sendMessageToChannel(message, style, attachment, channelId, access, detect, instanceComponent, dataRefesh) {
 
-
-// export function createChannel( localUserId, referenceUserId, refesh, detect ) {
-//     console.log("createChannel")
-//     var data = { localUserId, referenceUserId, refesh, ... detect}
-//     fetch(CONFIG.SERVER.ASSET() + '/api/channel', {
-//         method: 'POST',
-//         body: JSON.stringify(data),
-//         headers: {
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(res => res.json())
-//     .then(response => {
-//         if (response.code != 200) {
-//             console.log(response, " lỗi không thể tạo access token")
-//             throw new Error("token refesh không đúng")
-//         }
-        
-//         console.log( response )
-//     })
-//     .catch(error => {
-//         alert(error.message)
-//         return false
-//     })
-// }
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-function validateRefeshToken(data) {
-    try {
-        var { userId, refesh, detect } = data,
-            { browser, browserMajorVersion, browserVersion, os, osVersion } = detect
-        if (!userId || !refesh || !browser || !browserMajorVersion || !browserVersion || !os || !osVersion) {
-            throw new Error("遮る")
-        }
-        return true
-    } catch (error) {
-        /// nếu refesh không thành công thì crash ứng dụng
-        alert( " refesh không thành công ")
-        // localStorage.setItem('user', JSON.stringify(null))
+    console.log({ message, channelId, access, detect, instanceComponent, dataRefesh }, "before sendMessageToChannel")
+    if (!dataRefesh) {
+        socket.emit(EVENT.SEND_MESSAGE, { message, style, attachment, channelId, access, ...detect })
+        /// 
+        instanceComponent.props.dispatch(addMessage({ type: true, read: true, content: message, style, attachment }))
         return false
     }
-}
-function resfeshTokenExpire(data, instanceComponent) {
-    var { userId, refesh, detect } = data
-    var isValid = validateRefeshToken(data)
-    if (!isValid) {
-        alert("アカウントの有効期限が切れています。もう一度ログインしてください")
-        return false
-    }
-    var dataRefesh = { userId, refesh, ...detect }
-    return fetch(CONFIG.SERVER.ASSET() + '/api/user/refesh', {
+    console.log(dataRefesh, "refesh token trước khi send chat vì hết hạn")
+    /// đóng băng phần input textarea nhập chat 
+
+    //// userId : user._id, refesh : user.tokens.tokenRefesh, detect: this.props.client 
+    var { userId, refesh, detect } = dataRefesh
+    var dataFetch = { userId, refesh, ...detect }
+
+    fetch(CONFIG.SERVER.ASSET() + '/api/refesh', {
         method: 'POST',
-        body: JSON.stringify(dataRefesh),
+        body: JSON.stringify(dataFetch),
         headers: {
             'Content-Type': 'application/json'
         }
     })
     .then(res => res.json())
     .then(response => {
+        console.log( response , "/api/refesh")
         if (response.code != 200) {
-            console.log( response, "refesh token mã trả về không pahir 200")
-            throw new Error("アカウントの有効期限が切れています。もう一度ログインしてください")
+            
+            throw new Error("token refesh không đúng")
+        }        
+        var tokensUser = { 
+            expire: response.data.expire,
+            period: response.data.period,
+            tokenAccess: response.data.tokenAccess,
+            tokenRefesh: response.data.tokenRefesh
         }
-        /// save user to local storage
-        var user        = JSON.parse(localStorage.getItem('user'))
-            user.tokens = response.data
-        localStorage.setItem('user', JSON.stringify(user))
-        instanceComponent.props.dispatch(setterUser(user))
-        /// fetch data channel
-        var dataFetchChannel = { access: user.tokens.tokenAccess, ...detect }
-        console.log(dataFetchChannel, "fetchChannelMessage in resfeshTokenExpire")
-        return fetchChannelMessage( dataFetchChannel )
-    })
-    .then( dataChannel => {
-        if( !dataChannel ){
-            alert( "fetch channel có lỗi ")
-            return false
-        }
-        instanceComponent.props.dispatch(setterChannels(dataChannel))
-        return true
+        var userLogin = { ... response.data.user, tokens : tokensUser }
+        localStorage.setItem('user', JSON.stringify(userLogin))
+        access = userLogin.tokens.tokenAccess
+        socket.emit(EVENT.SEND_MESSAGE, { message, style, attachment, channelId, access, ...detect })
+        instanceComponent.props.dispatch(setterUser(userLogin))
+        instanceComponent.props.dispatch(addMessage({ type: true, read: true, content: message, style, attachment }))
     })
     .catch(error => {
-        console.log(error, " have error ")
-        localStorage.setItem('user', JSON.stringify(null))
-        alert("アカウントの有効期限が切れています。もう一度ログインしてください")
+        alert("メッセージの送信に失敗しました。 再度ログインするか、管理者に連絡してください")
         return false
     })
 }
+export function sendTypingMessageToChannel(channelId, access, detect ) {
+    
+    socket.emit(EVENT.SEND_TYPING, { channelId, access, ...detect })
+    return false
+}
 
+
+
+export function saveBlobToServer(file) {
+    var SIZE_LIMIT = 5 * 1024 * 1024
+
+    if( !file.size || file.size > SIZE_LIMIT ){
+        handleErrorUploadFile()
+    }
+    
+    let dataFile = file
+    let form = new FormData()
+    form.append('file', dataFile)
+    form.append('user_id', 1)
+
+    $.ajax({
+        url        : CONFIG.SERVER_PHP.URL + '/api/upload',
+        type       : 'post',
+        enctype    : 'multipart/form-data',
+        data       : form,
+        cache      : false,
+        contentType: false,
+        processData: false,
+        success: function( response ){
+            response = JSON.parse(response);
+            if (response.code != 200) {
+                handleErrorUploadFile()
+            }
+            var reWriteUrl = document.getElementById("js-image--block").getElementsByClassName("js-sign-url")
+            if (reWriteUrl.length) {
+                reWriteUrl[0].setAttribute("data-url", response.data.url)
+
+                var typeFile = response.data.file_name,
+                extentionType = null
+                if( typeFile ){
+                    extentionType = getTypeFile( typeFile )
+                }
+                if( !extentionType ){
+                    reWriteUrl[0].remove()
+                }else{
+                    reWriteUrl[0].setAttribute("data-type", extentionType )
+                    reWriteUrl[0].classList.remove("js-sign-url")
+                }
+            }
+        },
+        error: function(error){
+            console.log(error)
+            handleErrorUploadFile()
+        }
+    })
+}
+export function listenScrollMessage(e, messages, channelActive ) { 
+               
+    if(!messages || !messages.length){
+        return false
+    }
+    var domScroll = document.getElementById("js-scroll-to-bottom")
+    console.log(domScroll.scrollHeight, domScroll.clientHeight + "listenScrollMessage")
+    if ($(e).scrollTop() + 
+        $(e).innerHeight() >=  
+        $(e)[0].scrollHeight) { 
+            document.getElementById("js-is-write-message").classList.add("follow-conversation")
+            /// check message unread
+            var existNoneRead = messages.some( function( message ){
+                
+                return !message.read && !message.type
+            })
+
+            if( existNoneRead ){
+                console.log(EVENT.READ_MESSAGE_ALL, "listenScrollMessage")
+                var userLocal = JSON.parse(localStorage.getItem('user'))
+                socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
+            }
+    }else{
+        document.getElementById("js-is-write-message").classList.remove("follow-conversation")
+    } 
+}
+export function listenReadMessageNewUser( messages, channelActive ) { 
+               
+    if(!messages || !messages.length){
+        return false
+    }
+    
+    var existNoneRead = messages.some( function( message ){
+            
+        return !message.read && !message.type
+    })
+
+    if( existNoneRead ){
+        console.log(EVENT.READ_MESSAGE_ALL, "listenReadMessageNewUser")
+        var userLocal = JSON.parse(localStorage.getItem('user'))
+        socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+function handleErrorUploadFile(){
+    var reWriteUrl = document.getElementById("js-image--block").getElementsByClassName("js-sign-url")
+    if (reWriteUrl.length) {
+        reWriteUrl[0].remove()
+    }
+}
+function getTypeFile( filename ){
+    var accept = /(\.jpg|\.jpeg|\.bmp|\.gif|\.png|\.image)$/i
+    if(accept.exec(filename)){ 
+        return "img"
+    }
+    var accept = /(\.xls|\.xlsx|\.csv|\.pdf|\.doc|\.docx)$/i
+    if(accept.exec(filename)){ 
+
+        return "file"
+    }
+    return null
+}
 function validateFetchChannelMessage(data) {
     try {
         var { access, browser, browserMajorVersion, browserVersion, os, osVersion } = data
@@ -217,16 +342,21 @@ function validateFetchChannelMessage(data) {
         }
         return true
     } catch (error) {
-        console.log(error, "validateFetchChannelMessage")
+        
         return false
     }
 }
 
 function fetchChannelMessage( data ) {
+    console.log(data, "validateFetchChannelMessage(data)")
     var isValid = validateFetchChannelMessage(data)
     if (!isValid) {
-        alert("エラーが発生しました。しばらくしてからもう一度お試しください")
+        alert("エラーが発生しました。しばらくしてからもう一度お試しください1")
         return false
+    }
+    if( typeof ID_VIEW_USER_CHAT != 'undefined' && ID_VIEW_USER_CHAT ){
+        
+        data.userIdActiveChannel = ID_VIEW_USER_CHAT
     }
     return fetch(CONFIG.SERVER.ASSET() + '/api/channels', {
         method: 'POST',
@@ -237,11 +367,12 @@ function fetchChannelMessage( data ) {
     })
     .then(res => res.json())
     .then(response => {
-        if (response.code != 200) {
-            console.log(JSON.stringify(response.data), "data fetch channel có lỗi")
-            throw new Error("エラーが発生しました。しばらくしてからもう一度お試しください")
-        }
         console.log( response , "/api/channels")
+        if (response.code != 200) {
+            
+            throw new Error("エラーが発生しました。しばらくしてからもう一度お試しください2")
+        }
+        
         return response.data
     })
     .catch(error => {
@@ -249,41 +380,70 @@ function fetchChannelMessage( data ) {
         return false
     })
 }
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+function getChannelAdmin( data, access ) { 
 
+    var { userId, refesh }   = data
+        data.localUserId     = userId
+        data.referenceUserId = 1
+        data.refesh          = refesh
+        data.access          = access
+        data.newChannelAdmin = 1
 
-const peer = new Peer({ 
-    host: '127.0.0.1',
-    port: config.SERVER.PEER_PORT,
-    path: '/myapp'
-})
-
-peer.on('open', id => {
-    console.log("========================================================================")
-    console.log("====================" + id + "================")
-    document.getElementById("Application").setAttribute('data-peer', id )
-    console.log("========================================================================")
-})
-
-
-
-// //Callee
-peer.on('call', call => {
-    openStream()
-    .then(stream => {
-        call.answer(stream);
-        playStream('localStream', stream);
-        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+    return fetch(CONFIG.SERVER.ASSET() + '/api/channel', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
-    .catch(function(error) {
-        console.log("peer.on('call'")
+    .then(res => res.json())
+    .then(response => {
+        console.log(response, "getChannelAdmin")
+        if (response.code != 200) {
+            alert("エラーが発生しました。しばらくしてからもう一度お試しください")
+        }
+        return fetchChannelMessage( data )
     })
-});
+    .catch(error => {
+        return false
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+
+// const peer = new Peer({ 
+//     host: '127.0.0.1',
+//     port: config.SERVER.PEER_PORT,
+//     path: '/myapp'
+// })
+
+// peer.on('open', id => {
+//     console.log("========================================================================")
+//     console.log("====================" + id + "================")
+//     document.getElementById("Application").setAttribute('data-peer', id )
+//     console.log("========================================================================")
+// })
+
+
+
+// // //Callee
+// peer.on('call', call => {
+//     openStream()
+//     .then(stream => {
+//         call.answer(stream);
+//         playStream('localStream', stream);
+//         call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+//     })
+//     .catch(function(error) {
+//         console.log("peer.on('call'")
+//     })
+// });
 
 // $('#ulUser').on('click', 'li', function() {
 //     const id = $(this).attr('id');
@@ -296,25 +456,25 @@ peer.on('call', call => {
 //     });
 // });
 
-function openStream() {
-    const config = { audio: false, video: true };
-    return navigator.mediaDevices.getUserMedia(config);
-}
+// function openStream() {
+//     const config = { audio: false, video: true };
+//     return navigator.mediaDevices.getUserMedia(config);
+// }
 
-function playStream(idVideoTag, stream) {
-    const video = document.getElementById(idVideoTag);
-    video.srcObject = stream;
-    video.play();
-}
+// function playStream(idVideoTag, stream) {
+//     const video = document.getElementById(idVideoTag);
+//     video.srcObject = stream;
+//     video.play();
+// }
 
-function getPeerUserChannel( channelInfor, user, client ){
+// function getPeerUserChannel( channelInfor, user, client ){
 
-    var channelId = channelInfor.id,
-    access = user.tokens.tokenAccess
-    if( socket ){
-        socket.emit(EVENT.SEND_PEER, { channelId, access, ...client })
-    }
-}
+//     var channelId = channelInfor.id,
+//     access = user.tokens.tokenAccess
+//     if( socket ){
+//         socket.emit(EVENT.SEND_PEER, { channelId, access, ...client })
+//     }
+// }
 
 // openStream()
 // .then(stream => playStream('localStream', stream));
@@ -322,83 +482,63 @@ function getPeerUserChannel( channelInfor, user, client ){
 
 
 function socketListenner( socket, instanceApp ){
-    var EVENT = CONFIG_EVENT
 
-    socket.on(EVENT.REQUEST_GET_CHANEL, () => {
-        console.log("đã vào " + EVENT.REQUEST_GET_CHANEL)
-        
-    });
+    socket.on(EVENT.USER_ONLINE_NOTI, data => {
+        /// 
+        instanceApp.props.dispatch(addUserOnline( data.user ))
+    })
+    
+    socket.on(EVENT.USER_OFFLINE_NOTI, data => {
+        /// 
+        instanceApp.props.dispatch(removeUserOnline( data.user ))
+    })
+
     socket.on(EVENT.RESPONSE_MESSAGE, data => {
-        console.log("đã vào " + EVENT.RESPONSE_MESSAGE, data)
-        var { user, message, style, attachment, channel, detect } = data 
-        if (typeof(Storage) !== 'undefined') {
-            var userLocal = JSON.parse(localStorage.getItem('user'))
-            if( userLocal && userLocal.id == user ){
-                var { browser, browserMajorVersion, browserVersion, os, osVersion } = detect
-                var clientServerSend = { browser, browserVersion, browserMajorVersion, os, osVersion }
-                var { client } = instanceApp.props
-                console.log(JSON.stringify(clientServerSend), JSON.stringify(client))
-                if( JSON.stringify(clientServerSend) == JSON.stringify(client) ){
-                    return false
-                }
-            }
-            instanceApp.props.dispatch( addMessageSendToMe({ type: false, content: message, style, attachment, channel }) )
+        
+        var { user, token, message, style, attachment, channel, detect } = data 
+        var userLocal = JSON.parse(localStorage.getItem('user'))
+        if( userLocal && userLocal.id == user && userLocal.tokens.tokenAccess == token ){
             return false
-        } else {
-            alert('このアプリケーションはこのブラウザをサポートしていません。アップグレードしてください')
         }
+        instanceApp.props.dispatch( addMessageSendToMe({ type: (userLocal.id == user), content: message, style, attachment, channel }) )
+        return false
         
     })
     socket.on(EVENT.RESPONSE_TYPING, data => {
-        console.log("vaof EVENT.RESPONSE_TYPING" + EVENT.RESPONSE_TYPING)
-        var { user, channel } = data 
-        if (typeof(Storage) !== 'undefined') {
-            var userLocal = JSON.parse(localStorage.getItem('user'))
-            if( userLocal && userLocal.id == user ){
-                return false
-            }else{
-                console.log("cos theer show typing ")
-                if(timeoutTyping){
-                    clearTimeout(timeoutTyping)
-                }
+
+        var { user, token, channel } = data 
+        var userLocal = JSON.parse(localStorage.getItem('user'))
+        if( userLocal && userLocal.id == user && userLocal.tokens.tokenAccess == token ){
+            return false
+        }else{
+            
+            if(timeoutTyping){
+                clearTimeout(timeoutTyping)
+            }
+            var domTyping = document.getElementById("js-typing")
+            if(domTyping.getAttribute("channel") == channel)
+            domTyping.classList.add("show")
+            /// scroll bottom 
+            // var inputMessage = document.getElementById("js-is-write-message")
+            // if(inputMessage.classList.contains("follow-conversation")){
+            //     document.getElementById('js-scroll-to-bottom').scrollTop  = document.getElementById('js-scroll-to-bottom').scrollHeight
+            // }
+            var timeoutTyping = setTimeout(function() {
                 var domTyping = document.getElementById("js-typing")
                 if(domTyping.getAttribute("channel") == channel)
-                domTyping.classList.add("show")
-                /// scroll bottom 
-                var inputMessage = document.getElementById("js-is-write-message")
-                if(inputMessage.classList.contains("writing")){
-                    document.getElementById('js-scroll-to-bottom').scrollTop  = document.getElementById('js-scroll-to-bottom').scrollHeight
-                }
-                var timeoutTyping = setTimeout(function() {
-                    var domTyping = document.getElementById("js-typing")
-                    if(domTyping.getAttribute("channel") == channel)
-                    domTyping.classList.remove("show")
-                }, 10000);
-                return false
-            }
-        } else {
-            alert('このアプリケーションはこのブラウザをサポートしていません。アップグレードしてください')
+                domTyping.classList.remove("show")
+            }, 3000);
+            return false
         }
-        
     })
-    socket.on(EVENT.RESPONSE_PEER, data => {
-        console.log(data, "đã vào " + EVENT.RESPONSE_PEER)
-        var peerid = { data }
-        var call = peer.call(peerid, globalStream)
-        call.on('stream', remoteStream => playStream('id-peer-remote', remoteStream))
+    
+    socket.on(EVENT.DUPLICATION_TAB, data => {
+
+        window.location.href = CONFIG.SERVER_PHP.URL
     })
-    socket.on(EVENT.REQUEST_GET_PEER, data => {
-        console.log(data, "đã vào " + EVENT.REQUEST_GET_PEER)
-        var peerid = document.getElementById("Application").setAttribute('data-peer'),
-        detect = null
-        /// get user
-        if (typeof(Storage) !== 'undefined') {
-            
-            detect = JSON.parse(localStorage.getItem('detect'))
-            user = JSON.parse(localStorage.getItem('user'))
-            socket.emit(EVENT.RESPONSE_GET_PEER, { peerid, user, ...detect })
-        }else{
-            socket.emit(EVENT.RESPONSE_GET_PEER, null)
-        }
+
+    socket.on(EVENT.READ_MESSAGE_ALL_RESPONSE, data => {
+
+        instanceApp.props.dispatch( readAllMessageChannelActive() )
     })
 }

@@ -1,6 +1,126 @@
-.wrapper-page{
-    color: red;
+.container-login{
+    margin: 0;
+    padding: 0;
+    .wrapper-login{
+        position: relative;
+        margin: 50px auto;
+        width: 400px;
+        .login-header{
+            text-align: center;
+            padding-bottom: 10px;
+            .text-medium{
+                font-size: 20px;
+                font-weight: 600;
+            }
+            .text-none{
+                font-size: 19px;
+            }
+        }
+        .backround-login{
+            position: absolute;
+            height: 410px;
+            width: 400px;
+            z-index: -1;
+        }
+        .form-main{
+            height: 410px;
+            width: 400px;
+            padding: 30px;
+            background: rgba(242, 255, 210, 0.8);
+            border: 1px solid #2dc187;
+            box-sizing: border-box;
+            .form-header{
+                text-align: center;
+                padding-bottom: 18px;
+                span{
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #06784b;
+                }
+            }
+            .form-body{
+                .form-row{
+                    .group-control{
+                        .form-control{
+                            height: 35px;
+                            width: 100%;
+                            padding: 0 10px;
+                        }
+                    }
+                    .form-validate{
+                        display: flex;
+                        flex-direction: column;
+                        .form-error{
+                            margin-right: auto;
+                            font-size: 13px;
+                            color: red;
+                        }
+                    }
+                    .h-25{
+                        height: 25px;
+                    }
+                }
+                .group-row{
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    .check-save-password{
+                        margin: 0;
+                        height: 15px;
+                        width: 15px;
+                    }
+                    label{
+                        padding: 3px 0 0 5px;
+                    }
+                }
+                .form-action{
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                    padding-top: 25px;
+                    .forgot-password{
+                        padding-bottom: 15px;
+                        font-weight: 600;
+                        color: #06784b;
+                    }
+                    .btn-login{
+                        height: 40px;
+                        width: 160px;
+                        margin: 0 auto;
+                        background: #fc6536;
+                        color: #fff;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 5px;
+                        &:hover{
+                            background: #f48461;
+                        }
+                    }
+                    .register-new{
+                        padding-top: 15px;
+                        font-weight: 600;
+                        color: #06784b;
+                       
+                    }
+                    a{
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+
+    }
 }
-.wrapper-header-page{
-    color: green;
+@include DivResponsive(425px){
+    .container-login {
+        .wrapper-login{
+            width: 100%;
+            .backround-login{
+                width: 100%;
+            }
+            .form-main{
+                width: 100%;
+            }
+        }
+    }
 }

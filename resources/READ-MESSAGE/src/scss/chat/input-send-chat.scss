@@ -1,0 +1,106 @@
+@import "../variable";
+@import "../mixin";
+
+.component-input-send-chat{
+  border: 1px solid $gray-200;
+  border-left: none;
+  position: relative;
+  padding: 5px 80px 0 80px;
+  
+  textarea{
+    width: 100%!important;
+    min-height: 30px;
+    max-height: 150px;
+    overflow-y: scroll;
+    resize: none;
+    padding: 10px 15px;
+    background-color: #f2f2f2;
+    border-radius: 15px;
+    border: 1px solid $gray-400;
+    font-size: 14px;
+    scrollbar-width: none;
+    margin: 0;
+    text-decoration: none;
+    -ms-overflow-style : none;
+
+    &:focus{
+      border-color: $custom-primary-color-dark;
+      color: $custom-primary-color-dark;
+    }
+
+    &::-webkit-scrollbar {
+      display: block;
+    }
+  }
+
+  & > i {
+    position: absolute;
+    z-index: 11;
+    bottom: 20px;
+    font-size: 28px;
+    color: $blue;
+  }
+  .hero-icon{
+
+    &.emoticon{
+      left: 10px;
+    }
+
+    &.file{
+      left: 45px;
+    }
+    &.send{
+      display: inline-block;
+      z-index: 1;
+      right: 45px;
+    }
+    &.react{
+      z-index: 1;
+      display: inline-block;
+      right: 10px;
+    }
+  }
+
+  .image-block{
+    
+
+    .remove-image{
+      max-height: 100px;
+      overflow: hidden;
+      display: inline-block;
+      position: relative;
+
+      &:after{
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        content: "\F0157";
+        width: 32px;
+        height: 24px;
+        text-align: center;
+        display: inline-block;
+        vertical-align: middle;
+        cursor: pointer;
+        line-height: 24px;
+        font: normal normal normal 24px/1 "HERO Icons";
+        text-rendering: auto;
+        line-height: inherit;
+        -webkit-font-smoothing: antialiased;
+      }
+      &:hover{
+        img{
+          opacity: 0.4;
+        }
+        &:after{
+          animation-duration: 1s;
+          animation-fill-mode: both;
+          animation-name: tada;
+        }
+      }
+    }
+    img{
+      padding: 5px;
+      opacity: .9;
+    }
+  }
+}

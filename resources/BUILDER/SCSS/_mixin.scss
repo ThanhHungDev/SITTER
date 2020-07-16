@@ -44,24 +44,69 @@
   background: linear-gradient($deg, $start, $end) !important;
 }
 
-
-@mixin Responsive($canvas) {
-  @if $canvas == XXL {
-    @media only screen and (max-width: $XXL) { @content; } 
-  } @else if $canvas == XL {
-    @media only screen and (max-width: $XL) { @content; } 
-  }@else if $canvas == LG {
-    @media only screen and (max-width: $LG) { @content; } 
-  }@else if $canvas == MD {
-    @media only screen and (max-width: $MD) { @content; } 
+@mixin MaxWidthResponsive($canvas) {
+  @if $canvas == XS {
+    @media only screen and (max-width: $XS) { @content; } 
   }@else if $canvas == SM {
     @media only screen and (max-width: $SM) { @content; } 
-  }@else if $canvas == XS {
-    @media only screen and (max-width: $XS) { @content; } 
-  }
+  }@else if $canvas == MD {
+    @media only screen and (max-width: $MD) { @content; } 
+  }@else if $canvas == LG {
+    @media only screen and (max-width: $LG) { @content; } 
+  }@else if $canvas == XL {
+    @media only screen and (max-width: $XL) { @content; } 
+  }@else if $canvas == XXL {
+    @media only screen and (max-width: $XXL) { @content; } 
+  } 
 }
 
 
+
+@mixin MinWidthResponsive($canvas, $value) {
+  @if $canvas == XS {
+    @media (min-width:$value)  { @content; } 
+  }@else if $canvas == SM {
+    @media (min-width: $value) { @content; } 
+  }@else if $canvas == MD {
+    @media (min-width: $value) { @content; } 
+  }@else if $canvas == LG {
+    @media (min-width: $value) { @content; } 
+  }@else if $canvas == XL {
+    @media (min-width: $value) { @content; } 
+  }@else if $canvas == XXL {
+    @media (min-width: $value) { @content; } 
+  } 
+}
+
+
+
+$containers-min-width : (
+  XS : 320px,
+  SM : 540px,
+  MD : 720px,
+  LG : 720px,
+  XL : 960px,
+  XXL: 1010px
+) !default;
+@mixin Responsive($canvas) {
+  @if $canvas == XXL {
+    @media only screen and (min-width: $XXL) { @content; } 
+  } @else if $canvas == XL {
+    @media only screen and (min-width: $XL) { @content; } 
+  }@else if $canvas == LG {
+    @media only screen and (min-width: $LG) { @content; } 
+  }@else if $canvas == MD {
+    @media only screen and (min-width: $MD) { @content; } 
+  }@else if $canvas == SM {
+    @media only screen and (min-width: $SM) { @content; } 
+  }@else if $canvas == XS {
+    @media only screen and (min-width: $XS) { @content; } 
+  }
+}
+
+@mixin DivResponsive($value) {
+  @media only screen and (max-width: $value) { @content; } 
+}
 
 @mixin clearfix {
   &:after {

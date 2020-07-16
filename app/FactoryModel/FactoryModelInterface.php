@@ -14,8 +14,20 @@ interface FactoryModelInterface
     // public function createRatingActiveModel();
 
     public function createUserModel();
-    public function createRatingModel();
+    // public function createRatingModel();
     public function createDBModel();
     public function createMessageModel();
     public function createChannelModel();
+    public function createVerifyEmailModel();
+    public function createSitterProfileModel();
+    public function createGalaryModel();
+    public function createEmployerProfileModel();
+    public function createTokenRefeshModel();
+    public function createExperienceModel();
+    public function createSkillModel();
+    public function createSkillActivityModel();
+    public function createSitterModel();
+    public function createSalaryModel();
+    public function createPasswordResetModel();
+    public function createScheduleModel();
 }

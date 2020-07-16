@@ -1,0 +1,304 @@
+.emp-mypage{
+    .nav-bottom{
+        display: none!important;
+    }
+    .nav-mypage{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+        .btn{
+            padding: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            min-width: 120px;
+            margin: 15px;
+        }
+        .btn-edit{
+            background-color: #c9c9c9;
+        }
+        .btn-register{
+            background-color: #fcd036;
+        }
+        .btn-chat{
+            background-color: #fff;
+            border: 1px solid #ccc;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            img{
+                width: 34px;
+                margin-right: 5px;
+            }
+        }
+        a{
+            text-decoration: none;
+        }
+    }
+    .em-wapper-image{
+        img{
+            max-width: 100%;
+        }
+        .em-avatar, .em-identity-card{
+            height: 270px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            text-align: center;
+            img{
+                height: 100%;
+            }
+        }
+        .em-avatar{
+            position: relative;
+            .upload-icon{
+                display: none;
+                position: absolute;
+                left: 28%;
+                top: 28%;
+                width: 150px;
+                height: 150px;
+                margin: 0 auto;
+            }
+            &:hover{
+                img[type='avatar']{
+                    opacity: 0.7;
+                }
+                .upload-icon{
+                    display: block;
+                    cursor: pointer;
+                }
+                div[data-status='active']{
+                    display: block;
+                }
+            }
+        }
+    }
+    .em-wapper-info{
+        min-height: 555px;
+        padding: 15px;
+        background: #efffc7;
+        border: 1px solid #2dc187;
+    }
+    .body-mypage{
+        .wapper-mypage{
+            margin: 0 15px;
+            .left-mypage{
+                // padding-right: 0;
+            }
+            .right-mypage{
+                padding-left: 0;
+            }
+            .clear-both{
+                overflow: hidden;
+                width: 100%;
+            }
+            .pl-0{
+                padding-left: 0;
+            }
+        }
+        .em-title-info{
+            font-size: 18px;
+            color: #333333;
+            font-weight: 600;
+            border-bottom: 1px solid #2dc187;
+            margin-bottom: 15px;
+        }
+    }
+    .em-content-info{
+        .label-color{
+            color: #06784b;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .item-inline{
+            p{
+                margin-bottom: 0;
+                margin-top: 0;
+            }
+            div{
+                padding-right: 0;
+            }
+        }
+        word-break: break-word;
+    }
+    .boder-img{
+        border: 2px solid #2dc187;
+    }
+    .delete_avatar{
+        position: absolute;
+        z-index: 999;
+        color: red;
+        top: -3px;
+        right: 0;
+        font-size: 25px;
+        background: #c9c9c9;
+        border-radius: 0 0 0 15px;
+        cursor: pointer;
+        width: 45px;
+    }
+}
+.em-wapper-edit{
+    input{
+        border: 1px solid #dcdcdc;
+        outline: none;
+        width: 100%;
+        padding: 10px 15px;
+    }
+    select, textarea{
+        border: 1px solid #dcdcdc;
+        outline: none;
+    }
+    textarea{
+        width: 100%;
+        resize: none;
+        height: 140px;
+    }
+    .input-date-content{
+        display: flex;
+        .year_select{
+            min-width: 120px;
+            margin-right: 5px;
+        }
+        .month_select, .day_select{
+            min-width: 60px;
+            margin-right: 5px;
+        }
+        span{
+            margin-right: 5px;
+        }
+    }
+    .flex-box{
+        input{
+            width: auto;
+        }
+        label{
+            margin: 0 15px;
+        }
+        display: flex;
+        align-items: center;
+    }
+    .em-row{
+        margin-top: 5px;
+    }
+    input[type="radio"], input[type="checkbox"]{
+        width: 15px;
+        height: 15px;
+    }
+    .input-child-label{
+        color: #333333;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border-bottom: 1px solid #2dc187;
+    }
+    .child-delete{
+        float: right;
+        cursor: pointer;
+        color: red;
+    }
+    .em-add-child{
+        display: flex;
+        justify-content: center;
+        .add-child{
+            padding: 0 15px;
+            font-size: 16px;
+            background: #2dc187;
+            border: 1px solid #dcdcdc;
+            margin: 15px 0;
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+    .pl-3{
+        padding-left: 15px;
+    }
+    .form-error{
+        font-size: 14px;
+        color:red;
+    }
+}
+#confirm-form{
+    padding: 0;
+    width: 50%;
+    border-radius: 0;
+    .head-modal{
+        padding: 5px 0;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        color: #fff;
+        background: #2dc187;
+    }
+    .body-modal{
+        min-height: 115px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        border-bottom: 1px solid #dcdcdc;
+        padding: 15px;
+    }
+    .footer-modal{
+        display: flex;
+        justify-content: center;
+        padding: 5px 0;
+        .btn{
+            padding: 10px 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 0;
+            font-size: 16px;
+            min-width: 120px;
+        }
+        .btn-close{
+            background-color: #ff0505;
+            color: #fff;
+        }
+        .btn-accept{
+            background-color: #2dc187;
+            color: #fff;
+        }
+    }
+}
+div[data-status=''], div[data-status='active']{
+    display: none;
+}
+@include DivResponsive(575px){
+    .emp-mypage {
+        .nav-bottom{
+            display: flex!important;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            margin-bottom: 0;
+            a{
+                width: 50%;
+            }
+            .btn{
+                margin: 0!important;
+                min-width: unset;
+                width: 100%;
+                padding: 10px 0;
+            }
+        }
+        .nav-top{
+            display: none!important;
+        }
+        .right-mypage{
+            margin-bottom: 60px;
+            padding: 0;
+        }
+        .left-mypage{
+            padding: 0;
+        }
+    }
+    .em-wapper-edit{
+        input{
+            padding: 10px 15px;
+        }
+    }
+    #confirm-form{
+        min-width: 320px;
+    }
+}

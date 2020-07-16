@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class EMPLOYER_LOGGED
 {
@@ -15,6 +16,13 @@ class EMPLOYER_LOGGED
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+        if (Auth::check()) {
+            if (Auth::user()->role_id == config('constant.ROLE.EMPLOYER')) {
+                return $next($request);
+            }else{
+                return redirect()->route('EMPLOYER_LOGOUT');
+            }
+        }
+        return redirect()->route('EMPLOYER_LOGIN');
     }
 }

@@ -1,34 +1,45 @@
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import TYPE from "../../action/type.js"
+import CONFIG from "../../config"
+class UserChat extends Component {
 
-class UserChat extends Component{
+    changeActiveUser = ( e , id) => {
 
-  changeActiveUser = ( id) => {
+        e.props.dispatch({ type: TYPE.CHAT.CHANGE_USER_CHAT_DEFAULT, payload: id })
+    }
 
-    this.props.dispatch({ type: TYPE.CHAT.CHANGE_USER_CHAT_DEFAULT, payload : id })
-  }
+    render() {
+        var { channel }        = this.props,
+            classActiveOnline  = channel.user.online ? ' active ' : '',
+            classActiveMessage = channel.isActive ? ' active-message ' : ''
 
-  render(){
-    var { user } = this.props
-    var classActiveOnline = user.isOnline ? ' active ' : ''
-    var classActiveMessage = user.isActive ? ' active-message ' : ''
+        var [lastItem] = channel.message.slice(-1)
 
-    var [lastItem] = user.message.slice(-1);
-    return (
-      <div className="component-user-chat-sidebar" >
-        <div className={ classActiveOnline + classActiveMessage + "user-chat"} 
-        onClick={() => this.changeActiveUser( user.id )} >
-          <figure className="state-avatar">
-            <img src={user.avatar} alt=""/>
-          </figure>
-          <div className="text-info">
-            <span className="name">{user.name}</span>
-            <span className="last-message">{ lastItem.content}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+        var munberNoneRead = channel.message.filter(message => !message.read && !message.type ).length
+
+        return (
+            <div className="component-user-chat-sidebar" >
+                <div className={classActiveOnline + classActiveMessage + "user-chat"}
+                    onClick={() => this.changeActiveUser(this, channel.id)} >
+                    <figure className="state-avatar">
+                        <img src={CONFIG.SERVER_PHP.URL + channel.user.avatar} alt="" />
+                    </figure>
+                    <div className="text-info">
+                        <span className="name">{channel.user.first_name + " " + channel.user.last_name}</span>
+                        { lastItem &&
+                            <span className="last-message">{lastItem.content}</span>
+                        }
+                    </div>
+                    { 
+                        munberNoneRead ?
+                        <i className="none-read-message">{munberNoneRead}</i> 
+                        :
+                        null
+                    }
+                </div>
+            </div>
+        );
+    }
 }
-export default connect()(UserChat);
+export default connect()(UserChat)

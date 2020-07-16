@@ -7,9 +7,9 @@ import SocketReducer from "./socket.js"
 import Auth from "./auth.js"
 //// khởi tạo 1 biến biểu diễn REDUCER ALL 
 const Reducer = combineReducers({
-    client         : DetectClientReducer,
-    userChat       : userChat,
-    socket         : SocketReducer,
-    users          : Auth
+    client  : DetectClientReducer,
+    userChat: userChat,
+    socket  : SocketReducer,
+    users   : Auth,
 });
 export default Reducer;

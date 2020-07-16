@@ -26,5 +26,5 @@ if (typeof (Storage) !== 'undefined') {
         </Provider>
     , document.getElementById("CHAT_ELEMENT"));
 }else{
-    alert("ứng dụng không chạy tốt trên trình duyện này. vui lòng nâng cấp")
+    alert("このブラウザでは、アプリケーションは正常に動作しません。 アップグレードしてください")
 }

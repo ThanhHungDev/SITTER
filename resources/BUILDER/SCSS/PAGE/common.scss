@@ -1,0 +1,42 @@
+.my-modal-confirm{
+    padding: 0;
+    width: 50%;
+    border-radius: 0;
+    .head-modal{
+        padding: 5px 0;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        color: #fff;
+        background: #2dc187;
+    }
+    .body-modal{
+        min-height: 115px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        border-bottom: 1px solid #dcdcdc;
+        padding: 15px;
+    }
+    .footer-modal{
+        display: flex;
+        justify-content: center;
+        padding: 5px 0;
+        .btn{
+            padding: 10px 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 0;
+            font-size: 16px;
+            min-width: 120px;
+        }
+        .btn-close{
+            background-color: #ff0505;
+            color: #fff;
+        }
+        .btn-accept{
+            background-color: #2dc187;
+            color: #fff;
+        }
+    }
+}

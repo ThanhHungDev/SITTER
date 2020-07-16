@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 
-// import SideBarChat from "./SideBarChat.jsx"
+import SideBarChat from "./SideBarChat.jsx"
 import ListMessage from "./ListMessage.jsx"
 import { connect } from "react-redux"
-import { changeChannelActive } from "../../action"
-import { getAccessTokenByRefesh, resfeshTokenIfExpire, 
-    fetchChannelMessage, createChannel } from "../../library/service.js"
+import { getAccessTokenByRefesh } from "../../library/service.js"
 import '../../scss/chat/chat.scss'
 class Chat extends Component {
 
@@ -15,7 +13,7 @@ class Chat extends Component {
     }
 
     componentDidMount() {
-        console.log("chat page index componentDidMount")
+
         /// mỗi lần vào chat thì buộc phải có 1 refesh token. nếu không thì lỗi. 
         /// Dựa vào refesh token ta sẽ tạo ra 1 access token 
         /// song song việc fetch accesstoken thì lắng nghe trong socket nếu có 
@@ -28,22 +26,27 @@ class Chat extends Component {
             /// fetch token access by token refesh 
             var refesh = TOKEN_REFESH_DOM.getAttribute('data-refesh'),
                 userId = TOKEN_REFESH_DOM.getAttribute('data-user')
-            if( userId && refesh ){
+
+            ///////////////////////////////////////////////////////
+            // var name = 'id'
+            // var url = window.location.href;
+            // name = name.replace(/[\[\]]/g, '\\$&');
+            // var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            //     results = regex.exec(url)
+            // if (!results) userId = null
+            // else if (!results[2]) userId = ''
+            // else userId = decodeURIComponent(results[2].replace(/\+/g, ' '))
+
+            ////////////////////////////////////////////////////
+            if( userId ){ // && refesh
 
                 getAccessTokenByRefesh( userId, refesh, detect, instanceChat )
             }
         }
         
     }
-    componentDidUpdate() {
-        console.log("chat page index componentDidUpdate")
-    }
 
-    // <button onClick={this.createChannelData}>click create channel</button>
-    // createChannelData = event => {
-    //     console.log(JSON.stringify(this.props.detect))
-    //     createChannel( 2, 5, "00f004f5236799f14067e68633c9b2f5", this.props.detect)
-    // }
+    
 
 
     render() {
@@ -53,7 +56,7 @@ class Chat extends Component {
             <div className="component-chat">
                 <div className="bg-chat-temalate">
                     <div className="wrapper-page-chat">
-                        {/* {/* <SideBarChat /> */}
+                        <SideBarChat />
                         <ListMessage />
                         
                     </div>

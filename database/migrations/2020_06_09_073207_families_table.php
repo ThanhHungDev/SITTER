@@ -25,7 +25,7 @@ class FamiliesTable extends Migration
                 $table->string('first_name_furigana', 255)->nullable();
                 $table->string('last_name_furigana', 255)->nullable();
                 $table->date('birth_date')->nullable();
-                $table->enum('gender', [ 0, 1, 2 ])->default(0); 
+                $table->integer('gender')->default(0); 
                 $table->boolean('allergic')->default(false);
                 $table->boolean('chronic')->default(false);
                 $table->integer('type')->nullable(); /// mapping type wife, husband, child ...

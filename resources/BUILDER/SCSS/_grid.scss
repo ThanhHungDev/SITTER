@@ -2,6 +2,15 @@
 $padding-grid-x : 15px;
 $column-max : 12;
 
+$containers-min-width : (
+  XS : 320px,
+  SM : 540px,
+  MD : 720px,
+  LG : 720px,
+  XL : 960px,
+  XXL: 1010px
+) !default;
+
 $containers-max-width : (
   XXL: 1320px,
   XL : 1010px,
@@ -46,16 +55,20 @@ $containers-max-width : (
     padding-left: $padding-grid-x;
     float: left;
   }
-  @each $name, $value in $containers-max-width {
-    .col-#{to-lower-case(#{$name})}-#{$i} {
-      @include Responsive($name){
+}
+@each $name, $value in $containers-min-width {
+  
+  @for $i from 1 through $column-max {
+    @include MinWidthResponsive($name, $value){
+      .col-#{to-lower-case(#{$name})}-#{$i} {
         width: (100% * $i) / $column-max;
         padding-right: $padding-grid-x;
-        padding-left: $padding-grid-x;
+        padding-left: $padding-grid-x; 
         float: left; 
-      }
-    }
+      } 
+    } 
   }
+  
 }
 
 

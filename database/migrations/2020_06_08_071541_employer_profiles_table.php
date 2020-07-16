@@ -21,7 +21,7 @@ class EmployerProfilesTable extends Migration
                 $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('CASCADE');
                 $table->integer('type_upload')->nullable();
-                $table->string('nick_name', 20)->nullable();
+                $table->string('nick_name', 255)->nullable();
                 $table->text('note')->nullable();
                 $table->text('remark')->nullable();
                 $table->boolean('publish')->default(true);

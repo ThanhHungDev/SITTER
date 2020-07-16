@@ -1,0 +1,45 @@
+@import "../variable";
+@import "../mixin";
+
+
+.component-search-user{
+  padding: 0 0 5px 5px;
+  position: relative;
+
+  .search-user{
+
+    background-color: $gray-100;
+    border: 1px solid $gray-600;
+    width: 100%;
+    padding: 8px 8px 8px 30px;
+    font-size: 14px;
+    color: $gray-600;
+    font-style: $font-archivo-medium;
+
+    &:focus{
+      border-color: $custom-primary-color-dark;
+      color: $custom-primary-color-dark;
+
+      & ~ .hero-icon{
+        color: $custom-primary-color-dark;
+      }
+    }
+  }
+  .hero-icon{
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    font-size: 25px;
+    color: $gray-600;
+    right: 10px;
+    z-index: 2;
+  }
+}
+
+
+@include Responsive(SM){
+
+  .component-search-user{
+    display: none;
+  }
+}

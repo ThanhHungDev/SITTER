@@ -1,0 +1,99 @@
+.container-forgot, .container-renew{
+    margin: 0;
+    padding: 0;
+    .wrapper-forgot, .wrapper-renew{
+        position: relative;
+        margin: 50px auto;
+        overflow: hidden;
+        width: 400px;
+        .forgot-header, .renew-header{
+            text-align: center;
+            padding-bottom: 10px;
+            .text-medium{
+                font-size: 20px;
+                font-weight: 600;
+            }
+            .text-none{
+                font-size: 19px;
+            }
+        }
+        .backround-forgot, .backround-renew{
+            position: absolute;
+            height: 410px;
+            width: 400px;
+            z-index: -1;
+        }
+        .form-main{
+            height: 280px;
+            width: 400px;
+            padding: 30px;
+            background: rgba(242, 255, 210, 0.8);
+            border: 1px solid #2dc187;
+            box-sizing: border-box;
+            .form-header{
+                text-align: center;
+                padding-bottom: 18px;
+                span{
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #06784b;
+                }
+            }
+            .form-body{
+                .form-row{
+                    .group-control{
+                        .form-control{
+                            height: 35px;
+                            width: 100%;
+                            padding: 0 10px;
+                        }
+                    }
+                    .form-validate{
+                        display: flex;
+                        flex-direction: column;
+                        .form-error{
+                            margin-right: auto;
+                            height: 25px;
+                            font-size: 13px;
+                            color: red;
+                        }
+                    }
+                }
+                .form-action{
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                    padding-top: 40px;
+                    .btn-login{
+                        height: 40px;
+                        width: 160px;
+                        margin: 0 auto;
+                        background: #fc6536;
+                        color: #fff;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 5px;
+                        &:hover{
+                            background: #f48461;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.container-renew{
+    .wrapper-renew{
+        .form-main{
+            .form-body{
+                .form-action{
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                    padding-top: 10px;
+                }
+            }
+        }
+    }
+}

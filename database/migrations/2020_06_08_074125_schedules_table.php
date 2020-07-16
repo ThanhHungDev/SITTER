@@ -25,7 +25,8 @@ class SchedulesTable extends Migration
                 $table->timestamp('start')->nullable();
                 $table->timestamp('finish')->nullable();
                 $table->boolean('overnight')->default(false);
-                $table->boolean('deleted')->default(false);
+                $table->string('type', 125)->nullable();//type_working , type save eg:,1,2,
+                $table->integer('status')->default(0);
                 $table->timestamps();
             });
         }

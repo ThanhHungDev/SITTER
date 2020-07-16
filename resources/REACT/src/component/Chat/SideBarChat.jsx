@@ -1,18 +1,19 @@
 import React, { Component } from "react";
-
+import { connect } from "react-redux"
 // import SearchUser from "./SearchUser.jsx"
 import ListUser from "./ListUser.jsx"
-import "../scss/chat/sidebar.scss"
+import "../../scss/chat/sidebar.scss"
+import CONFIG from "../../config"
 
 class SideBarChat extends Component {
 
     render() {
         console.log("render sidebar")
-        var auth = { avatar: '', name: '' }
-        var { user } = this.props
-        if (user && user._id) {
-            auth.avatar = user.avatar
-            auth.name = user.name;
+        var infor = { avatar: '', name: '' }
+        var { auth } = this.props
+        if (auth && auth.id) {
+            infor.avatar = auth.avatar
+            infor.name = auth.first_name + " " + auth.last_name 
         }
 
         return (
@@ -20,13 +21,13 @@ class SideBarChat extends Component {
                 <div className="myinfo">
                     <div className="avatar">
                         <figure className="state-avatar active-online">
-                            <img src={ myinfo.avatar } alt="" />
+                            <img src={ CONFIG.SERVER_PHP.URL + infor.avatar } alt="" />
                         </figure>
-                        <span className="name">{myinfo.name}</span>
+                        <span className="name">{infor.name}</span>
                     </div>
                 </div>
                 <div className="list-user">
-                    <ListUser usersChat={this.props.userChat} />
+                    <ListUser conversations={this.props.conversations} />
                 </div>
             </div>
         );
@@ -34,10 +35,8 @@ class SideBarChat extends Component {
 }
 let mapStateToProps = (state) => {
     return {
-        user: state.users,
-        client: state.client,
-        userChat: state.userChat,
-        socket: state.socket
+        auth: state.users,
+        conversations: state.userChat
     }
 }
 export default connect(mapStateToProps)(SideBarChat)

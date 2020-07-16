@@ -7,6 +7,7 @@
   overflow: hidden;
 
   .wrapper-list-message {
+    position: relative;
     padding: 15px;
     height: 400px;
     overflow-y: scroll;
@@ -77,7 +78,7 @@
 }
 @include Responsive(SM){
   .component-list-message {
-    width: calc(100% - 60px);
+    width: calc(100% - 75px);
 
     .wrapper-list-message {
       height: 300px;

@@ -1,5 +1,6 @@
 var mongoose = require("mongoose"),
-    CONFIG = require("../config")
+    CONFIG = require("../config"),
+    TokenAccess = require("../model/TokenAccess")
     
 
 var IS_PRODUCTION = CONFIG.IS_ENVIROMENT_PRODUCT
@@ -24,7 +25,7 @@ mongoose.connection.on('connected', function () {
 
 // If the connection throws an error
 mongoose.connection.on('error', function (err) {
-    console.log('Mongoose default connection error: ' + err);
+    console.log('Mongoose default connection error: ' + err.message, CONFIG.database.mongodb);
 });
 
 // When the connection is disconnected
@@ -47,4 +48,29 @@ mongoose.connection.on('open', function () {
     //     console.log(err, " có lỗi db")
     // })
 
+    // myTokenAccess = new TokenAccess({
+    //     token : "tokenAccess",
+    //     user  : 1,
+    //     online: false,
+    //     detect: "ahihi"
+    // })
+
+    // myTokenAccess.save()
+    // .then( token => {
+        
+    //     console.log("vào đc")
+    // })
+    // .catch( err => {
+    //     console.log( err.message )
+    // })
+
+
+    // TokenAccess.find({ user  : 1 })
+    // .then( token => {
+    //     console.log( token )
+    // })
+    // .catch( err => {
+    //     console.log( err.message , "catching")
+    // })
+    
 });

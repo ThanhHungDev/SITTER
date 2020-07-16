@@ -21,8 +21,10 @@
         }
         .site-name {
             margin-left: 10px;
-            padding-top: 16px;
+            padding-top: 22px;
             align-self: flex-start;
+            font-size: 16px;
+            font-weight: bold;
         }
     }
     .nav-link{
@@ -33,7 +35,7 @@
             text-decoration: none;
             color: $black-light;
             .nav-button-link{
-                height: 86px;                
+                height: 86px;
                 width: 100px;
                 padding: 7px 0;
                 display: flex;
@@ -44,6 +46,9 @@
                 span {
                     line-height: 18px;
                     text-align: center;
+                }
+                span.nav-text.mobile{
+                    display: none;
                 }
                 .icon-img{
                     width: 25px;
@@ -57,6 +62,9 @@
                 .icon-img.faq{
                     width: 31px;
                 }
+                .icon-img.adv{
+                    width: 30px;
+                }
                 &.register{
                     background-color: #fc6536;
                     font-weight: bold;
@@ -64,12 +72,181 @@
                 &.login{
                     background-color: #fcd036;
                     font-weight: bold;
-                }             
-                    
+                }
+            }
+        }
+
+        .avatar{
+            height: auto;
+            display: flex;
+            align-items: center;
+            .icon-img{
+                margin-right: 5px;
+                width: 40px;
+                height: auto;
+            }
+            margin-right: 50px;
+        }
+    }
+    .icon-mobile, .menu-mobile{
+        display: none;
+    }
+}
+
+@media(max-width: 699px) {//(máy tính bảng loại to, hiển thị chiều ngang)
+    .header_container{
+        height: 70px;
+        border: none;
+        flex-wrap: wrap;
+        padding-left: 0;
+        .nav-logo{
+            height: 70px;
+            width: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 40px;
+            a {
+                .link-img{
+                    padding-top: 10px;
+                    width: 90px;
+                }
+            }
+            .site-name {
+                padding-top: 15px;
+                font-size: 13px;
+            }
+        }
+        .nav-link{
+            display: none;
+        }
+        .icon-mobile{
+            display: flex;
+            width: 43px;
+            height: 43px;
+            font-size: 28px;
+            align-self: flex-start;
+            text-decoration: none;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            background-color: #2dc187;
+            z-index: 9999;
+        }
+        .menu-mobile{
+            display: flex;
+            width: 100%;
+            height: auto;
+            background-color: white;
+            z-index: 999;
+            .nav-link{
+                display: flex;
+                flex-direction: column;
+                border-top: 1px solid #2dc187;
+                width: 100%;
+                a{
+                    width: 100%;
+                    height: auto;
+                    .nav-text{
+                        display: none;
+                        &.mobile{
+                            display: block !important;
+                        }
+                    }
+                    .nav-button-link{
+                        width: calc(100% - 20px);
+                        height: 40px;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        align-items: center;
+                        border-bottom: 1px solid #2dc187;
+                        padding: 0;
+                        margin: 0;
+                        padding-left: 20px;
+                        span {
+                            font-size: 13px;
+                            line-height: 15px;
+                            color: black;
+                        }
+                        .icon-img{
+                            width: 23px;
+                            padding-right: 10px;
+                        }
+                        .icon-img.username {
+                            width: 20px;
+                        }
+                        .icon-img.flow{
+                            width: 20px;
+                        }
+                        .icon-img.faq{
+                            width: 20px;
+                        }
+                        .icon-img.adv{
+                            width: 18px;
+                        }
+                        &.register{
+                            background-color: white;
+                            font-weight: normal;
+                        }
+                        &.login{
+                            background-color: white;
+                            font-weight: normal;
+                        }
+                    }
+                }
             }
         }
     }
 }
+@media(min-width: 700px) and (max-width: 900px) {//(máy tính bảng loại to, hiển thị chiều ngang)
+    .header_container{
+        height: 70px;
+        .nav-logo{
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+            a {
+                .link-img{
+                    width: 70px;
+                }
+            }
+            .site-name {
+                padding-top: 11px;
+                font-size: 13px;
+            }
+        }
+        .nav-link{
+            display: flex;
+            a {
+                border-left: 1px solid #cccccc;
+                text-decoration: none;
+                color: $black-light;
+                .nav-button-link{
+                    height: 56px;
+                    width: 70px;
+                    span {
+                        font-size: 13px;
+                        line-height: 15px;
+                    }
+                    .icon-img{
+                        width: 23px;
+                    }
+                    .icon-img.username {
+                        width: 20px;
+                    }
+                    .icon-img.flow{
+                        width: 25px;
+                    }
+                    .icon-img.faq{
+                        width: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
 .header-top-page{
     *,
     &:after,

@@ -24,16 +24,24 @@ class VALIDATE_LOGIN extends FormRequest
     public function rules()
     {
         return [
-            'email' =>'required|email',
-            'password' => 'required|min:6'
+            'email' =>'sometimes|required|email',
+            'password' => 'sometimes|required|min:6|max:32',
+            'confirm_password' => 'sometimes|required|min:6|max:32|same:password',
+            'detect' => 'sometimes|required'
         ];
     }
     public function messages(){
         return [
-            'email.required' => 'email phải được nhập',
-            'email.email' => 'email không phải là định dạng email',
-            'password.required'  => 'password phải được nhập',
-            'password.min'  => 'password phải chứa ít nhất 6 kí tự',
+            'email.required' =>  'メールアドレスは必須です。',
+            'email.email' =>  'メールアドレスが無効です。',
+            'password.required' =>  'パスワードは必須です。',
+            'password.min' =>  'パスワードは6文字以上、32文字以下でなければなりません。',
+            'password.max' =>  'パスワードは6文字以上、32文字以下でなければなりません。',
+            'confirm_password.required' =>  'パスワード確認は必須です。',
+            'confirm_password.min' =>  'パスワードは6文字以上、32文字以下でなければなりません。',
+            'confirm_password.max' =>  'パスワードは6文字以上、32文字以下でなければなりません。',
+            'confirm_password.same' => 'パスワード確認はパスワードと一致しません。',
+            'detect.required' =>  'メールアドレスまたはパスワードが間違っています!'
         ];
     }
 }

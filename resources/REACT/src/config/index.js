@@ -1,6 +1,6 @@
-var local      = "localhost",
-    local_ip   = "127.0.0.1",
-    local_port = 8000,
+var local      = "153.126.149.63",
+    local_ip   = "153.126.149.63",
+    local_port = 9999,
     peer_port  = 7000
 
 export default {
@@ -28,14 +28,8 @@ export default {
       return protocol + local + port_url;
     }
   },
-  SITE: {
-    NAME: 'EBUDEZAIN',
-    company_name: "EBUDEZAIN Vietnam Limited Company",
-    address: "0674, Binh Gia Commune, Chau Duc District, Ba Ria - Vung Tau Province, Vietnam",
-    tax: "0314650129",
-    tax_register: "28-09-2017",
-    phone: "080-3387-0674",
-    email : "thanhhung.code@gmail.com"
+  SERVER_PHP: {
+    URL: "http://babysitter.trust-growth.co.jp" 
   },
   EMOJIS: [
     { symbol: "🤭", sign: ":3" },

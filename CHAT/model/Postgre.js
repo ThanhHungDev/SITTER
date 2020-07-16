@@ -29,6 +29,6 @@ db.sequelize = sequelize;
  */
 db.USER         = require('./User.js')(sequelize, Sequelize)
 db.TOKEN_REFESH = require("./TokenRefesh.js")(sequelize, Sequelize)
-
+db.SCHEDULE     = require("./Schedule.js")(sequelize, Sequelize)
 
 module.exports = db

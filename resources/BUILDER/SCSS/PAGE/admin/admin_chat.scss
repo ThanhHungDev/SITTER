@@ -1,0 +1,118 @@
+.container-admin-chat{
+    padding: 0 15px;
+    .action-public{
+        position: relative;
+        margin-right: 10px;
+        width: 100px;
+        height: 30px;
+        box-sizing: border-box;
+        border: 1.5px solid #c9c9c9;
+        border-radius: 10px;
+        .btn-toggle-public{
+            position: absolute;
+            display: none;
+            cursor: pointer;
+            &:checked{
+                +.bl-toggle-public{
+                    right: 3px;
+                    left: unset;
+                    background-color: #fc6536;
+                }
+            }
+        }
+        .bl-toggle-public{
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 22px;
+            background-color: #b6b6b6;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    }
+    .mw-250{
+        min-width: 250px;
+    }
+    .c-header, .c-footer{
+        display: flex;
+        align-items: center;
+        .c-title{
+            flex: 1;
+        }
+        .c-pagination{
+            flex: 1;
+            span{
+                padding-right: 5px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+        }
+    }
+    .c-table{
+        width: 100%;
+        tr{
+            td,th{
+                border-bottom: 1px solid #dcdcdc;
+            }
+        }
+        th{
+            text-align: left;
+            font-size: 16px;
+            color: green;
+        }
+        tbody{
+            tr{
+                td{
+                    padding: 5px 0;
+                }
+            }
+        }
+        .history-btn{
+            padding: 5px 15px;
+            font-weight: bold;
+            background: #b6b6b6;
+            border: unset;
+        }
+    }
+    .list-unread{
+        .history-btn{
+            position: relative;
+            padding-right: 25px;
+            padding-left: 25px;
+            min-width: 120px;
+            cursor: pointer;
+        }
+        .mess-unread{
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            color: #fff;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
+
+.right-side-admin{
+    .bg-chat-temalate{
+        background: none!important;
+    }
+    .td-truncate{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 1px;
+    }
+}

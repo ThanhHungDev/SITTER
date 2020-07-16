@@ -3,61 +3,57 @@ import { connect } from "react-redux"
 import HeadInfo from "./HeadInfo.jsx"
 import MessageChat from "./MessageChat.jsx"
 import InputSendChat from "./InputSendChat.jsx"
-import MessageChatTyping from "./MessageChatTyping.jsx"
+import $ from "jquery"
 import "../../scss/chat/list-message.scss"
+import { listenScrollMessage } from "../../library/service.js"
 
 class ListMessage extends Component {
-
-  componentDidMount(){
-    document.getElementById('js-scroll-to-bottom').scrollTop  = document.getElementById('js-scroll-to-bottom').scrollHeight
-    document.getElementById('js-scroll-to-bottom').addEventListener('scroll', (event) => {
-      // handle the scroll event 
-      var domIsWriting = document.getElementById("js-is-write-message")
-      if(domIsWriting){
-        domIsWriting.classList.remove("writing")
-      }
-    });
-  }
-
-  componentDidUpdate(){
-    document.getElementById('js-scroll-to-bottom').scrollTop  = document.getElementById('js-scroll-to-bottom').scrollHeight
-  }
-  render() {
     
-    console.log("render ListMessage")
-    var { channels } = this.props
-    var channelActiveChat = channels.find( channel => channel.isActive );
+    
+    componentDidUpdate() {
 
-    if( channelActiveChat ){
-      var { typing } = channelActiveChat
+        var { channels } = this.props
+        var channelActiveChat = channels.find(channel => channel.isActive)
+
+        var messages = channelActiveChat && channelActiveChat.message
+
+        var lstMessage   = document.getElementById('js-scroll-to-bottom')
+        if(lstMessage){
+            
+            $('#js-scroll-to-bottom').on('scroll', function(){
+                listenScrollMessage(this, messages, channelActiveChat)
+            })
+        }
     }
     
-    var messages = channelActiveChat && channelActiveChat.message;
+    render() {
 
-    var { myinfo } = this.props
-    return (
-      <div className="component-list-message">
-        <HeadInfo />
-        <div className="wrapper-list-message" id="js-scroll-to-bottom">
-          { messages && messages.map( 
-            (message , key) => 
-            <MessageChat 
-              key={"message-chat" + key + channelActiveChat.id} 
-              myinfo={myinfo} 
-              message={message} 
-              toUser={channelActiveChat} 
-            /> 
-          )}
-          <MessageChatTyping toUser={channelActiveChat} />
-        </div>
-        <InputSendChat />
-      </div>
-    );
-  }
+        var { channels } = this.props
+        var channelActiveChat = channels.find(channel => channel.isActive);
+
+        var messages = channelActiveChat && channelActiveChat.message;
+
+        return (
+            <div className="component-list-message">
+                <HeadInfo />
+                <div className="wrapper-list-message" id="js-scroll-to-bottom">
+                    {messages && messages.map(
+                        (message, key) =>
+                            <MessageChat
+                                key={"message-chat" + key + channelActiveChat.id}
+                                message={message}
+                                channelActiveChat={channelActiveChat}
+                            />
+                    )}
+                </div>
+                <InputSendChat />
+            </div>
+        );
+    }
 }
 let mapStateToProps = (state) => {
-  return {
-    channels: state.userChat
-  }
+    return {
+        channels: state.userChat
+    }
 }
 export default connect(mapStateToProps)(ListMessage);

@@ -8,7 +8,7 @@ const PRECACHE_URLS = [
     '/',
     'js/vendors~main.index.bundle.js',
     'js/index.bundle.js',
-    'jquery.min.js',
+    'library/jquery.min.js',
     "font/IconFont/webfont.eot",
     "font/IconFont/webfont.ttf",
     "font/IconFont/webfont.woff",

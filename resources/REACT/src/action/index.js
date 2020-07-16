@@ -10,7 +10,7 @@ export function setterUser( user ){
     console.log(user , " set user ")
     return {
         type : TYPE.USER.SETTER_USER,
-        payload : user
+        payload : { ...user, fetched: true }
     }
 }
 
@@ -44,5 +44,28 @@ export function changeChannelActive( channelName ){
     return {
         type : TYPE.CHANNEL.SET_ACTIVE,
         payload : channelName
+    }
+}
+
+export function addUserOnline( id ){
+    console.log(id , " addUserOnline ")
+    return {
+        type : TYPE.CHANNEL.ADD_USER_ONLINE,
+        payload : id
+    }
+}
+
+export function removeUserOnline( id ){
+    console.log(id , " removeUserOnline ")
+    return {
+        type : TYPE.CHANNEL.REMOVE_USER_ONLINE,
+        payload : id
+    }
+}
+
+export function readAllMessageChannelActive(){
+    console.log(" readAllMessageChannelActive ")
+    return {
+        type : TYPE.CHANNEL.READ_ALL_MESSAGE_CHANNEL_ACTIVE
     }
 }

@@ -10,7 +10,7 @@ function detectClient() {
     var nameOffset, verOffset, ix;
     // Opera
     if ((verOffset = nAgt.indexOf('Opera')) != -1) {
-      browser = 'Opera';
+      browser += 'Opera';
       version = nAgt.substring(verOffset + 6);
       if ((verOffset = nAgt.indexOf('Version')) != -1) {
         version = nAgt.substring(verOffset + 8);
@@ -18,27 +18,32 @@ function detectClient() {
     }
     // Opera Next
     if ((verOffset = nAgt.indexOf('OPR')) != -1) {
-      browser = 'Opera';
+      browser += 'Opera';
       version = nAgt.substring(verOffset + 4);
     }
     // Edge
-    else if ((verOffset = nAgt.indexOf('Edge')) != -1) {
-      browser = 'Microsoft Edge';
+    else if ((verOffset = nAgt.indexOf('Edg')) != -1) {
+      browser += 'Microsoft Edge';
       version = nAgt.substring(verOffset + 5);
     }
     // MSIE
     else if ((verOffset = nAgt.indexOf('MSIE')) != -1) {
-      browser = 'Microsoft Internet Explorer';
+      browser += 'Microsoft Internet Explorer';
       version = nAgt.substring(verOffset + 5);
+    }
+    // CocCoc
+    else if ((verOffset = nAgt.indexOf('coc')) != -1) {
+      browser += 'CocCoc';
+      version = nAgt.substring(verOffset + 8);
     }
     // Chrome
     else if ((verOffset = nAgt.indexOf('Chrome')) != -1) {
-      browser = 'Chrome';
+      browser += 'Chrome';
       version = nAgt.substring(verOffset + 7);
     }
     // Safari
     else if ((verOffset = nAgt.indexOf('Safari')) != -1) {
-      browser = 'Safari';
+      browser += 'Safari';
       version = nAgt.substring(verOffset + 7);
       if ((verOffset = nAgt.indexOf('Version')) != -1) {
         version = nAgt.substring(verOffset + 8);
@@ -46,12 +51,12 @@ function detectClient() {
     }
     // Firefox
     else if ((verOffset = nAgt.indexOf('Firefox')) != -1) {
-      browser = 'Firefox';
+      browser += 'Firefox';
       version = nAgt.substring(verOffset + 8);
     }
     // MSIE 11+
     else if (nAgt.indexOf('Trident/') != -1) {
-      browser = 'Microsoft Internet Explorer';
+      browser += 'Microsoft Internet Explorer';
       version = nAgt.substring(nAgt.indexOf('rv:') + 3);
     }
     // Other browsers
@@ -209,8 +214,8 @@ function detectClient() {
 
   return {
     browser: browser.toString(),
-    browserVersion: version.toString(),
     browserMajorVersion: majorVersion.toString(),
+    browserVersion: version.toString(),
     os: os.toString(),
     osVersion: osVersion.toString()
   }

@@ -26,9 +26,19 @@ php artisan make:migration create_users_table
 
  php artisan db:seed
 
+ php artisan storage:link
+ php artisan config:cache
+ 
  composer require jenssegers/mongodb
 
  Laravel
 In case your Laravel version does NOT autoload the packages, add the service provider to config/app.php:
 
 Jenssegers\Mongodb\MongodbServiceProvider::class,
+
+Command Add SSH private key with git bash
+$ eval $(ssh-agent -s)
+$ ssh-add ~/.ssh/id_rsa
+
+
+php artisan cache:clear

@@ -4,8 +4,22 @@
 @import "../mixin";
 
 .component-user-chat-sidebar{
+  position: relative;
+    .none-read-message{
+      position: absolute;
+      right: 15px;
+      border-radius: 50%;
+      padding: 3px 6px;
+      bottom: 30%;
+      font-size: 11px;
+      line-height: 1;
+      font-style: normal;
+      background-color: $green;
+      color: $gray-200;
+    }
 
   .user-chat{
+    min-height: 50px;
     position: relative;
     padding: 5px;
     cursor: pointer;
@@ -30,6 +44,10 @@
       top: 50%;
       display: block;
       padding: 0;
+      width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
       margin: 0;
       overflow: hidden;
       border-radius: 50%;
@@ -56,11 +74,13 @@
       img{
         width: 40px;
         height: 40px;
+        min-width: 40px;
+        min-height: 40px;
       }
     }
     .text-info{
       display: block;
-      padding: 7px 7px 7px 55px;
+      padding: 0 0 0 55px;
       color: $custom-primary-color-dark;
 
       .name{
@@ -85,6 +105,7 @@
 
 
   .component-user-chat-sidebar{
+    
 
     .user-chat{
 
