@@ -22,6 +22,16 @@
                 }
             }
         }
+        &.calendar-cell-disable-prev-month, &.calendar-cell-disable-next-month{
+            .calendar-event{
+                opacity: 0.6;
+            }
+        }
+        &.calendar-cell-disable-less-today{
+            .calendar-event{
+                background-color: $gray-700!important;
+            }
+        }
     }
     .calendar-event{
         display: block;
@@ -32,11 +42,20 @@
         &.event-over{
             background-color: #fc6536;
         }
-        &.event-new{
-            background-color: $custom-green;
+        // &.event-new{
+        //     background-color: $custom-green;
+        // }
+        // &.event-update{
+        //     background-color: $custom-brown;
+        // }
+        &.type-job1{
+            background-color: rgb(6, 120, 75);;
         }
-        &.event-update{
-            background-color: $custom-brown;
+        &.type-job2{
+            background-color: #4169e1  ;
+        }
+        &.type-job1-2{
+            background-color: #ffd700;
         }
     }
 }

@@ -20,8 +20,8 @@ class App extends Component {
 
     componentDidUpdate() {
         var EVENT   = CONFIG_EVENT
-        //var peerDom = document.getElementById("Application")
-        if ( !this.state.sendUserOnline ) { // peerDom && peerDom.getAttribute('data-peer') &&
+        
+        if ( !this.state.sendUserOnline ) { 
             if( this.props.auth && this.props.auth.fetched ){
                 
                 if (this.props.socket) {
@@ -32,6 +32,7 @@ class App extends Component {
                             peer  : "1234567890",
                             access: this.props.auth.tokens.tokenAccess
                         })
+                        this.props.socket.emit(EVENT.USER_GET_BOOKING, { id: this.props.auth.id })
                     })
                 }
             }

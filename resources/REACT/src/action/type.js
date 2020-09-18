@@ -23,6 +23,10 @@ const TYPE =  {
   },
   CONFIG: {
     SETTER_SEND_PEER : "SETTER_SEND_PEER"
+  },
+  BOOKING: {
+    SETTER_BOOKING : "SETTER_BOOKING",
+    CHANGE_BOOKING: "CHANGE_BOOKING"
   }
 }
 export default TYPE;

@@ -5,7 +5,7 @@
 
 @import "variable.scss";
 @import "reboot.scss";
-// @import "alert.scss";
+@import "alert.scss";
 // @import "button.scss";
 // @import "grid.scss";
 // @import "proress.scss";
@@ -14,3 +14,10 @@
 @import "gradient.scss";
 @import "icon.scss";
 // @import "awesome.scss";
+@import "_modal.jquery.scss";
+
+#ui-datepicker-div{
+    z-index: 1000!important;
+}
+@import "./timepicker.scss";
+@import "./chat/modal-booking.scss"

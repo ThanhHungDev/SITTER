@@ -16,7 +16,7 @@ class EmployerProfileModel extends Model
         return  $this->select(DB::raw($select))
                         ->leftjoin('users', 'users.id', '=', 'employer_profiles.user_id')
                         ->where('employer_profiles.user_id', '=', $userId)
-                        ->first()->toArray();
+                        ->firstOrFail()->toArray();
     }
 
     public function getFieldProfile()

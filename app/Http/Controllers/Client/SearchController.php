@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Client;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\FactoryModel\FactoryModelInterface;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\FactoryModel\FactoryModelInterface;
 
 class SearchController extends Controller
 {
@@ -13,11 +14,6 @@ class SearchController extends Controller
     public function __construct(FactoryModelInterface $_model) {
         $this->model = $_model;
         $this->JP_LOCATION = config('constant.JP_LOCATION');
-    }
-
-    public function convertDate($date)
-    {
-
     }
 
     //Phong:18062020: return index page
@@ -63,7 +59,6 @@ class SearchController extends Controller
         $data_params['exps'] = $_exps;
         $data_params['skills'] = $_skills;
 
-        //dd($data_params);
         //get data from model
         $_list_items = $this->model->createUserModel()->searchItems( $data_params);
 
@@ -71,6 +66,9 @@ class SearchController extends Controller
         $data['list_items']  = $_list_items;
         $data['jp_locations']  = $this->JP_LOCATION;
         $data['data_params'] = $data_params;
+        if (Auth::check() && Auth::user()->role_id == config('constant.ROLE.EMPLOYER')) {
+            $data['is_login'] = true;
+        }
         return view('client.search.search_result', $data);
     }
     public function advanceSearch(){

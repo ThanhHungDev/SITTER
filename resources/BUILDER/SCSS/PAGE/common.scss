@@ -15,14 +15,18 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 18px;
+        font-size: 16px;
         border-bottom: 1px solid #dcdcdc;
         padding: 15px;
+        overflow-y: scroll;
+        background-color: #efffc7;
+        max-height: 520px;
     }
     .footer-modal{
         display: flex;
         justify-content: center;
         padding: 5px 0;
+        background-color: #efffc7;
         .btn{
             padding: 10px 15px;
             border: 1px solid #dcdcdc;
@@ -39,4 +43,35 @@
             color: #fff;
         }
     }
+    
+}
+#emp-privacy, #sitters-privacy, #emp-terms, #sitters-terms{
+    .policy-header{
+        h1{
+            margin: 0;
+        }
+    }
+    .body-modal{
+        display: block;
+    }
+    .footer-modal{
+        .btn-back{
+            background: #dcdcdc;
+            color: #000;
+        }
+    }
+    .privacy{
+        padding: 15px;
+    }
+    .policy-subheader{
+        font-weight: 600;
+        .title{
+            margin-bottom: 0;
+        }
+    }
+}
+@include DivResponsive(575px){
+    .my-modal-confirm{
+        width: 100%;
+    }   
 }

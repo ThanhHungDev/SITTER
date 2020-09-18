@@ -25,18 +25,39 @@ class HeadInfo extends Component {
 			return null
 		}
 		var textOnline =  channelActive.user.online ? "オンライン" : "オフライン"
-
-		
+		var hrefUser = null
+		if( typeof ROUTE_VIEW_SITTER != 'undefined' && typeof ROUTE_VIEW_EMPLOYER != 'undefined' ){
+			if( channelActive.user.role_id == CONFIG.ROLE_USER.sitter ){
+				hrefUser = ROUTE_VIEW_SITTER + "/" + channelActive.user.id
+			}
+			if( channelActive.user.role_id == CONFIG.ROLE_USER.employer ){
+				hrefUser = ROUTE_VIEW_EMPLOYER + "/" + channelActive.user.id
+			}
+		}
 
 		return (
 			<div className="component-head-info">
 
 				<div className="user-active-chat">
 					<figure className="state-avatar active-online">
-						<img src={CONFIG.SERVER_PHP.URL + channelActive.user.avatar} alt="" />
+						{
+							hrefUser ? 
+							<a href={hrefUser}>
+								<img src={CONFIG.SERVER_PHP.URL + channelActive.user.avatar} alt="" />
+							</a>
+							: 
+							<img src={CONFIG.SERVER_PHP.URL + channelActive.user.avatar} alt="" />
+						}
+						
 					</figure>
 					<div className="text-info">
-						<span className="name">{channelActive.user.first_name + " " +channelActive.user.last_name}</span>
+						{
+							hrefUser ? 
+							<a href={hrefUser} className="name">{channelActive.user.first_name + " " +channelActive.user.last_name}</a>
+							: 
+							<span className="name">{channelActive.user.first_name + " " +channelActive.user.last_name}</span>
+						}
+						
 						<span className={(channelActive.user.online ? "active-now" : '') + " time-online"}>{textOnline}</span>
 					</div>
 				</div>

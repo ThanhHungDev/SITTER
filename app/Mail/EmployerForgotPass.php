@@ -36,8 +36,9 @@ class EmployerForgotPass extends Mailable
         );
         
         return $this->view('emails.employer_forgot_pass')
-                    ->with([
-                        'dataSendMail' => $dataSendMail,
-                    ]);
+                ->subject('【家政婦さん・ベビーシッタードットコム】パスワード再発行のお知らせ')
+                ->with([
+                    'dataSendMail' => $dataSendMail,
+                ]);
     }
 }

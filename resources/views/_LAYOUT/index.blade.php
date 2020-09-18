@@ -1,17 +1,17 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title> @yield('title') </title>
-    {{-- <meta name="robots" content="index, follow" /> --}}
-    <meta name="robots" content="noindex" />
-    <meta name="googlebot" content="noindex" />
+    <meta name="robots" content="index, follow" />
+    {{-- <meta name="robots" content="noindex" />
+    <meta name="googlebot" content="noindex" /> --}}
 
-    <meta http-equiv="content-language" content="jp" />
+    {{-- <meta http-equiv="content-language" content="jp" /> --}}
     <meta property="og:title" content="@yield('title')" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ asset('/') }}" />
@@ -21,13 +21,14 @@
     <meta name="keywords" content="@yield('keywords')">
 
     <link rel="icon" href="{{ asset('favicon.ico')}}" type="image/png">
-    <link rel="stylesheet" href="{{ asset('css/app.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/app.css?'.config('constant.VERSION_CSS'))}}">
+    <link rel="stylesheet" href="{{ asset('css/library/jquery.timepicker.css?'.config('constant.VERSION_CSS'))}}">
     @yield('stylesheets')
     <script>
-        const SYSTEM_BASE_URL      = "{{ asset('') }}"
-        const SYSTEM_REAL_TIME_URL = "{{ config('app.realtime_url') }}"
+        const SYSTEM_BASE_URL      = "{{ asset('') }}";
+        const SYSTEM_REAL_TIME_URL = "{{ config('app.realtime_url') }}";
 
-        const SYSTEM_CHAT_EMPLOYER = "{{ route('EMPLOYER_CHAT') }}"
+        const SYSTEM_CHAT_EMPLOYER = "{{ route('EMPLOYER_CHAT') }}";
 
         const CONFIG_EVENT            = {
             CONNECTTION              : 'connection',
@@ -46,11 +47,21 @@
             USER_OFFLINE_NOTI        : "USER_OFFLINE_NOTI",
             DUPLICATION_TAB          : "DUPLICATION_TAB",
             READ_MESSAGE_ALL         : "READ_MESSAGE_ALL",
-            READ_MESSAGE_ALL_RESPONSE: "READ_MESSAGE_ALL_RESPONSE"
-        }
+            READ_MESSAGE_ALL_RESPONSE: "READ_MESSAGE_ALL_RESPONSE",
+            USER_GET_BOOKING            : "USER_GET_BOOKING",
+            RESPONSE_USER_GET_BOOKING   : "RESPONSE_USER_GET_BOOKING",
+            USER_CHANGE_BOOKING         : "USER_CHANGE_BOOKING",
+            RESPONSE_USER_CHANGE_BOOKING: "RESPONSE_USER_CHANGE_BOOKING",
+            RESPONSE_USER_CHANGE_BOOKING_ERROR: "RESPONSE_USER_CHANGE_BOOKING_ERROR"
+        };
 
-        const ID_VIEW_SITTER = "{{ $ID_VIEW_SITTER?? null }}"
-        const ID_VIEW_USER_CHAT = "{{ $ID_VIEW_USER_CHAT ?? null }}"
+        const ID_VIEW_SITTER    = "{{ $ID_VIEW_SITTER?? null }}";
+        const ID_VIEW_USER_CHAT = "{{ $ID_VIEW_USER_CHAT ?? null }}";
+
+        const ROUTE_VIEW_SITTER   = "{{ Route('VIEW_SITTER', [ 'id' => null ]) }}";
+        const ROUTE_VIEW_EMPLOYER = "{{ Route('VIEW_EMPLOYER', [ 'id' => null ]) }}";
+        const LIMIT_RECORD_REVIEW = 3;
+        const ROUTE_LOAD_REVIEWS  = "{{ Route('AJAX_LOAD_REVIEWS') }}";
     </script>
 </head>
 <body>
@@ -68,24 +79,27 @@
             @include ('_LAYOUT.client.partial.footer')
         </div>
     </div>
+    @include('modals.employers.privacy')
     <input id="scroll-btn" onclick="scrollToTop()" type="button" title="Go to top"/>
     <script type="text/javascript" src="{{ asset('js/library/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/calendar.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/jquery.timepicker.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/app.min.js' . Config::get('app.version')) }}"></script>
+
     @yield('scripts')
     <script>
         $('#icon-mobile-bars').click(function(){
             event.preventDefault();
             $('.menu-mobile').slideToggle('slow');
         });
-        window.onscroll = function(){
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200){
-                document.getElementById("scroll-btn").style.display = "block";
+
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 70) {
+                $('#scroll-btn').show();
+            } else {
+                $('#scroll-btn').hide();
             }
-            else{
-                document.getElementById("scroll-btn").style.display = "none";
-            }
-        };
+        });
 
         function scrollToTop()
         {

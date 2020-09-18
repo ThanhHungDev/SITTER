@@ -1,0 +1,84 @@
+.container-card{
+    max-width: 1080px;
+    margin: 0 auto;
+    .wapper-card{
+        min-height: 80vh;
+    }
+    .left-payment{
+        h2{
+            margin: 0;
+            text-align: center;
+        }
+    }
+    .payment-detail{
+        margin-top: 15px;
+    }
+    .debitCard{
+        h2{
+            margin: 0;
+            color: #fc6536;
+        }
+    }
+    #card-errors{
+        font-size: 14px;
+        color: red;
+        padding-top: 10px;
+    }
+    .StripeElement {
+        box-sizing: border-box;
+        // height: 40px;
+        padding: 10px 12px;
+        border: 1px solid #dcdcdc;
+        background-color: #fff;
+        // box-shadow: 0 1px 3px 0 #e6ebf1;
+        // -webkit-transition: box-shadow 150ms ease;
+        transition: box-shadow 150ms ease;
+    }
+    
+    .StripeElement--focus {
+        box-shadow: 0 1px 3px 0 #cfd7df;
+    }
+    
+    .StripeElement--invalid {
+        border-color: #fa755a;
+    }
+    
+    .StripeElement--webkit-autofill {
+        background-color: #fefde5 !important;
+    }
+    .submit{
+        padding: 12px 15px;
+        color: #fff;
+        // background-color: #2196F3;
+        border: unset;
+        border-bottom: 3px solid #198e5d;
+        margin: 10px 0 15px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        border-radius: 6px;
+        box-shadow: 1px 4px 6px #9a9a9a;
+        min-width: 150px;
+    }
+
+    .list-image-card {
+        display: flex;
+        flex-flow: row;
+        img{
+            width: 40px;
+            height: 35px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    }
+}
+@include DivResponsive(575px){
+    .container-card {
+        form{
+            width: 100%;
+        }
+        .form-collect-card {
+            width: 95%;
+        }
+    }
+}

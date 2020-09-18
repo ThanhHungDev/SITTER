@@ -247,7 +247,7 @@ function check_birthday() {
     if ( year == '' || month == '' || day == '' ) {
         return true;
     } else {
-        let date = new Date(year + '-' + month + '- '+ day);
+        let date = new Date(year + '/' + month + '/'+ day);
         if (date.getDate() != day) {
             return false;
         }
@@ -289,16 +289,30 @@ $('#inp-post-code').jpostal({
     ],
     address : {
         '#sl-box-pref'  : '%3',
-        '#inp-town'  : '%4, %5' 
+        '#inp-town'  : '%4' ,
+        '#inp-address' : '%5'
     }
 });
-$('#inp-post-code').keyup(function () {
-    let strPostCode = $(this).val();
+$('#inp-post-code').on('change',function () {
+    let strPostCode = regReplace($(this).val(), "０１２３４５６７８９ー", "0123456789-")
+    this.value = strPostCode
     if (strPostCode.length <= 8 ) {
         if (strPostCode.length>3 && strPostCode.indexOf('-') < 0) {
-            $(this).val(strPostCode.substr(0,3) + '-' + strPostCode.substr(3))
+            $(this).val(strPostCode.substr(0,3) + '-' + strPostCode.substr(3)) 
         }
     }else {
         $(this).val(strPostCode.substr(0,8))
     }
+    $(this).keyup();
 })
+function regReplace( text, search, replace ) {
+    // Make the search string a regex.
+    let regex = RegExp( '[^0-9]|[' + search + ']', 'g' );
+    return text.replace( regex,  
+        function( chr ) {
+            // Get the position of the found character in the search string.
+            let ind = search.indexOf( chr );
+            // Get the corresponding character from the replace string.
+            return replace.charAt( ind )
+    });
+}

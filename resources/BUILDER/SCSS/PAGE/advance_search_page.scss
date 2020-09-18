@@ -11,51 +11,20 @@
             height: 100%;
             object-fit: cover;
         }
+        @include input-search-custom-grid();
         .searchbox{
-            max-width: $container-2;
-            margin: 0 auto;
-            height: 160px;
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            left: 0; 
-            right: 0; 
-            top: 70px;
-            .header{
-                height: 60px;
-                width: 100%;
-                background-color: #2dc187;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                span{
-                    font-size: 26px;
-                    line-height: 26px;
-                    color: white;
-                }
-            }
+            top: 40px;
+            left: 0;
+            right:0;
+            bottom: 0;
+            margin:auto;
+            height: auto;
             .body{
-                width: 100%;
-                height: calc(160px - 60px);
-                background-color: #e6f6c3;
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
-                form {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
-                    padding-left: 70px;
-                    @include input-search-custom();
-                    .div-hidden{
-                        display: none;
-                    }
-                }
+                height: auto;
+                padding-bottom: 30px;
             }
         }
-      
+
     }
     @media(max-width: 670px) {//(máy tính bảng loại to, hiển thị chiều ngang)
         section.slider{
@@ -77,7 +46,7 @@
                 }
             }
         }
-    } 
+    }
 
     section.area-search{
         width: 100%;
@@ -102,7 +71,12 @@
                     margin-left: 15px;
                     font-size: 18px;
                     line-height: 18px;
+                    @media(max-width: 495px) { // smartphone
+                        font-size: 23px;
+                        line-height: 23px;
+                    }
                     color:#06784b;
+                    font-weight: bold;
                 }
             }
             .body-section{
@@ -117,6 +91,9 @@
                     width: 100%;
                     height: 18px;
                     font-size: 16px;
+                    @media(max-width: 495px) { // smartphone
+                        font-size: 18px;
+                    }
                     color: black;
                     display: flex;
                     align-items: center;
@@ -133,6 +110,9 @@
                     width: calc(100% - 30px);
                     height: auto;
                     font-size: 16px;
+                    @media(max-width: 495px) { // smartphone
+                        font-size: 18px;
+                    }
                     @include input-search-custom();
 
                     .row-content{
@@ -141,6 +121,10 @@
                         .title-row{
                             padding-top: 10px;
                             line-height: 16px;
+                            @media(max-width: 495px) { // smartphone
+                                padding: 8px 0;
+                                line-height: 18px;
+                            }
                             font-weight: bold;
                         }
                         .date-row{
@@ -158,7 +142,7 @@
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        .btn-search{ 
+                        .btn-search{
                             width: 220px;
                             height: 45px;
                             background-color: #fc6536;
@@ -191,13 +175,20 @@
                 width: auto;
                 height: auto;
                 margin: 0;
+                .title-section{
+                    span{
+                        margin-left: 10px;
+                    }
+                }
                 .body-section{
                     height: auto;
+                    width: calc(100% - 20px);
+                    padding: 10px;
                     .area{
                         flex-wrap: wrap;
                         height: auto;
                         span, a{
-                            font-size: 15px;
+                            font-size: 18px;
                         }
                     }
                 }
@@ -243,7 +234,7 @@
                                 }
                             }
                         }
-                       
+
                     }
                 }
             }

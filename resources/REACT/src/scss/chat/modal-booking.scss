@@ -1,0 +1,196 @@
+.modal-booking{
+
+    .title{
+        font-size: 18px;
+        color: $custom-primary-color-dark;
+        padding: 0 5px 5px;
+        text-align: center;
+    }
+    .wrapper__datetime-picker{
+        text-align: center;
+
+        .input-group{
+            width: 30%;
+            margin: 0 auto;
+            display: inline-block;
+            margin: 0 1.5% 15px;
+            position: relative;
+            height: 37px;
+
+            .hero-icon {
+                position: absolute;
+                top: 50%;
+                left: 10px;
+                display: block;
+                font-size: 28px;
+                z-index: 3;
+                color: #6c757d;
+                @include render-transform(translateY(-50%));
+            }
+            .input-control {
+                position: absolute;
+                top: 0;
+                right: 0;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                color: #525666;
+                background-color: #fff;
+                padding-left: 45px;
+                border-radius: 0;
+                font-size: 15px;
+                transition: border .3s linear;
+                border: 1px solid #ccc;
+            }
+            .text-control {
+                position: absolute;
+                top: 0;
+                right: 0;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                color: #525666;
+                background-color: #fff;
+                padding: 10px 0 10px 25px ;
+                border-radius: 0;
+                font-size: 15px;
+                transition: border .3s linear;
+            }
+        } 
+    }
+    
+    .statistical{
+        width: 100%;
+        display: block;
+
+        .session-statistical{
+            display: block;
+            position: relative;
+            padding: 5px 0;
+            @include clearfix();
+
+            .head{
+                display: block;
+                float: left;
+                font-size: 16px;
+                padding-right: 15px;
+                z-index: 1;
+                background-color: $white;
+                span{
+                    padding-right: 10px;
+                    
+                    font-size: 14px;
+                } 
+                &:after{
+                    content: ".";
+                    color: transparent;
+                    border-bottom: 1px dashed $gray-800;
+                    position: absolute;
+                    z-index: -1;
+                    left: 0;
+                    right: 0;
+                    bottom: 15px;
+                }
+            }
+            .text-value{
+                padding-left: 10px;
+                display: block;
+                float: right;
+                font-size: 16px;
+                color: $custom-primary-color-dark;
+                text-align: right;
+                min-width: 60px;
+                background-color: $white;
+            }
+            
+            &.note{
+                
+                font-size: 11px;
+            }
+        }
+    }
+    .group-box-total{
+        margin-top: 10px;
+        border-top: 1px solid $gray-300;
+        .wrapper__total{
+            width: 100%;
+            display: table;
+            .head, .text-value{
+                padding: 10px 0;
+                display: table-cell;
+            }
+            .text-value{
+                text-align: right;
+            }
+        }
+        .text-button-question{
+            text-align: center;
+        }
+        .wrapper-button-setting{
+            text-align: center;
+
+            .btn-booking{
+                text-decoration: none;
+                margin: 2px 10px;
+                font-size: 12px;
+                text-align: center;
+                display: inline-block;
+                padding: 8px 15px;
+                border: none;
+                color: $white;
+                text-decoration: null;
+                white-space: normal;
+                word-wrap: break-word;
+                vertical-align: middle;
+                -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+                -o-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+                cursor: pointer;
+            }
+            .btn-sitter-accept{
+                
+                background: #007bfc;
+                border: 2px solid #007bfc;
+                @include btn-interaction($white, color-level(#007bfc, -8),#007bfc)
+            }
+            .btn-employer-accept{
+                
+                background: $custom-danger;
+                border: 2px solid $custom-danger;
+                @include btn-interaction($white, color-level($custom-danger, -8),$custom-danger)
+            }
+            .btn-user-cancel{
+                
+                background: $custom-danger-color;
+                border: 2px solid $custom-danger-color;
+                @include btn-interaction($white, color-level($custom-danger-color, -8),$custom-danger-color)
+            }
+            .btn-user-approved{
+                background: $custom-primary-color-dark;
+                border: 2px solid $custom-primary-color-dark;
+                @include btn-interaction($white, color-level($custom-primary-color-dark, -8),$custom-primary-color-dark)
+            }
+        }
+    }
+}
+@include Responsive( SM ){
+    .modal.modal-booking{
+        width: 100%;
+        padding: 10px;
+        
+        .wrapper__datetime-picker{
+            
+            .wrapper__date-picker{
+                width: 60%;
+                margin: 0 1.5% 5px;
+            }
+            .wrapper__time-picker{
+                width: 40%;
+            }
+        }
+    }
+}

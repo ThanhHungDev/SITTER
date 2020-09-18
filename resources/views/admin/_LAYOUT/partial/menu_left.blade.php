@@ -16,6 +16,14 @@
                 <span class="nav-text">利用者一覧</span>
             </a>
         </li> 
+        <li class="{{ Route::is("ADMIN_LIST_BOOKING") ? 'active' : '' }}">
+            <a href="{{ route('ADMIN_LIST_BOOKING') }}">
+                <div class="icon-div">
+                    <img class="icon-img booking">
+                </div>
+                <span class="nav-text">予約一覧</span>
+            </a>
+        </li>
         <li class="{{ Route::is("ADMIN_CHAT","ADMIN_READ_MESSAGE") ? 'active' : '' }}">
             <a href="{{ route('ADMIN_CHAT') }}">
                 <div class="icon-div">

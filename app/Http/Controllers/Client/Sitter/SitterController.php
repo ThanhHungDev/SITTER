@@ -8,6 +8,7 @@ use App\FactoryModel\FactoryModelInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Http;
 
 use App\Services\CommonService;
 use App\Services\SitterService;
@@ -34,6 +35,8 @@ class SitterController extends Controller
     public function index()
     {
         $data = $this->getDataCommon();
+        $userModel = $this->model->createUserModel();
+
         if(!$data['sitter']){
             return view('client.sitter.mypage', compact('data'), )
                     ->with('warning', '本サービスの利用前にプロフィールを登録してください');
@@ -87,23 +90,27 @@ class SitterController extends Controller
     }
 
     private function getDataCommon(){
-        $user_id = Auth::user()->id;
+        $user_id   = Auth::user()->id;
         $userModel = $this->model->createUserModel();
-        $user = $userModel::findOrFail($user_id);
+        $user      = $userModel::findOrFail($user_id);
         
         $data = [];
+        $data['gender'] = $user->gender;
+        $arrBalance = \Stripe\Balance::retrieve(
+            ['stripe_account' => $user->stripe_account_id]
+        )->available[0]->amount;
+        $data['balance'] = $arrBalance;
 
         $skillModel = $this->model->createSkillModel();
         $data['skills'] = $skillModel::get();
 
         $schedules = $user->schedules;
-        $sitter = $user->sitter;
+        $sitter    = $user->sitter;
         if($sitter){
             $sitter['time_support'] = (new Carbon($sitter['time_support']))->format('H:i');
         }
-        $data['sitter'] = $sitter;
+        $data['sitter']  = $sitter;
         $data['avatars'] = $user->galaries;
-
         $salarySitter = $user->salaries()->where('type', config('constant.SALARY_TYPE.SALARY_SITTER'))->first();
         $salaryHouse  = $user->salaries()->where('type', config('constant.SALARY_TYPE.SALARY_HOUSE'))->first();
 
@@ -138,8 +145,8 @@ class SitterController extends Controller
     
         DB::beginTransaction();
         try {
-            if(!isset($params['kid_qty'])){
-                $params['kid_qty'] = null;
+            if(!isset($params['exp_kid_qty'])){
+                $params['exp_kid_qty'] = null;
             }
 
             $sitterModel->updateOrCreate(['user_id' => $user_id], $params);
@@ -198,6 +205,27 @@ class SitterController extends Controller
         $refresh = $request->cookie(config('constant.TOKEN_COOKIE_NAME'));
         return view('client.chat', compact(['refresh', 'ID_VIEW_USER_CHAT']));
     }
+
+    public function getStripeAccount(Request $request){
+        $user_id   = Auth::user()->id;
+        $userModel = $this->model->createUserModel();
+        $user      = $userModel::findOrFail($user_id);
+
+        if(!$user) {
+            return view('errors.404');
+        }
+
+        $stripe_account_id = $user->stripe_account_id;
+        try {
+            $resData = \Stripe\Account::createLoginLink($stripe_account_id);
+            $url = $resData->url;
+
+            return redirect($url);
+        } catch (\Throwable $th) {
+            $errors = new MessageBag(['errors' => '続行するには銀行口座を更新してください']);
+        }
+    }
+
     public function ajaxUploadAvatar(Request $request){
 
         $data = [
@@ -323,5 +351,14 @@ class SitterController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    public function ajaxLoadListBookings(Request $request){
+        $sitter_id = Auth::user()->id;
+        $bookingModel = $this->model->createBookingModel();
+        $data = $bookingModel->getListEmployerBookings(['sitter_id'=>$sitter_id])->paginate(10);
+        if ($request->ajax()) {
+            return view('client.sitter.list_booking', compact('data'));
+        }
     }
 }

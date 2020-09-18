@@ -60,7 +60,7 @@ class LoginController extends Controller
             return redirect()->route('ADMIN_SITTER')
             ->withCookie(cookie()->forever(config("constant.TOKEN_COOKIE_NAME"), $token));
         }
-        $errors = new MessageBag(['errorlogin' => 'パスワードまたはメールアドレスが異なります。!']);
+        $errors = new MessageBag(['errorlogin' => 'パスワードまたはメールアドレスが間違っています！']);
         return redirect()->back()->withInput()->withErrors($errors);
     }
 

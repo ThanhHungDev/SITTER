@@ -75,11 +75,11 @@ class VALIDATE_SITTER_REGISTER extends FormRequest
             'email.email' =>  'メールアドレスを入力して下さい。',
             'email.unique' =>  'メールアドレスは既に存在しています。',
             'password.required' =>  'パスワードを入力して下さい。',
-            'password.min' =>  'パスワードは半角英数文字8文字以上にする必要があります。',
-            'password.max' =>  'パスワードは半角英数文字8文字以上にする必要があります。' ,
+            'password.min' =>  'パスワードは半角英数文字6文字以上にする必要があります。',
+            'password.max' =>  'パスワードは半角英数文字6文字以上にする必要があります。' ,
             'confirm_password.required' =>  'パスワード確認入力して下さい。',
-            'confirm_password.min' =>  'パスワードは半角英数文字8文字以上にする必要があります。',
-            'confirm_password.max' =>  'パスワードは半角英数文字8文字以上にする必要があります。',
+            'confirm_password.min' =>  'パスワードは半角英数文字6文字以上にする必要があります。',
+            'confirm_password.max' =>  'パスワードは半角英数文字6文字以上にする必要があります。',
             'confirm_password.same' => 'パスワード確認はパスワードと一致しません。'
         ];
     }

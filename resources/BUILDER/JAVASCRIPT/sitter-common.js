@@ -4,6 +4,7 @@ $(document).ready(function(){
     $('#alert_message .close').click(function(e) {
         $("#alert_message").fadeOut('slow');
     });
+    fetch_list_booking_data();
     $('#btn-sitter-public').one('click', function(e){
         e.preventDefault();
         $.ajax({
@@ -60,4 +61,20 @@ $(document).ready(function(){
         autoplay: true,
         focusOnSelect: true
     });
+
+    $(document).on('click', '.pagination-list-booking a', function (event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        fetch_list_booking_data(page);
+    });
+      
+    function fetch_list_booking_data(page = 1) {
+        console.log(SYSTEM_BASE_URL);
+        $.ajax({
+            url: SYSTEM_BASE_URL + "sitter/load-list-bookings?page=" + page,
+            success: function (data) {
+                $('#list-booking').html(data);
+            }
+        });
+    }
 });

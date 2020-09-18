@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
         gender: { 
             type: DataTypes.INTEGER 
         },
+        stripe_account_id: {
+            type: DataTypes.STRING
+        },
         created_at: {
             type: DataTypes.DATE
         },
@@ -55,7 +58,8 @@ module.exports = (sequelize, DataTypes) => {
             first_name_furigana: this.first_name_furigana,
             last_name_furigana : this.last_name_furigana,
             birth_date         : this.birth_date,
-            gender             : this.gender
+            gender             : this.gender,
+            role_id            : this.role_id,
         }
     }
     return USER

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import ListEmoji from "./ListEmoji.jsx";
 import MessageChatTyping from "./MessageChatTyping.jsx"
+import Booking from "./Booking.jsx"
+import BtnBookingModal from "./BtnBookingModal.jsx"
 import "../../scss/chat/input-send-chat.scss";
 import config from "../../config/index.js"
 import { sendMessageToChannel, saveBlobToServer, sendTypingMessageToChannel, 
@@ -39,11 +41,11 @@ class InputSendChat extends Component {
 
         var messages = channelActiveChat && channelActiveChat.message
         
-        console.log("|input send chat componentDidUpdate")
+        //console.log("|input send chat componentDidUpdate")
 
         var domScroll = document.getElementById("js-scroll-to-bottom")
         var domWriter = document.getElementById("js-is-write-message")
-        console.log(domScroll.scrollHeight, domScroll.clientHeight + "listenReadMessageNewUser")
+        //console.log(domScroll.scrollHeight, domScroll.clientHeight + "listenReadMessageNewUser")
         if( domWriter && domScroll && domScroll.scrollHeight == domScroll.clientHeight){
             listenReadMessageNewUser(messages, channelActiveChat)
         }else if(
@@ -54,7 +56,11 @@ class InputSendChat extends Component {
                 document.getElementById('js-scroll-to-bottom').scrollTop = document.getElementById('js-scroll-to-bottom').scrollHeight
                 if( $("#js-scroll-to-bottom img").length ){
                     $("#js-scroll-to-bottom img").one("load", function() {
-                        document.getElementById('js-scroll-to-bottom').scrollTop = document.getElementById('js-scroll-to-bottom').scrollHeight
+                        
+                        if(document.getElementById('js-scroll-to-bottom')){
+
+                            document.getElementById('js-scroll-to-bottom').scrollTop = document.getElementById('js-scroll-to-bottom').scrollHeight
+                        }
                     })
                 }
             
@@ -331,6 +337,7 @@ class InputSendChat extends Component {
             <div id="js-is-write-message" className="component-input-send-chat follow-conversation">
                 <MessageChatTyping toUser={channelActiveChat} />
                 <div id="js-image--block" className="image-block"></div>
+                <BtnBookingModal />
                 <i
                     className="hero-icon hero-file-cloud-outline file"
                     onClick={ this.chooseFile }
@@ -350,6 +357,7 @@ class InputSendChat extends Component {
                 <i className="hero-icon hero-send-outline send" onClick={this.handleSendMessageSubmit}></i>
                 <i className="hero-icon hero-heart-multiple-outline react" onClick={this.handleSendEmojiSubmit}></i>
                 <ListEmoji />
+                <Booking />
             </div>
         );
     }

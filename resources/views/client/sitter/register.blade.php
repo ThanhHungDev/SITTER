@@ -3,11 +3,11 @@
 @section('content')
 <div class="sitter-common">
     <div class="max-width-780 sitter-register">
-        @include('client.sitter.partials.errors_form')
+        {{-- @include('client.sitter.partials.errors_form') --}}
         <form method="post" action="{{ route('SITTER_POST_REGISTER') }}" id="sitter-register">
             {{ csrf_field()}}
             <div class="div-title height-55 back-ground-green">
-                <span class="fs-20 span-title">ご利用者様応募フォーム</span>
+                <span class="fs-20 span-title">ベビーシッター応募フォーム</span>
             </div>
 
             <div>
@@ -208,12 +208,12 @@
 
             <div class="div-form-group">
                 <div class="div-title-form">
-                    <span class="span-title">市区町村と番地 <span class="color-red">※</span></span>
+                    <span class="span-title">市区町村 <span class="color-red">※</span></span>
                 </div>
                 <div class="div-content-form">
                     <div class="form-row input-content form-validate">
                         <div class="col-sm-8 col-12">
-                            <input type="text" class="form-control @error('town') input-error @enderror" value="{{ old('town') }}" placeholder="新宿区西新宿2-7-1" name="town" id="inp-town">
+                            <input type="text" class="form-control @error('town') input-error @enderror" value="{{ old('town') }}" placeholder="市区町村" name="town" id="inp-town">
                             <div class="form-error">
                                 @error('town')
                                     <label class="error">{{ $message }}</label>
@@ -226,12 +226,12 @@
 
             <div class="div-form-group">
                 <div class="div-title-form">
-                    <span class="span-title">建物名・部屋番号</span>
+                    <span class="span-title">番地以下（建物名・部屋番号など）</span>
                 </div>
                 <div class="div-content-form">
                     <div class="form-row input-content">
                         <div class="col-sm-8 col-12 form-validate">
-                            <input type="text" class="form-control @error('address') input-error @enderror" value="{{ old('address') }}" placeholder="小田急第一生命ビル13階" name="address">
+                            <input type="text" class="form-control @error('address') input-error @enderror" value="{{ old('address') }}" placeholder="番地以降(建物名・部屋番号など)" name="address" id="inp-address">
                             <span class="fs-14">建物名・部屋番号がある方は必ずご記入ください</span>
                         </div>
                     </div>
@@ -245,7 +245,7 @@
                 <div class="div-content-form">
                     <div class="form-row input-content form-validate">
                         <div class="col-sm-8 col-12">
-                            <input type="text" class="form-control @error('phone') input-error @enderror" value="{{ old('phone') }}" placeholder="例）0369113010" name="phone">
+                            <input type="text" class="form-control @error('phone') input-error @enderror" value="{{ old('phone') }}" placeholder="例）0369113010" name="phone" id="reg-phone">
                             <div class="form-error">
                                 @error('phone')
                                     <label class="error">{{ $message }}</label>
@@ -309,8 +309,8 @@
             <div class="checkbox mt-50 form-validate">
                 <label>
                     <input type="checkbox" value="" name="check_accept">
-                    <a href="#" class="text-green">利用規約</a>と
-                    <a href="#" class="text-green">プライバシーポリシー</a>に同意する
+                    <a href="#sitters-terms" rel="modal:open" class="text-green">利用規約</a>と
+                    <a href="#sitters-privacy" rel="modal:open" class="text-green">プライバシーポリシー</a>に同意する
                     <span class="checkmark"></span>
                 </label>
                 <div class="form-error">
@@ -325,6 +325,9 @@
         </form>
     </div>
 </div>
+@include('modals.sitters.privacy')
+@include('modals.sitters.terms')
+
 @endsection
 @section('scripts')
     <script type="text/javascript" src="{{ asset('/js/library/jquery.validate.min.js') }}"></script>

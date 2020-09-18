@@ -30,5 +30,11 @@ db.sequelize = sequelize;
 db.USER         = require('./User.js')(sequelize, Sequelize)
 db.TOKEN_REFESH = require("./TokenRefesh.js")(sequelize, Sequelize)
 db.SCHEDULE     = require("./Schedule.js")(sequelize, Sequelize)
+db.BOOKING      = require("./Booking.js")(sequelize, Sequelize)
+db.DATE_BOOKING = require("./DateBooking.js")(sequelize, Sequelize)
+db.ORDER        = require("./Order.js")(sequelize, Sequelize)
+db.PAYMENT      = require("./Payment.js")(sequelize, Sequelize)
 
+db.BOOKING.hasOne(db.DATE_BOOKING, {foreignKey: 'booking_id'})
+db.DATE_BOOKING.belongsTo(db.BOOKING, {foreignKey: 'booking_id'})
 module.exports = db

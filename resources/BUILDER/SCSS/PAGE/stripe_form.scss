@@ -1,0 +1,137 @@
+.form-collect-card {
+    width: 80%;
+	margin: 0 auto;
+	border: 1px solid #dcdcdc;
+	padding: 15px;
+	box-shadow: 3px 4px 12px 0px #dcdcdc;
+	background: linear-gradient(90deg, #efffc7, #cefbcf);
+	margin-bottom: 15px;
+  }
+  
+  .form-collect-card .fieldset {
+	margin: 5px 0;
+    padding: 0;
+    border-style: none;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+  }
+  
+  .form-collect-card .field {
+    padding: 10px 20px 11px;
+    background-color: #fff;
+    border-radius: 0;
+    width: 100%;
+  }
+  
+  .form-collect-card .field.half-width {
+    width: calc(50% - (5px / 2));
+  }
+  
+  .form-collect-card .field.third-width {
+    width: calc(33% - (5px / 3));
+  }
+  
+  .form-collect-card .field + .field {
+    margin-top: 6px;
+  }
+  
+  .form-collect-card .field.focus,
+  .form-collect-card .field:focus {
+    color: #424770;
+    background-color: #f6f9fc;
+  }
+  
+  .form-collect-card .field.invalid {
+    background-color: #fff;
+  }
+  
+  .form-collect-card .field.invalid.focus {
+    background-color: #f6f9fc;
+  }
+  
+  .form-collect-card .field.focus::-webkit-input-placeholder,
+  .form-collect-card .field:focus::-webkit-input-placeholder {
+    color: #cfd7df;
+  }
+  
+  .form-collect-card .field.focus::-moz-placeholder,
+  .form-collect-card .field:focus::-moz-placeholder {
+    color: #cfd7df;
+  }
+  
+  .form-collect-card .field.focus:-ms-input-placeholder,
+  .form-collect-card .field:focus:-ms-input-placeholder {
+    color: #cfd7df;
+  }
+  
+  .form-collect-card input, .form-collect-card button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    border-style: none;
+  }
+  
+  .form-collect-card input {
+    color: #fff;
+  }
+  
+  .form-collect-card input::-webkit-input-placeholder {
+    color: #9bacc8;
+  }
+  
+  .form-collect-card input::-moz-placeholder {
+    color: #9bacc8;
+  }
+  
+  .form-collect-card input:-ms-input-placeholder {
+    color: #9bacc8;
+  }
+  
+  .form-collect-card button {
+	display: block;
+    background: linear-gradient(180deg,#2dc187,#198e5d);
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  
+  .form-collect-card button:active {
+    background-color: #f5be58;
+  }
+  
+  .form-collect-card .error svg .base {
+    fill: #fa755a;
+  }
+  
+  .form-collect-card .error svg .glyph {
+    fill: #fff;
+  }
+  
+  .form-collect-card .error .message {
+    color: #ff1b00;
+  }
+  
+  .form-collect-card .success .icon .border {
+    stroke: #fcd669;
+  }
+  
+  .form-collect-card .success .icon .checkmark {
+    stroke: #fff;
+  }
+  
+  .form-collect-card .success .title {
+    color: #ff1b00;
+  }
+  
+  .form-collect-card .success .message {
+    color: #9cabc8;
+  }
+  
+  .form-collect-card .success .reset path {
+    fill: #fff;
+  }

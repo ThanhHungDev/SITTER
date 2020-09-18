@@ -1,6 +1,9 @@
 .wapper-parent{
     max-width: 780px;
     margin: 50px auto;
+    .dl-none{
+        display: none;
+    }
     a, p, span, label, select, option, input{
         // font-family: "KozGoPro";
         text-decoration: none;
@@ -94,6 +97,9 @@
                 width: 100%;
                 resize: none;
                 height: 140px;
+            }
+            .child-textarea{
+                height: 60px;
             }
             .type_certificate{
                 min-width: 328px;
@@ -208,6 +214,9 @@
     .term_private{
         font-size: 15px;
     }
+    .pb-0{
+        padding-bottom: 0!important;
+    }
 }
 @include DivResponsive(768px){
     .wapper-parent{
@@ -249,6 +258,11 @@
         }
         .term_private{
             font-size: 14px;
+        }
+        .form-error{
+            .error{
+                padding: 0 15px;
+            }
         }
     }
 }

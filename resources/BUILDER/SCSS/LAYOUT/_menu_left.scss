@@ -40,6 +40,9 @@
                         &.lock{
                             content:url("../image/icons/icon-lock.png");
                         }
+                        &.booking{
+                            content:url("../image/icons/icon-booking.png");
+                        }
                     }
                 }
                 span{
@@ -78,6 +81,9 @@
                             }
                             &.lock{
                                 content:url("../image/icons/icon-lock-active.png");
+                            }
+                            &.booking{
+                                content:url("../image/icons/icon-booking-active.png");
                             }
                         }
                     } 

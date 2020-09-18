@@ -18,19 +18,33 @@ $('#postCode').jpostal({
     ],
     address : {
         '#pref'  : '%3',
-        '#town'  : '%4, %5' 
+        '#town'  : '%4',
+        '#address' : '%5'
     }
 });
-$('#postCode').keyup(function () {
-    let strPostCode = $(this).val();
+$('#postCode').on('change',function () {
+    let strPostCode = regReplace($(this).val(), "０１２３４５６７８９ー", "0123456789-")
+    this.value = strPostCode
     if (strPostCode.length <= 8 ) {
         if (strPostCode.length>3 && strPostCode.indexOf('-') < 0) {
-            $(this).val(strPostCode.substr(0,3) + '-' + strPostCode.substr(3))
+            $(this).val(strPostCode.substr(0,3) + '-' + strPostCode.substr(3)) 
         }
     }else {
         $(this).val(strPostCode.substr(0,8))
     }
+    $(this).keyup();
 })
+function regReplace( text, search, replace ) {
+    // Make the search string a regex.
+    let regex = RegExp( '[' + search + ']', 'g' );
+    return text.replace( regex,  
+        function( chr ) {
+            // Get the position of the found character in the search string.
+            let ind = search.indexOf( chr );
+            // Get the corresponding character from the replace string.
+            return replace.charAt( ind )
+    });
+}
 
 $(document).on("click",".child-delete",function() {
 
@@ -43,7 +57,7 @@ $(document).on("click",".child-delete",function() {
         $(this).parent().parent().remove();
         let number_child_current = $('input[name="child_number"]').val();
         var number_child_saved   = parseInt($('input[name="number_child_root"]').val());
-
+        //CẬP NHẬT LẠI INDEX SAU KHI THÊM 1 ITEM RỖNG VÀO
         $('.list-child').find('.contain-child-0').each(function () {
             
             $(this).find('.label_child_number').text(parseInt(number_child_saved)+1);
@@ -55,9 +69,22 @@ $(document).on("click",".child-delete",function() {
             $(this).find('select[name^="y_birth_child_"]').attr('name', 'y_birth_child_' + number_child_saved);
             $(this).find('select[name^="m_birth_child_"]').attr('name', 'm_birth_child_' + number_child_saved);
             $(this).find('select[name^="d_birth_child_"]').attr('name', 'd_birth_child_' + number_child_saved);
+            $(this).find('input[name^="allergic_"]').attr('data-index', number_child_saved);
+            $(this).find('input[name^="chronic_"]').attr('data-index', number_child_saved);
+
             $(this).find('input[name^="allergic_"]').attr('name', 'allergic_' + number_child_saved);
             $(this).find('input[name^="chronic_"]').attr('name', 'chronic_' + number_child_saved);
+            
+            
+            $(this).find('textarea[name^="allergic_note_"]').attr('name', 'allergic_note_' + number_child_saved);
+            $(this).find('textarea[name^="chronic_note_"]').attr('name', 'chronic_note_' + number_child_saved);
+
+            $(this).find("div[class^='allergic_note_'],div[class*=' allergic_note_']").attr('class', 'allergic_note_' + number_child_saved + " col-md-12" +  " dl-none");
+            $("div[class^='apple-'],div[class*=' apple-']")
+            $(this).find("div[class^='chronic_note_'],div[class*=' chronic_note_']").attr('class', 'chronic_note_' + number_child_saved + " col-md-12" +  " dl-none");
+
             number_child_saved = number_child_saved + 1;
+
         })
 
         let current_item = parseInt(number_child_current)-1;
@@ -110,8 +137,18 @@ $('.add-child').click(function (params) {
     $('#child-default').find('select[name="y_birth_child_0"]').attr('name', 'y_birth_child_' + index);
     $('#child-default').find('select[name="m_birth_child_0"]').attr('name', 'm_birth_child_' + index);
     $('#child-default').find('select[name="d_birth_child_0"]').attr('name', 'd_birth_child_' + index);
+
+    $('#child-default').find('input[name="allergic_0"]').attr('data-index', index);
+    $('#child-default').find('input[name="chronic_0"]').attr('data-index', index);
+
     $('#child-default').find('input[name="allergic_0"]').attr('name', 'allergic_' + index);
     $('#child-default').find('input[name="chronic_0"]').attr('name', 'chronic_' + index);
+
+    $('#child-default').find('textarea[name="allergic_note_0"]').attr('name', 'allergic_note_' + index);
+    $('#child-default').find('textarea[name="chronic_note_0"]').attr('name', 'chronic_note_' + index);
+
+    $('#child-default').find('.allergic_note_0').attr('class', 'allergic_note_' + index + " col-md-12" +  " dl-none");
+    $('#child-default').find('.chronic_note_0').attr('class', 'chronic_note_' + index + " col-md-12" +  " dl-none" );
 
     let itemChild = $('#child-default').html();
     $('.list-child').append(itemChild);
@@ -125,9 +162,46 @@ $('.add-child').click(function (params) {
     $('#child-default').find('select[name="y_birth_child_'+ index +'"]').attr('name','y_birth_child_0');
     $('#child-default').find('select[name="m_birth_child_'+ index +'"]').attr('name','m_birth_child_0');
     $('#child-default').find('select[name="d_birth_child_'+ index +'"]').attr('name','d_birth_child_0');
-    $('#child-default').find('input[name="allergic_'+ index +'"]').attr('name', 'allergic_0');
-    $('#child-default').find('input[name="chronic_'+ index +'"]').attr('name', 'chronic_0');
 
+    $('#child-default').find('input[name="allergic_'+ index +'"]').attr('data-index', '0');
+    $('#child-default').find('input[name="chronic_'+ index +'"]').attr('data-index', '0');
+
+    $('#child-default').find('input[name="allergic_'+ index +'"]').attr('name', 'allergic_0');
+    $('#child-default').find('input[name="chronic_'+ index +'"]').attr('name', 'chronic_0');    
+
+    $('#child-default').find('textarea[name="allergic_note_'+ index +'"]').attr('name', 'allergic_note_0');
+    $('#child-default').find('textarea[name="chronic_note_'+ index +'"]').attr('name', 'chronic_note_0');
+
+    $('#child-default').find('.allergic_note_'+ index).attr('class', 'allergic_note_0' + " col-md-12" +  " dl-none");
+    $('#child-default').find('.chronic_note_'+ index).attr('class', 'chronic_note_0'+ " col-md-12" +  " dl-none");
+})
+
+//show hidden textarea 
+$(document).on("click",'input[name^="allergic_"]',function() {
+    let index = $(this).attr('data-index');
+    let data = $(this).val();
+    let name = '.'+'allergic_note_' + index;
+    if(data == 0){
+        $('textarea[name="'+'allergic_note_' + index+'"]').val('');
+        $(name).hide();
+    }
+    if(data == 1){
+        $('textarea[name="'+'allergic_note_' + index+'"]').val('');
+        $(name).show();
+    }
+})
+$(document).on("click",'input[name^="chronic_"]',function() {
+    let index = $(this).attr('data-index');
+    let data = $(this).val();
+    let name = '.'+'chronic_note_' + index;
+    if(data == 0){
+        $('textarea[name="'+'chronic_note_' + index+'"]').val('');
+        $( name).hide();
+    }
+    if(data == 1){
+        $('textarea[name="'+'chronic_note_' + index+'"]').val('');
+        $( name).show();
+    }
 })
 
 // validate

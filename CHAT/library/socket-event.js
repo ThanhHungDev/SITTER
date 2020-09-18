@@ -4,7 +4,11 @@ mongoose    = require("mongoose"),
 TokenAccess = require("../model/TokenAccess"),
 Message     = require("../model/Message"),
 Channel     = require("../model/Channel"),
+Postgre     = require("../model/Postgre.js"),
+stripe      = require('stripe')(process.env.STRIPE_SECRET),
 EVENT       = CONFIG.EVENT
+
+var Op       = Postgre.Sequelize.Op;
 // listSocket = []
 
 module.exports = function(_io) {
@@ -25,6 +29,8 @@ function socketConnecting(){
             listenTyping(socket)
             listenUserOnline(socket)
             listenReadMesssage( socket )
+            listenGetBooking( socket )
+            listenChangeBooking( socket )
         } catch (err) {
             console.log( err )
         }
@@ -123,7 +129,7 @@ function sendMessageChat(socket){
             return Channel.findOne({ _id: channelId, user: userIdSendMessage })
         })
         .then( channelResult => {
-            console.log(channelId , "channel send message to channel but not select show", channelResult)
+            
             if( !channelResult ){
 
                 throw new Error("チャンネルがありません」")
@@ -254,4 +260,256 @@ function listenReadMesssage( socket ){
         })
         io.in(channelName).emit(EVENT.READ_MESSAGE_ALL_RESPONSE, { message: "read all messge" })
     })
+}
+
+function listenGetBooking( socket ){
+
+    socket.on( EVENT.USER_GET_BOOKING, data => {
+        
+        console.log( data , EVENT.USER_GET_BOOKING)
+
+        
+        return Postgre.BOOKING.findAll({ 
+            where: { 
+                [Op.or]: [
+                    {
+                        sitter_id: parseInt(data.id)
+                    }, 
+                    {
+                        employer_id: parseInt(data.id)
+                    }
+                ]
+            },
+            // Add order conditions here....
+            order: [
+                ['sitter_id', 'ASC'],
+                ['status', 'ASC'],
+                ['created_at', 'DESC'],
+            ],
+            attributes : [
+                Postgre.Sequelize.literal('DISTINCT ON("BOOKING"."sitter_id") *'),
+                'id',
+                'employer_id',
+                'sitter_id',
+                'status',
+                'sitter_accept',
+                'employer_accept',
+                'created_at',
+                'updated_at'
+            ],
+            include: [
+                {model: Postgre.DATE_BOOKING }
+            ]
+        }, {raw: true}).then(bookings => {
+            if(!bookings.length){
+                throw Error('dont have booking')
+            }
+
+            var data = bookings.map(booking => {
+
+                console.log(booking.DATE_BOOKING.toJSONFor())
+
+                var start  = booking.DATE_BOOKING.start,
+                    finish = booking.DATE_BOOKING.finish
+                    start  = start.substring(0, start.length - 3)
+                    finish = finish.substring(0, finish.length - 3)
+
+                return { ...booking.DATE_BOOKING.toJSONFor(), ...booking.toJSONFor(), start, finish}
+            })
+            socket.emit(EVENT.RESPONSE_USER_GET_BOOKING, { bookings: data })
+        })
+        .catch( err => {
+            console.log( err.message)
+            socket.emit(EVENT.RESPONSE_USER_GET_BOOKING, { bookings: [] })
+        })
+    })
+}
+
+function listenChangeBooking( socket ){
+
+    socket.on( EVENT.USER_CHANGE_BOOKING, data => {
+        
+        console.log( data , EVENT.USER_CHANGE_BOOKING)
+        
+        var { booking_id, status, sitter_accept, employer_accept, start, finish, work_date, tokenAccess, userId, channelName } = data
+
+        var saccept = 0,
+            eaccept = 0,
+            isEdit  = 0
+
+        var messageBody = "message default",
+        channelId = null
+
+        Promise.all([
+            Channel.findOne({ name: channelName }),
+            TokenAccess.findOne({ token: tokenAccess, user: userId+"" }),
+            Postgre.BOOKING.findOne({ where: { id: booking_id } }),
+            Postgre.DATE_BOOKING.findOne({ where: { booking_id } }),
+            Postgre.USER.findOne({ where: { id: (parseInt(userId) || 0) } })
+        ]).then(([ channel, tokenAccess, booking, date_booking, user ]) => {
+            
+            if(!channel){
+                throw Error('channel not found')
+            }
+            if(!tokenAccess){
+                throw Error('token not found')
+            }
+            if(!booking){
+                throw Error('booking not found')
+            }
+            if( !user ){
+                throw Error('user not found')
+            }
+            
+            channelId = channel._id
+
+            saccept = booking.sitter_accept
+            eaccept = booking.employer_accept
+            isEdit  = date_booking.start != start + ":00" || date_booking.finish != finish + ":00" || date_booking.work_date != work_date
+            
+            if(isEdit){
+                if(sitter_accept){
+                    saccept = 1
+                    eaccept = 0
+                }else{
+                    saccept = 0
+                    eaccept = 1
+                }
+            }else{
+                if(sitter_accept) saccept = 1
+                if(employer_accept) eaccept = 1
+            }
+
+            if( status ){
+                saccept = 1
+                eaccept = 1
+                status  = 1
+            }
+
+            if( saccept ){
+                messageBody = "シッターは仕事に受け入れられました \n " +
+                                    "日：" + work_date + " \n " + 
+                                    "開始時間：" + start + " \n " + 
+                                    "終了時間：" + finish 
+            }else  if( eaccept ){
+                messageBody = "雇用主は求人リクエストを送信しました \n " +
+                                    "日：" + work_date + " \n " + 
+                                    "開始時間：" + start + " \n " + 
+                                    "終了時間：" + finish 
+            }else if( status ){
+                messageBody = "雇用主はちょうど雇用を確認しました \n "
+                                    "日：" + work_date + " \n " + 
+                                    "開始時間：" + start + " \n " + 
+                                    "終了時間：" + finish 
+            }
+            
+
+            
+            if(!status || !saccept || !eaccept){
+                // none add payment
+                var iterables = [
+                    Postgre.DATE_BOOKING.update({start, finish, work_date}, { where: { booking_id } }),
+                    Postgre.BOOKING.update({ status: status, sitter_accept: saccept, employer_accept: eaccept }, { where: { id: booking_id } }),
+                    saveMessage(userId,messageBody, "", [], channel._id)
+                ]
+                return Promise.all(iterables)
+            }
+            
+            return paymentEmployer(user, date_booking.toJSONFor()).then( payResult => {
+                if(!payResult){
+                    throw Error("支払いが失敗しました")
+                }
+                var iterables = [
+                    Postgre.DATE_BOOKING.update({start, finish, work_date}, { where: { booking_id } }),
+                    Postgre.BOOKING.update({ status: status, sitter_accept: saccept, employer_accept: eaccept }, { where: { id: booking_id } }),
+                    saveMessage(userId,messageBody, "", [], channel._id)
+                ]
+                return Promise.all(iterables)
+            })
+        })
+        .then(([update_date_booking, update_booking, message ]) => {
+
+            var bookingUpdate = {
+                booking_id, 
+                status, 
+                employer_accept: eaccept,
+                sitter_accept  : saccept,
+                start, 
+                finish, 
+                work_date
+            }
+            // socket.broadcast.to(channelName).emit(EVENT.RESPONSE_USER_CHANGE_BOOKING, bookingUpdate); 
+            io.in(channelName).emit(EVENT.RESPONSE_USER_CHANGE_BOOKING, { user: parseInt(userId), token: tokenAccess, message: messageBody, style: "", attachment: [], channel: channelId, booking: bookingUpdate })
+        })
+        .catch( error => {
+            console.log(error.message)
+            socket.emit(EVENT.RESPONSE_USER_CHANGE_BOOKING_ERROR, { message : error.message , data: error })
+        })
+    })
+}
+
+
+function paymentEmployer(user, booking){
+    
+    var  [ differenceTime, price, vat, profit, stripeServFee ] = calculatorBill(booking)
+    var order = {
+        booking_id: booking.booking_id,
+        salary    : booking.salary,
+        diff_time : differenceTime,
+        price     : price,
+        vat       : vat,
+        fee_stripe: stripeServFee,
+        profit    : profit
+    }
+    var amount = (parseInt(order.price) || 0) + (parseInt(order.vat) || 0)
+    var payIntent = {
+        amount              : amount,
+        currency            : 'jpy',
+        payment_method_types: ['card'],
+        customer            : user.stripe_account_id
+    }
+
+
+    return Promise.all([
+        stripe.paymentIntents.create(payIntent),
+        Postgre.ORDER.upsert(order, { booking_id: order.booking_id })
+    ]).then( ([ paymentIntent, _order ]) => {
+        var payment = {
+            user_id       : user.id,
+            order_id      : _order.id,
+            stripe_payment: paymentIntent.id
+        }
+        return Postgre.PAYMENT.create(payment)
+    })
+    .catch( err => {
+        var orderUpdate = { ...order, note: err.message, status: CONFIG.ORDER_STATUS.ERROR }
+        Postgre.ORDER.upsert(orderUpdate, { booking_id: order.booking_id })
+        return false
+    })
+}
+
+
+function calculatorBill(booking ) {
+    var start     = booking.start,
+        finish    = booking.finish,
+        salary    = booking.salary
+
+    var differenceTime = 0,
+        price          = 0,
+        profit         = 0,
+        stripeServFee  = 0,
+        vat            = 0
+    
+    var [ fHour, fMinute ] = finish.split(':'),
+        [ sHour, sMinute ] = start.split(':')
+    var dateTimeFinish     = (new Date(1,1,2020, fHour, fMinute, 0)).getTime(),
+        dateTimeStart      = (new Date(1,1,2020, sHour, sMinute, 0)).getTime()
+
+    differenceTime = (dateTimeFinish - dateTimeStart)/ 1000 / 60 / 60
+    price          = Math.floor(differenceTime * salary)
+    profit         = Math.floor(price * 0.2)
+    vat            = Math.floor((price + profit) * 0.1)
+    stripeServFee  = Math.floor((price + profit + vat) * 0.036)
+
+    return [ differenceTime, price, vat, profit, stripeServFee ] 
 }

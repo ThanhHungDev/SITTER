@@ -56,7 +56,7 @@
                     </select>
                 </div>
                 <div class="search-register-date">
-                    <input type="text" name="created_at" class="register-date search-control" id="slt_datepicker" placeholder="登録日を指定　例）2020/04/30" value="{{ old('created_at') }}">
+                    <input type="text" name="created_at" onfocus="blur()" autocomplete="off" class="register-date search-control" id="slt_datepicker" placeholder="登録日を指定　例）2020/04/30" value="{{ old('created_at') }}">
                 </div>
                 <div class="search-user-name">
                     <input type="text" name="name" class="user-name search-control" placeholder="ユーザーを指定" value="{{ old('name') }}">
@@ -154,8 +154,8 @@
                                 </div>
                                 <div class="action-delete">
                                     <button class="btn-delete fz-b-15 js-delete-sitter" data-url='{{ route('ADMIN_SITTER_AJAX_DELETE') }}' data-item='{{ $item->user_id }}'>削除</button>
-                                </div>                                
-                                @if ($item->admin_confirm < 1)
+                                </div>
+                                @if ($item->admin_confirm != config('constant.ADMIN_CONFIRM.ACCEPT'))
                                     <div class="f-row" id="action-confrim-{{ $item->user_id }}">
                                         <div class="action-activity">
                                             <button class="btn-activity fz-b-15 js-activity-sitter" data-url='{{ route('ADMIN_SITTER_AJAX_ACCEPT') }}' data-item='{{ $item->user_id }}' data-confirm = '{{ config('constant.ADMIN_CONFIRM.ACCEPT') }}'>承認</button>
@@ -172,9 +172,9 @@
             @else
                 <p>No data...</p>
             @endif
-            
+
         </div>
-        
+
     </div>
     {{-- modal details  --}}
     <div id="details-sitter-modal" class="modal item-details-popup">
@@ -216,16 +216,22 @@
                 </div>
             </div>
         </div>
+        <div class="link-update">
+            <button id="link-update" value="">ンクをコピーする</button>
+        </div>
     </div>
-    @include('modals.modal-confirm',['title'=> 'Confirm Delete', 'content'=> 'Are you delete it?','action' => 'deleteSitter()', 'modal_id' =>'deleteSitter'])
+    @include('modals.modal-confirm',['title'=> '削除を確認', 'content'=> '削除しますか','action' => 'deleteSitter()', 'modal_id' =>'deleteSitter'])
 </div>
 @endsection
 
 @section('scripts-admin')
+    <script>
+        const ADMIN_CONFIRM_ACCEPT = {{config('constant.ADMIN_CONFIRM.ACCEPT')}}
+    </script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.toast.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/datepicker-ja.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_sitter.min.js') }}"></script>
+
 @endsection

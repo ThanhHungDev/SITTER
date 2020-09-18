@@ -10,7 +10,7 @@ class MessageChatTyping extends Component {
         var typeMessage = 'float-left ';
         return (
             <div id="js-typing" className="component-message-chat typing-chat-messsage" channel={toUser.id}>
-                <div className={typeMessage + "chat-group hungtt"}>
+                <div className={typeMessage + "chat-group"}>
                     
                     <div className="message-content typing-message">
                         

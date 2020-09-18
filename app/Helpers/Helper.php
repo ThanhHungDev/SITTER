@@ -1,5 +1,7 @@
 <?php
     use Illuminate\Support\Facades\Storage;
+    use Illuminate\Support\Carbon;
+
     if(!function_exists('moneyFormat')){
         function moneyFormat($data){
             $newData = 0; 
@@ -100,4 +102,76 @@
             return $name;
         }
     }
+
+    if(!function_exists('getTextGender')){
+        function getTextGender($gender_id)
+        {
+            $text = '';
+            switch ($gender_id) {
+                case config('constant.GENDER.MALE'):
+                    $text = '男性';
+                    break;
+                case config('constant.GENDER.FEMALE'):
+                    $text = '女性';
+                    break;
+                default:
+                    $text = '女性';
+                    break;
+            }
+            return $text;
+        }
+    }
     
+    if(!function_exists('calculatorRatingAvergate')){
+        function calculatorRatingAvergate($rate, $total)
+        {
+            $avg = 0;
+            if($total > 0){
+                $avg = round($rate/$total,1);
+            }
+            return $avg;
+        }
+    }
+
+    if(!function_exists('getLimitParagraph')){
+        function getLimitParagraph($string, $length)
+        {
+            $string = strip_tags($string);
+            if (strlen($string) > $length) {
+                // truncate string
+                $stringCut = substr($string, 0, $length);
+                $endPoint = strrpos($stringCut, ' ');
+                $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+                $string .= '...';
+            }
+            return $string;
+        }
+    }
+
+    if(!function_exists('formatDate')){
+        function formatDate($param)
+        {
+            $date = (new Carbon($param))->format('Y/m/d');
+            return $date;
+        }
+    }
+
+    if(!function_exists('formatTime')){
+        function formatTime($param)
+        {
+            $time = (new Carbon($param))->format('H:i');
+            return $time;
+        }
+    }
+
+    if(!function_exists('handleExceptionStripe')){
+        function handleExceptionStripe($e)
+        {
+            return  [
+                'status'      => $e->getHttpStatus(),
+                'type'        => $e->getError()->type,
+                'code'        => $e->getError()->code,
+                'message'     => $e->getError()->message
+            ];
+        }
+    }

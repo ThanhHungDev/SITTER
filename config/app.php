@@ -54,9 +54,15 @@ return [
 
     'url' => env('APP_URL', 'http://sitters.jp'),
 
+    'version' => env('APP_VERSION', "?v=12345678"),
+    
     'realtime_url' => env('REALTIME_URL', 'http://153.126.149.63:9999'),
 
     'asset_url' => env('ASSET_URL', null),
+
+    'STRIPE_API_KEY' => env('STRIPE_API_KEY', 'sk_test_51HH3fxEkyn0XMKpG77QqVE25YW8wxLTAhjbl2rykPI4KHVsy39d2QxF9v37hRM4wpCJVwVPRcr6fNmqigrDzPihD00Gn0FvEI8'),
+
+    'STRIPE_API_URL' => env('STRIPE_API_URL', 'https://api.stripe.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -180,7 +186,6 @@ return [
 
         // add helper
         App\Providers\HelperServiceProvider::class,
-
         
 
     ],
@@ -236,6 +241,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class,
 
+        'Stripe' => Cartalyst\Stripe\Laravel\Facades\Stripe::class,
     ],
 
 ];

@@ -11,6 +11,6 @@ class PasswordResetModel extends Model
 
     public function getDataByToken($toke_verify)
     {
-        return $this->select('*')->where('verify_code', $toke_verify)->first()->toarray();
+        return $this->select('*')->where('verify_code', $toke_verify)->firstOrFail()->toarray();
     }
 }

@@ -1,0 +1,73 @@
+.wapper-policy{
+    max-width: 1080px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+    .policy-header{
+        text-align: center;
+        h1{
+            color: #11a911;
+        }
+    }
+    .policy-subheader{
+        
+        width: 100%;
+        display: flex;
+        align-items: center;
+        .title{
+            margin-left: 1%;
+            flex-grow: 1;
+            font-weight: bold;
+            font-size: 16px;
+            
+        }
+        .policy-line{
+            height: 2px;
+            background: #59C872;
+            margin-bottom: auto;
+            margin-top: auto;
+            flex-grow: 30;
+        }
+        .img-title {
+            width: 8px;
+            height: 22px;
+            background-image: linear-gradient(to right, #91e1bf, #11a911);
+            float: left;
+            border-radius: 1px;
+        }
+    }
+    .privacy{
+        padding-left: 15px;
+    }
+    .sitepolicy{
+        ol li {
+            font-weight: bold;
+            color: #000;
+        }
+    }
+    .privacy>ol>li{
+        font-weight: bold;
+    }
+    .ol-sub-2, .ul-sub-2{
+        li{
+            font-weight: normal;
+        }
+    }
+    span {
+        color: #000;
+        font-weight: normal;
+    }
+    
+}
+@include DivResponsive(768px){
+    .wapper-policy {
+        padding: 0 15px;
+        .policy-header{
+            h1{
+                margin: 0;
+            }
+        } 
+    }
+    .em-wapper-edit .pl-3, .wapper-policy .privacy{
+        padding: 15px;
+    }
+}

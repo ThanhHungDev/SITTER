@@ -16,7 +16,6 @@ export function listenScrollMessage(e, messages, channelActive ) {
     if ($(e).scrollTop() + 
         $(e).innerHeight() >=  
         $(e)[0].scrollHeight) { 
-            document.getElementById("js-is-write-message").classList.add("follow-conversation")
             /// check message unread
             var existNoneRead = messages.some( function( message ){
                 
@@ -28,8 +27,6 @@ export function listenScrollMessage(e, messages, channelActive ) {
                 var userLocal = JSON.parse(localStorage.getItem('user'))
                 socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
             }
-    }else{
-        document.getElementById("js-is-write-message").classList.remove("follow-conversation")
-    } 
+    }
 }
 

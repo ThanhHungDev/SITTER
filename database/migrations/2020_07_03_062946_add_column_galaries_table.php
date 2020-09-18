@@ -14,8 +14,10 @@ class AddColumnGalariesTable extends Migration
     public function up()
     {
         Schema::table('galaries', function (Blueprint $table) {
-            if (!Schema::hasColumn('name', 'path')) {
+            if (!Schema::hasColumn('galaries', 'name')) {
                 $table->string('name')->nullable();
+            }
+            if (!Schema::hasColumn('galaries', 'path')) {
                 $table->string('path')->nullable();
             }
         });

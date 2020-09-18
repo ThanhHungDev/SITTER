@@ -5,7 +5,7 @@
     
     <div class="wrapper-login">
         <div class="login-header">
-            <span class="text-medium">ようこそ〇〇〇〇〇〇〇〇へ</span>
+            <span class="text-medium">ようこそ家政婦さん・ベビーシッタードットコムへ</span>
             <br/>
             <span class="text-none">もっと頼って、ともに育む社会へ</span>
         </div>
@@ -14,7 +14,7 @@
             <form action="{{ Route('SITTER_POST_LOGIN') }}" method="POST" class="form-register">
                 @csrf
                 <div class="form-header">
-                    <span>利用者ログイン</span>
+                    <span>シッターログイン</span>
                 </div>
                 <div class="form-body">
                     
@@ -41,6 +41,9 @@
                                     <label class="error">{{ $message }}</label>
                                 @enderror
                                 @error('detect')
+                                    <label class="error">{{ $message }}</label>
+                                @enderror
+                                @error('errorActive')
                                     <label class="error">{{ $message }}</label>
                                 @enderror
                             </div>

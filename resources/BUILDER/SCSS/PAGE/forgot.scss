@@ -10,7 +10,7 @@
             text-align: center;
             padding-bottom: 10px;
             .text-medium{
-                font-size: 20px;
+                font-size: 17px;
                 font-weight: 600;
             }
             .text-none{
@@ -24,7 +24,7 @@
             z-index: -1;
         }
         .form-main{
-            height: 280px;
+            min-height: 280px;
             width: 400px;
             padding: 30px;
             background: rgba(242, 255, 210, 0.8);

@@ -84,7 +84,7 @@ function createModelCalendar__viewer( instance ){
     //// create body modal 
     var body           = document.createElement("div")
         body.className = instance.classModalBody
-        body.innerHTML = 'チャットに行くことができます'
+        body.innerHTML = 'チャットでベビーシッターさんと直接メッセージのやり取りができます'
     modal.appendChild( body )
 
     /// button
@@ -94,7 +94,7 @@ function createModelCalendar__viewer( instance ){
     var btnchat           = document.createElement("a")
         btnchat.id        = instance.idModalButtonGotoChat
         btnchat.href      = "/chat"
-        btnchat.innerHTML = 'チャットに行きます'
+        btnchat.innerHTML = 'チャットでやりとりをする'
 
     wrapperButton.appendChild( btnchat )
     modal.appendChild(wrapperButton)

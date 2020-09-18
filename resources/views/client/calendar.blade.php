@@ -15,5 +15,6 @@
 
 @section('scripts')
     {{-- script login if u have --}}
-    <script src="{{ asset('js/calendar.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/library/japanese-holidays.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/calendar.min.js') }}"></script>
 @endsection

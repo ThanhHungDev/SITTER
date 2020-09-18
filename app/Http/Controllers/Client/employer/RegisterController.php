@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Client\employer;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use App\Mail\EmployerRegister;
+use App\Mail\EmployerRegisterSuccess;
+use App\Mail\EmployerRegisterParent;
 use App\Mail\EmployerForgotPass;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
@@ -20,6 +22,7 @@ use App\Models\FamilyModel;
 use App\Models\GalaryModel;
 use App\Models\PasswordResetModel;
 use App\Services\CommonService;
+use App\FactoryModel\FactoryModelInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use App\Services\EmployerService;
@@ -29,7 +32,8 @@ class RegisterController extends Controller
     private $model = null;
     private $serviceCommon = null;
     private $employerService = null;
-    public function __construct(CommonService $_serviceCommon, EmployerService $employerService) {
+    public function __construct(FactoryModelInterface $model, CommonService $_serviceCommon, EmployerService $employerService) {
+        $this->model = $model;
         $this->serviceCommon = $_serviceCommon;
         $this->employerService = $employerService;
     }
@@ -76,6 +80,8 @@ class RegisterController extends Controller
             $params['birth_date'] = $params['birth_year'].'-'.$params['birth_month'].'-'.$params['birth_day'];
             $params['role_id'] = config('constant.ROLE.EMPLOYER');
             $params['token_verify'] = substr(md5(time().$params['email']), 0, config('constant.TOKEN_SIZE'));
+            $gender = (int)$params['gender'];
+            $params['avatar'] = getAvatarDefault($gender);
 
             $userModel = new UserModel();
             $user = $userModel->create($params);
@@ -88,24 +94,25 @@ class RegisterController extends Controller
 
                 if($verifyEmail->id){
                     $dataSendMail['token_verify'] = $dataVerifyEmail['token_verify'];
-                    $dataSendMail['name'] = $params['first_name'].' '.$params['last_name'];
+                    $dataSendMail['name'] = $params['first_name'].'　'.$params['last_name'];
                     // send mail
                     Mail::to($user->email)->send(new EmployerRegister($dataSendMail));
-                    return redirect()->route('EMPLOYER_REGISTER_COMFIRM');
+                    return redirect()->route('EMPLOYER_REGISTER_COMFIRM',['利用者登録' ,'ご登録ありがとうございます。','登録完了メールをご確認ください。']);
                 }
             }
         }
         return view('client.employer.register');
     }
 
-    public function registerComfirm()
+    public function registerComfirm($title = null, $messager1 = null, $messager2 = null)
     {
         if (Auth::check()) {
             return redirect()->route('EMPLOYER_MYPAGE');
         }
+        $messager = $messager2 ?  $messager1 . '<br/>' . $messager2 : $messager1;
         $data = [
-            'title' => 'Step 1 Register',
-            'messager' => 'please check email to confirm thank you!',
+            'title' => $title,
+            'messager' => $messager,
         ];
         return view('client.employer.comfirm', $data);
     }
@@ -144,30 +151,31 @@ class RegisterController extends Controller
             ];
 
             $profileModel = new EmployerProfileModel();
-            $insertProfile = $profileModel->create($paramProfile);
+            $insertProfile = $profileModel->updateOrCreate(['user_id' => $paramProfile['user_id']], $paramProfile);
             if(!($insertProfile->id)){
                 DB::rollback();
             }
 
             //insert table galaries
             $upFileFront = $this->serviceCommon->RegisterUploadFile($params['input_file_front'], config('constant.UPLOAD_FILE.EMPLOYER'));
+            $insertGalariesFront = (new GalaryModel())->updateOrCreate(['user_id' => $data['user_id'], 'type' => config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT')],
+            [
+                'user_id' => $data['user_id'],
+                'name'    => $upFileFront['name'],
+                'path'    => $upFileFront['path'],
+                'type'    => config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT')
+            ]);
+
             $upFileBack = $this->serviceCommon->RegisterUploadFile($params['input_file_back'], config('constant.UPLOAD_FILE.EMPLOYER'));
-            $paramGalaries = [
+            $insertGalariesBack = (new GalaryModel())->updateOrCreate(
+                ['user_id' => $data['user_id'], 'type' => config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')],
                 [
-                    'user_id' => $data['user_id'],
-                    'name'    => $upFileFront['name'],
-                    'path'    => $upFileFront['path'],
-                    'type'    => config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT')
-                ],
-                [
-                    'user_id' => $data['user_id'],
-                    'name'    => $upFileBack['name'],
-                    'path'    => $upFileBack['path'],
-                    'type'    => config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')
+                'user_id' => $data['user_id'],
+                'name'    => $upFileBack['name'],
+                'path'    => $upFileBack['path'],
+                'type'    => config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')
                 ]
-                
-            ];
-            $insertGalaries = (new GalaryModel())->insert($paramGalaries);
+            );
 
             //issert families
             $paramFather = [
@@ -180,7 +188,7 @@ class RegisterController extends Controller
                 'gender'              => config('constant.GENDER.MALE'),
                 'type'                => config('constant.TYPE_MEMBER_PARENT.FATHER')
             ];
-            $insertFather = (new FamilyModel())->insert($paramFather);
+            $insertFather = (new FamilyModel())->updateOrCreate(['id_profile' => $insertProfile->id, 'type' => config('constant.TYPE_MEMBER_PARENT.FATHER')], $paramFather);
             if(!$insertFather){
                 DB::rollback();
             }
@@ -195,12 +203,14 @@ class RegisterController extends Controller
                 'gender'              => config('constant.GENDER.FEMALE'),
                 'type'                => config('constant.TYPE_MEMBER_PARENT.MOM')
             ];
-            $insertMother = (new FamilyModel())->insert($paramMother);
+            $insertMother = (new FamilyModel())->updateOrCreate(['id_profile' => $insertProfile->id, 'type' => config('constant.TYPE_MEMBER_PARENT.MOM')], $paramMother);
             if(!$insertMother){
                 DB::rollback();
             }
 
             //number child
+            //delete all child
+            $clearOldData = (new FamilyModel())->deleteMemberFamily($insertProfile->id, config('constant.TYPE_MEMBER_PARENT.CHILD'));
             $numberChild = $params['child_number'];
             for ($i=0; $i < $numberChild; $i++) { 
                 $paramChilds = [];
@@ -214,6 +224,8 @@ class RegisterController extends Controller
                     'gender'              => $params['gender_child_'.$i],
                     'allergic'            => (isset($params['allergic_'.$i]) && ($params['allergic_'.$i] == '1')) ? true : false,
                     'chronic'             => (isset($params['chronic_'.$i]) && ($params['chronic_'.$i] == '1')) ? true : false,
+                    'allergic_note'            => (isset($params['allergic_note_'.$i])) ? $params['allergic_note_'.$i] : null,
+                    'chronic_note'             => (isset($params['chronic_note_'.$i])) ? $params['chronic_note_'.$i] : null,
                     'type'                => config('constant.TYPE_MEMBER_PARENT.CHILD')
                 ];
                 $insertChild = (new FamilyModel())->insert($paramChilds);
@@ -228,9 +240,11 @@ class RegisterController extends Controller
                 DB::rollback();
             }
 
-            //active account
-            $activeUser = (new UserModel())->activeUserById($data['user_id']);
             DB::commit();
+            $dataSendMail['email'] = $data['email'];
+            $dataSendMail['name'] = $data['first_name'].'　'.$data['last_name'];
+            // send mail
+            Mail::to($data['email'])->send(new EmployerRegisterParent($dataSendMail));
             return redirect()->route('EMPLOYER_REGISTER_SUCCESS');
             
         }catch(\Exception $e) {
@@ -265,13 +279,12 @@ class RegisterController extends Controller
         
         if(empty($checkActive)){
             $result = [
-                "status"  => false,
-                "message" => "Account is not existed or inactive!"
+                "message" => "アカウントが存在しないか、非アクティブです!"
             ];
-            $errors = new MessageBag($result);
-            return redirect()->back()->withInput()->withErrors($errors);
+            return redirect()->back()->withInput()->withErrors($result);
         }
-        
+
+        $checkActive = $checkActive->toArray();
         $code     = substr(md5(time().$requestData['email']), 0, 30);
         $dateSend = Carbon::now()->toDateTimeString();
         $dateExp  = Carbon::now()->addSeconds(config('constant.EXP_TOKEN'))->toDateTimeString();
@@ -286,7 +299,7 @@ class RegisterController extends Controller
         $dataSendCode['name']     = $checkActive['first_name'].' '.$checkActive['last_name'];
         $dataSendCode['exp_date'] = $dateExp;
         Mail::to($requestData['email'])->send(new EmployerForgotPass($dataSendCode));
-        return redirect()->route('EMPLOYER_REGISTER_COMFIRM');
+        return redirect()->route('EMPLOYER_REGISTER_COMFIRM', ['パスワード再発行', 'パスワード再発行メールをご確認ください。']);
     }
 
     public function renewPassword(Request $request)
@@ -333,5 +346,53 @@ class RegisterController extends Controller
         }
         
         return redirect()->route('EMPLOYER_LOGIN');
+    }
+
+    public function collectCard(Request $request)
+    {
+        $input = $request->all();
+        $data['token'] = $input['token'] ?? '';
+        $dataUser = (new VerifyEmailModel)->getDataByToken($data['token']);
+        if(empty($dataUser) || $dataUser['stripe_account_id'] != ''){
+            return view('errors.404');
+        }
+        return view('client.employer.create-card', $data);
+    }
+
+    public function postCollectCard(Request $request)
+    {
+        //get thông tin khách hàng từ token của postgres
+        $input     = $request->all();
+        $tokenUser = $input['user-token'];
+        $dataUser  = (new VerifyEmailModel)->getDataByToken($tokenUser);
+
+        if(!empty($dataUser)){
+            $stripe     = new \Stripe\StripeClient(config('constant.STRIPE_SECRET_KEY'));
+            $dataStripe = $stripe->customers->create([
+                "description" => 'My First Test Customer (created for API docs)',
+                "source"      => $input['stripeToken'],                                  // obtained with Stripe.js
+                "name"        => $dataUser['first_name']. ' ' .$dataUser['last_name'],
+                "email"       => $dataUser['email']
+            ]);
+            
+            $userModel = $this->model->createUserModel();
+            $user      = $userModel::findOrFail($dataUser['user_id']);
+            if(!$user->stripe_account_id){
+                //insert data user
+                $user->stripe_account_id = $dataStripe->id;
+                $user->active = true;
+                $user->save();
+                //send email đăng ký thành coong 
+                $dataSendMail = [
+                    'name'  => $user->first_name.' '.$user->last_name,
+                    'email' => $user->email
+                ];
+                Mail::to($user->email)->send(new EmployerRegisterSuccess($dataSendMail));
+                //return success page or
+                return redirect()->route('EMPLOYER_COLLECT_CARD_SUCCESS');
+            }else{
+                return redirect()->back();
+            }
+        }
     }
 }

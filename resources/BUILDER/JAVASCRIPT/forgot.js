@@ -47,7 +47,7 @@ $(document).ready(function () {
                 required: 'パスワード確認は必須です。',
                 minlength: 'パスワードは6文字以上、32文字以下でなければなりません。',
                 maxlength: 'パスワードは6文字以上、32文字以下でなければなりません。',
-                equalTo: 'パスワード確認はパスワードと一致しません。'
+                equalTo: 'パスワードが一致しません。'
             }
         },
         errorPlacement: function (error, element) {

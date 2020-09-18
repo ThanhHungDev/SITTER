@@ -9,6 +9,7 @@ class EmployerService
         if(isset($inputData)){
             $child_total = $inputData['child_number'];
             $listLabel = [];
+            $customMessages = [];
             for ($i=0; $i < $child_total; $i++) { 
                 $listLabel['first_name_child_'.$i]             = 'required|max:255';
                 $customMessages['first_name_child_'.$i.'.required'] = '姓 is required';

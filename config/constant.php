@@ -1,12 +1,18 @@
 <?php
 return [
+
+    'MAIL_GLOBAL' => env('MAIL_USERNAME', 'managementpartners.hospital@gmail.com'),
+
+    'MAIL_SUPPORT' => 'managementpartners.hospital@gmail.com',
+
     'TOKEN_VERIFY' => [
+
         'WRONG'      => 1,
         'ACTIVED'    => 2,
         'NOT_ACTIVE' => 3,
         'EXPIRED'    => 4,
     ],
-    
+
     'DAY_EXPIRE' => 1,
 
     'GENDER' => [
@@ -124,7 +130,7 @@ return [
             "Kochi"         => "高知県"
         ]
     ],
-    
+
     // save to database with data types is the month
     'KID_AGE' => [
         1 => '0歳1ヶ月',
@@ -176,19 +182,58 @@ return [
     'CALENDAR' => [
         'DAY_FREE' => 0,
         'DAY_BUSY' => 1,
+        'CARER' => 1,
+        'HOUSEMAID' => 2,
     ],
 
     // constant for sitter add here
 
-    'EXP_TOKEN' => '90',
+    'EXP_TOKEN' => '1800',//30minute
     'LIMIT_RECORD' => 10,
+    'LIMIT_RECORD_REVIEW' => 3,
 
     //admin confirm
     'ADMIN_CONFIRM' => [
+        "DEFAULT" => 0,
         "ACCEPT" => 1,
         "UNACCEPT"  => 2,
     ],
     'TOKEN_COOKIE_NAME'  => "TOKEN_COOKIE_NAME",
     'BACK_ROUTE_SESSION' => "BACK_ROUTE_SESSION",
-    'BACK_ID_SESSION'    => "BACK_ID_SESSION"
+    'BACK_ID_SESSION'    => "BACK_ID_SESSION",
+
+    // for filter salary range
+    'SALARY_FILTER_RANGE' => [
+        1 => '1000円～1500円',
+        2 => '1500円～2000円',
+        3 => '2000円～2300円',
+        4 => '2300円～2600円',
+        5 => '2600円～3000円',
+        6 => '3000円～',
+    ],
+
+    //type refund
+    'TYPE_REFUND' =>[
+        'REFUND_ALL' => 1,
+        'REFUND_HALF' => 2,
+        'NON_REFUND' => 3
+    ],
+
+    'PERCEN_REFUND'=>[
+        1 => 100,
+        2 => 50,
+        3 => 0
+    ],
+
+    //person cancel
+    'PERSON_CANCEL' => [
+        'EMPLOYER' => 1,
+        'SITTER' => 2 
+    ],
+
+    //version css, js
+    'VERSION_CSS' => Date('YmdHi'),
+    'VERSION_JS' => Date('YmdHi'),
+    'STRIPE_PUBLIC_KEY' => 'pk_test_51HH3fxEkyn0XMKpGPVUghMwsvtR0lktiryL5WUbPkvzhx1Ykw0V5j8w20RPXQLXAnNTlbqShTAiJaQaTwcNMI6Pz00H35guI44',
+    'STRIPE_SECRET_KEY' => 'sk_test_51HH3fxEkyn0XMKpG77QqVE25YW8wxLTAhjbl2rykPI4KHVsy39d2QxF9v37hRM4wpCJVwVPRcr6fNmqigrDzPihD00Gn0FvEI8'
 ];

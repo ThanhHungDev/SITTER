@@ -3,8 +3,11 @@
 import CONFIG from "../config"
 // import Peer from "peerjs"
 import { setterUser, setterChannels, addMessage, addMessageSendToMe, 
-    setterSocket, addUserOnline, removeUserOnline, readAllMessageChannelActive } from "../action"
-// import config from "../config"
+    setterSocket, addUserOnline, removeUserOnline, readAllMessageChannelActive,
+    setterBookings, changeBooking } from "../action"
+import config from "../config"
+
+
 import $ from "jquery"
 
 
@@ -137,11 +140,11 @@ export function socketInitialConnect(socketIOClient, instanceApp) {
     socket.on('disconnect', function () {
         instanceApp.props.dispatch(setterSocket(null))
         ApplicationDom && ApplicationDom.classList.add("connect-socket-error")
-        console.log("socket connect nè disconnect")
+        // window.location.replace(CONFIG.SERVER_PHP.URL)
     });
     socket.on('connect_error', function () {
         ApplicationDom && ApplicationDom.classList.add("connect-socket-error")
-        console.log("socket connect nè connect_error")
+        window.location.replace(CONFIG.SERVER_PHP.URL)
     });
 }
 
@@ -238,7 +241,7 @@ export function saveBlobToServer(file) {
         contentType: false,
         processData: false,
         success: function( response ){
-            response = JSON.parse(response);
+            
             if (response.code != 200) {
                 handleErrorUploadFile()
             }
@@ -271,7 +274,7 @@ export function listenScrollMessage(e, messages, channelActive ) {
         return false
     }
     var domScroll = document.getElementById("js-scroll-to-bottom")
-    console.log(domScroll.scrollHeight, domScroll.clientHeight + "listenScrollMessage")
+    // console.log(domScroll.scrollHeight, domScroll.clientHeight + "listenScrollMessage")
     if ($(e).scrollTop() + 
         $(e).innerHeight() >=  
         $(e)[0].scrollHeight) { 
@@ -306,6 +309,77 @@ export function listenReadMessageNewUser( messages, channelActive ) {
         console.log(EVENT.READ_MESSAGE_ALL, "listenReadMessageNewUser")
         var userLocal = JSON.parse(localStorage.getItem('user'))
         socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
+    }
+}
+
+
+export function sendBookingUpdate(bookingUpdate) {
+    socket.emit(EVENT.USER_CHANGE_BOOKING, bookingUpdate)
+    return false
+}
+
+export function calculatorBill(booking, auth ) {
+    var work_date = booking.work_date,
+        start     = booking.start,
+        finish    = booking.finish,
+        salary    = booking.salary
+
+    var differenceTime = 0,
+        price          = 0,
+        myServFee      = 0,
+        stripeServFee  = 0,
+        vat            = 0,
+        total          = 0
+    
+    if( salary && work_date && start && finish ){
+        var [ fHour, fMinute ] = finish.split(':'),
+            [ sHour, sMinute ] = start.split(':')
+        var dateTimeFinish     = (new Date(1,1,2020, fHour, fMinute, 0)).getTime(),
+            dateTimeStart      = (new Date(1,1,2020, sHour, sMinute, 0)).getTime()
+
+            differenceTime = (dateTimeFinish - dateTimeStart)/ 1000 / 60 / 60
+            price          = Math.floor(differenceTime * salary)
+            myServFee      = Math.floor(price * 0.2)
+            vat            = Math.floor((price + myServFee) * 0.1)
+            stripeServFee  = Math.floor((price + myServFee + vat) * 0.036)
+    }
+    if( auth.role_id == config.ROLE_USER.sitter ){
+        
+        total = price - stripeServFee
+    }else if( auth.role_id == config.ROLE_USER.employer ){
+        total = price + vat + myServFee
+    }
+    return [ work_date, start, finish, salary, differenceTime, price, vat, myServFee, stripeServFee, total ]
+}
+
+export function calculatorFeeStripe(amount, currency) {
+    var fees = { 
+        USD: { Percent: 2.9, Fixed: 0.30 },
+        GBP: { Percent: 2.4, Fixed: 0.20 },
+        EUR: { Percent: 2.4, Fixed: 0.24 },
+        CAD: { Percent: 2.9, Fixed: 0.30 },
+        AUD: { Percent: 2.9, Fixed: 0.30 },
+        NOK: { Percent: 2.9, Fixed: 2 },
+        DKK: { Percent: 2.9, Fixed: 1.8 },
+        SEK: { Percent: 2.9, Fixed: 1.8 },
+        JPY: { Percent: 3.6, Fixed: 0 },
+        MXN: { Percent: 3.6, Fixed: 3 }
+    }
+    var DEFAULT_PERCENT_STRIPE = 3.6;
+    var _fee = _fee = { Percent: DEFAULT_PERCENT_STRIPE, Fixed: 0 }
+    if(typeof feesStripe != 'undefined'){
+        
+        _fee = fees[currency];
+    }
+    
+    var amount = parseFloat(amount);
+    var total = (amount + parseFloat(_fee.Fixed)) / (1 - parseFloat(_fee.Percent) / 100);
+    var fee = total - amount;
+
+    return {
+        amount: amount,
+        fee: fee.toFixed(2),
+        total: total.toFixed(2)
     }
 }
 
@@ -348,7 +422,7 @@ function validateFetchChannelMessage(data) {
 }
 
 function fetchChannelMessage( data ) {
-    console.log(data, "validateFetchChannelMessage(data)")
+    console.log(data, "validateFetchChannelMessage")
     var isValid = validateFetchChannelMessage(data)
     if (!isValid) {
         alert("エラーが発生しました。しばらくしてからもう一度お試しください1")
@@ -387,7 +461,6 @@ function getChannelAdmin( data, access ) {
         data.referenceUserId = 1
         data.refesh          = refesh
         data.access          = access
-        data.newChannelAdmin = 1
 
     return fetch(CONFIG.SERVER.ASSET() + '/api/channel', {
         method: 'POST',
@@ -495,6 +568,7 @@ function socketListenner( socket, instanceApp ){
 
     socket.on(EVENT.RESPONSE_MESSAGE, data => {
         
+        console.log(EVENT.RESPONSE_MESSAGE, data)
         var { user, token, message, style, attachment, channel, detect } = data 
         var userLocal = JSON.parse(localStorage.getItem('user'))
         if( userLocal && userLocal.id == user && userLocal.tokens.tokenAccess == token ){
@@ -540,5 +614,38 @@ function socketListenner( socket, instanceApp ){
     socket.on(EVENT.READ_MESSAGE_ALL_RESPONSE, data => {
 
         instanceApp.props.dispatch( readAllMessageChannelActive() )
+    })
+
+    socket.on(EVENT.RESPONSE_USER_GET_BOOKING, data => {
+
+        var bookings = data.bookings
+        console.log(bookings, EVENT.RESPONSE_USER_GET_BOOKING)
+        instanceApp.props.dispatch(setterBookings({ fetch: true, data: bookings }))
+    })
+
+    socket.on(EVENT.RESPONSE_USER_CHANGE_BOOKING, data => {
+        
+        console.log( data, EVENT.RESPONSE_USER_CHANGE_BOOKING)
+
+        var { user, token, message, style, attachment, channel } = data 
+        var userLocal = JSON.parse(localStorage.getItem('user'))
+        var messageData = { type: (userLocal.id == user), content: message, style, attachment, channel }
+        instanceApp.props.dispatch( addMessageSendToMe(messageData) )
+        
+        var bookingUpdate = { ...data.booking, update: true }
+        instanceApp.props.dispatch(changeBooking(bookingUpdate))
+        $.modal.close();
+        return false
+    })
+
+    socket.on(EVENT.RESPONSE_USER_CHANGE_BOOKING_ERROR, data => {
+
+        $("#js-booking-error").find(".alert-danger").text(data.message)
+        $("#js-booking-error").modal({
+            escapeClose: false,
+            clickClose: false,
+            showClose: true
+        });
+        return false
     })
 }

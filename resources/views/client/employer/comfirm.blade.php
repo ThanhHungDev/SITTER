@@ -7,7 +7,7 @@
         <div class="content-comfirm">
             <div class="comfirm-text">
                 <span>
-                    {{ $messager }}
+                    {!! $messager !!}
                 </span>
             </div>
         </div>

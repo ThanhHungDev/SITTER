@@ -1,5 +1,5 @@
-var local      = "153.126.149.63",
-    local_ip   = "153.126.149.63",
+var local      = "127.0.0.1",
+    local_ip   = "127.0.0.1",
     local_port = 9999,
     peer_port  = 7000
 
@@ -28,9 +28,15 @@ export default {
       return protocol + local + port_url;
     }
   },
-  SERVER_PHP: {
-    URL: "http://babysitter.trust-growth.co.jp" 
+  ROLE_USER: {
+    sitter  : 2,
+    employer: 3,
+    admin   : 1
   },
+  SERVER_PHP: {
+    URL: "http://sitters.jp" 
+  },
+  
   EMOJIS: [
     { symbol: "🤭", sign: ":3" },
     { symbol: "🤣", sign: ":v" },

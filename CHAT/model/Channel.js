@@ -19,7 +19,7 @@ const ChannelSchema = new Schema(
         ],
         backup: {
             type   : Boolean,
-            default: false
+            default: false /// channel xóa thì không xóa hẳn, thông thường là cột delete
         },
     }, {
     timestamps: true
@@ -284,6 +284,16 @@ ChannelSchema.statics.adminGetMessageChat = function( _userId ){
         }
     ])
 }
+ChannelSchema.statics.informationUserRelationUser = function( _userId ){
+    
+    _userId = _userId.toString()
 
+    return this
+    .idFriendsbyUserId(_userId)
+    .then( idFriends => {
+        
+        return Postgre.USER.findAll({ where: { id: { [Op.in]: idFriends } } })
+    })
+}
 
 module.exports = mongoose.model("channel", ChannelSchema)

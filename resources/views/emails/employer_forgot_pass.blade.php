@@ -9,25 +9,25 @@
 </head>
 
 <body>
-    <h5>{{ $dataSendMail['name'] }}様</h5>
+    <h2>{{ $dataSendMail['name'] }}様</h2>
     <p>
-        〇〇〇〇〇〇〇〇〇〇のご利用ありがとうございます。
+        いつも家政婦さん・ベビーシッタードットコムをご利用いただきまして、誠にありがとうございます。
     </p>
     <p>
-        {{$dataSendMail['exp_date']}} にパスワード変更のリクエストがありました。
+        下記リンクにアクセスし、新しいパスワードを入力してください。
     </p>
     <p>
-        以下のリンクにアクセスしてパスワードを変更してください。
-    </p>
-    <a href="{{route('EMPLOYER_RENEW_PASSWORD').'?code='.$dataSendMail['verify_token']}}">パスワード変更</a>
-    <p>
-        ※本メールは会員登録時に登録されたメールアドレスに自動送信されております。
-        もし、本メールに心当たりがない場合は、速やかに破棄してください。
+        リンクURL：<a href="{{route('EMPLOYER_RENEW_PASSWORD').'?code='.$dataSendMail['verify_token']}}">{{route('EMPLOYER_RENEW_PASSWORD').'?code='.$dataSendMail['verify_token']}}</a>
     </p>
     <p>
-        ここにフッターが入りますがまだ未定です！
+        ※本メールに心当たりのない方は、本メールを破棄していただきますようお願いいたします。
     </p>
-
+    <p>
+        ご不明点等は、下記メールアドレスよりお気軽にお問い合わせくださいませ。
+    </p>
+    <p>メールアドレス：○○○○＠○○○○○○</p>
+    <br/>
+    @include('emails.footer')
 </body>
 
 </html>

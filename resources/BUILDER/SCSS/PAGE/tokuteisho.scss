@@ -1,0 +1,79 @@
+.wapper-tokuteisho{
+    max-width: 780px;
+    margin: 0 auto;
+    .toku-header{
+        background-color: #2dc187;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        h2{
+            padding: 7px 15px;
+            color: #ffffff;
+            margin-bottom: 0;
+            
+        }
+    }
+    .toku-body{
+        background-color: #efffc7;
+        margin-bottom: 30px;
+        .item-toku-head{
+            background-color: #d4ffc7;
+            color: #06784b;
+            padding: 10px 15px;
+            h4{
+                margin: 0;
+                font-size: 16px;
+            }
+        }
+        .item-toku-content{
+            padding: 15px 0;
+            p{
+                padding: 0 15px;
+                font-size: 14px;
+                margin: 0;
+                word-break: break-word;
+            }
+            .toku-list-card{
+                display: flex;
+                .tlc-box{
+                    margin: 0 15px;
+                    .tlc-item{
+                        p{
+                            padding: 0;
+                        }
+                        img{
+                            max-width: 100%;
+                            min-width: 52px;
+                            min-height: 52px;
+                        }
+                    }
+                }
+                
+            }
+        }
+        .toku-content-text{
+            p{
+                padding: 5px 15px;
+                margin: 0;
+                word-break: break-word;
+            }
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+    }
+}
+@include DivResponsive(768px){
+    .wapper-tokuteisho {
+        width: 90%;
+    }
+    .wapper-tokuteisho {
+        .toku-body {
+            .item-toku-content{
+                .toku-list-card {
+                    .tlc-box{
+                        margin: 0 5px;
+                    }
+                }
+            }
+        }
+    }
+}

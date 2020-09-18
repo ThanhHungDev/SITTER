@@ -4,7 +4,7 @@
 <div class="container-renew">
     <div class="wrapper-renew">
         <div class="renew-header">
-            <span class="text-medium">ようこそ〇〇〇〇〇〇〇〇へ</span>
+            <span class="text-medium">ようこそ家政婦さん・ベビーシッタードットコムへ</span>
             <br/>
             <span class="text-none">もっと頼って、ともに育む社会へ</span>
         </div>

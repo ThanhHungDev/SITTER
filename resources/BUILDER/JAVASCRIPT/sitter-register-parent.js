@@ -1,4 +1,7 @@
 $(document).ready(function () {
+
+    // previewImage();
+
     $('.upload-info').click(function () {
         let inputName = $(this).attr('data-name');
         let element = 'input[name="'+inputName+'"]';
@@ -8,35 +11,56 @@ $(document).ready(function () {
 
     $('input[data-type="upload"]').change(function(e) {
         var input = e.target;  
-        var reader = new FileReader();
         var elementInput = $(this);
         $('.validate-image').text('');
         if (input.files && input.files[0]) {
             var file = input.files[0];
             var type = file.type;
             //validate type file
-            var match = ["image/gif", "image/png", "image/jpg", "image/jpeg"];
-            if (type != match[0] && type != match[1] && type != match[2] && type != match[3]) {
-                $('.validate-image').text('サポートされていないファイル');
-                $(elementInput).val('');
-                return;
-            }    
-            
-            reader.readAsDataURL(input.files[0]); // convert to base64 string
-            //show image
-            reader.onload = function(e) {
-                var inputName = $(elementInput).attr('name');
-                var elementImage = "div[data-name='" + inputName + "'";
-                $(elementImage).css('background','unset');
-                var htmlElement = '<img class="load-image" src="'+e.target.result+'" alt="">';
-                if(htmlElement){
-                    // htmlElement += '<span class="btn-remove" title="trash"><i class="fas fa-trash-alt"></i></span>'
-                    $(elementImage).html(htmlElement);
-                }
-                
-            }
+            readAndPreview(file, type, elementInput);
         }
     });
+
+    // function previewImage(){
+    //     $('input[data-type="upload"]').each(function(index, file) {
+    //         var name = file.name;
+    //         var src = localStorage.getItem(name);
+    //         if(src){
+    //             var elementImage = "div[data-name='" + name + "'";
+    //             $(elementImage).css('background','unset');
+    //             var htmlElement = '<img class="load-image" src="'+src+'" alt="">';
+    //             $(elementImage).html(htmlElement);
+    //         }
+    //     })
+    // }
+
+    function readAndPreview(file, type, elementInput){
+        var match = ["image/gif", "image/png", "image/jpg", "image/jpeg"];
+        console.log(type);
+        console.log(file);
+        if (type != match[0] && type != match[1] && type != match[2] && type != match[3]) {
+            $('.validate-image').text('サポートされていないファイル');
+            $(elementInput).val('');
+            return;
+        }
+
+        var reader = new FileReader();
+        
+        reader.readAsDataURL(file); // convert to base64 string
+        //show image
+        reader.onload = function(e) {
+            var inputName = $(elementInput).attr('name');
+            // localStorage.setItem(inputName, e.target.result);
+            var elementImage = "div[data-name='" + inputName + "'";
+            $(elementImage).css('background','unset');
+            var htmlElement = '<img class="load-image" src="'+e.target.result+'" alt="">';
+            if(htmlElement){
+                // htmlElement += '<span class="btn-remove" title="trash"><i class="fas fa-trash-alt"></i></span>'
+                $(elementImage).html(htmlElement);
+            }
+            
+        }
+    }
 
     let formValidate = $('#sitter-register-parent');
     formValidate.validate({
@@ -49,16 +73,16 @@ $(document).ready(function () {
         rules: {
             type_upload: 'required',
             input_file_front: {
-                accept: "jpg|jpeg|png|JPG|JPEG|PNG",
                 required: true,
+                accept: "image/jpg,image/jpeg,image/png,image/gif"
             },
             input_file_back: {
-                accept: "jpg|jpeg|png|JPG|JPEG|PNG",
                 required: true,
+                accept: "image/jpg,image/jpeg,image/png,image/gif"
             },
             input_file_qualifi: {
-                accept: "jpg|jpeg|png|JPG|JPEG|PNG",
-                required: true,
+                accept: "image/jpg,image/jpeg,image/png,image/gif",
+                required: true
             },
             check_accept: 'required',
             'skills[]': 'required',
@@ -124,17 +148,17 @@ $(document).ready(function () {
 
             input_file_front: {
                 required: '画像を選択して下さい。',
-                accept: 'ファイル形式が異なります。',
+                accept: 'ファイル形式が異なります。'
             },
 
             input_file_back: {
                 required: '画像を選択して下さい。',
-                accept: 'ファイル形式が異なります。',
+                accept: 'ファイル形式が異なります。'
             },
 
             input_file_qualifi: {
                 required: '画像を選択して下さい。',
-                accept: 'ファイル形式が異なります。',
+                accept: 'ファイル形式が異なります。'
             },
 
             'experiences[]': {
@@ -192,4 +216,8 @@ function checkHyphen(text){
 
 jQuery.validator.addMethod('checkHyphen', function (value) {
     return !checkHyphen(value);
+});
+
+$(document).on('blur', '#contact-phone', function() {
+    $(this).val(convertNumberJP($(this).val()));
 });

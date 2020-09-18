@@ -14,7 +14,9 @@ class AddColumnUserTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('admin_confirm')->default(0);
+            if (!Schema::hasColumn('users', 'admin_confirm')) {
+                $table->integer('admin_confirm')->default(0);
+            }
         });
     }
 

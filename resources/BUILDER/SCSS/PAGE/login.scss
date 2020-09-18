@@ -9,7 +9,7 @@
             text-align: center;
             padding-bottom: 10px;
             .text-medium{
-                font-size: 20px;
+                font-size: 17px;
                 font-weight: 600;
             }
             .text-none{
@@ -100,7 +100,7 @@
                         padding-top: 15px;
                         font-weight: 600;
                         color: #06784b;
-                       
+
                     }
                     a{
                         text-decoration: none;
@@ -109,6 +109,9 @@
             }
         }
 
+    }
+    &.admin{
+        min-height: calc(100vh - 100px);
     }
 }
 @include DivResponsive(425px){

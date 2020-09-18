@@ -69,3 +69,18 @@ export function readAllMessageChannelActive(){
         type : TYPE.CHANNEL.READ_ALL_MESSAGE_CHANNEL_ACTIVE
     }
 }
+export function setterBookings(bookings){
+    console.log(bookings," setterBookings ")
+    return {
+        type : TYPE.BOOKING.SETTER_BOOKING,
+        payload : bookings
+    }
+}
+
+export function changeBooking(booking){
+    console.log(booking," changeBooking ")
+    return {
+        type : TYPE.BOOKING.CHANGE_BOOKING,
+        payload : booking
+    }
+}

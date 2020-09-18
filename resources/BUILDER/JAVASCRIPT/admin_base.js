@@ -15,7 +15,6 @@ function getUnreadMessage( refresh ) {
     .then(res => res.json())
     .then(response => {
         if( response.code == 200 ){
-            console.log(response.code);
             fillUnreadMsg(response.data);
         }else {
             $('#msg-user-unread').text(0);
@@ -29,7 +28,6 @@ function getUnreadMessage( refresh ) {
 
 function fillUnreadMsg(data) {
     if(data){
-        console.log(data);
         let numUnreadUser  = data.countUser.length;
         let numUnreadAdmin = data.countAdmin.length;
         if(numUnreadUser > 9){

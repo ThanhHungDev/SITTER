@@ -1,0 +1,189 @@
+.employer{
+    .review-page {
+        padding-top: 50px;
+        padding-bottom: 50px;
+
+        .bt-1 {
+            border-top: 1px solid #2dc187 !important;
+        }
+
+        .width-400 {
+            width: 400px;
+        }
+        
+        .width-td-half {
+            width: 200px;
+        }
+
+        .txt-green {
+            color: #06784b;
+        }
+
+        .fs-24 {
+            font-size: 24px !important;
+        }
+
+        .fs-20 {
+            font-size: 20px !important;
+        }
+
+        .fs-18 {
+            font-size: 15px !important;
+        }
+
+        .fs-16 {
+            font-size: 15px !important;
+        }
+
+        .fs-15 {
+            font-size: 15px !important;
+        }
+
+        .mtb-20 {
+            margin: 20px 0px;
+        }
+
+        .color-red {
+            color: red;
+        }
+
+        .form-error {
+            .error {
+                display: inline-block;
+                color: #cc0033;
+                font-size: 14px;
+                // line-height: 15px;
+                margin: 5px 0 0;
+            }
+        }
+
+        .head-page {
+            background-color: #2dc187;
+            height: 55px;
+            width: 100%;
+
+            span {
+                display: flex;
+                align-items: center;
+                font-weight: 600;
+                height: 100%;
+                width: 100%;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+
+        .wrap-page {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+
+            .left-page {
+                margin-right: 30px;
+                width: 400px;
+                height: fit-content;
+
+                table.sitter-info {
+                    padding: 7px 17px;
+                    display: inherit;
+                    width: 100%;
+                    border-spacing: 0px;
+                    min-height: 445px;
+                    border: 1px solid #2dc187;
+                    // background-color: #f0ffc8;
+                    background-image: url('../image/sitter_right.png');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                }
+
+                .table td{
+                    border: none;
+                    font-size: 14px;
+                    padding: 9px 0 8px 0px;
+                    vertical-align: center;
+                }
+            }
+
+            .right-page {
+                width: 650px;
+
+                .title-form {
+                    height: 50px;
+                    background-color: #D4FFC7;
+
+                    .span-title {
+                        display: flex;
+                        align-items: center;
+                        font-weight: 600;
+                        height: 100%;
+                        width: 100%;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                    }
+                }
+
+                .content-form {
+                    background: #EFFFC7;
+                    padding: 20px 20px 10px 20px;
+
+                    .rateit {
+                        margin-top: 10px;
+                        margin-left: 60px;
+                    }
+                }
+
+                textarea {
+                    width: 510px;
+                    height: 160px;
+                }
+
+                .submit-form {
+                    margin-top: 50px;
+                    text-align: center;
+
+                    .btn-submit-review {
+                        background-color: #FCD036;
+                        font-size: 18px;
+                        font-weight: 600;
+                        padding: 13px 35px;
+                        min-width: 180px;
+                        border: none;
+                    }
+                }
+            }
+        }
+
+        @include DivResponsive(1080px){
+            padding-top: unset;
+
+            .wrap-page {
+                .left-page {
+                    margin-right: unset;
+                    margin-bottom: 50px;
+                }
+            }
+        }
+
+        @include DivResponsive(650px){
+            .wrap-page {
+                .right-page {
+                    width: 100%;
+
+                    textarea {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        @include DivResponsive(400px){
+            .wrap-page {
+                .left-page {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

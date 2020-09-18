@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class SitterService
 {
@@ -29,19 +30,9 @@ class SitterService
         }
         $newDatas = [];
         foreach ($schedules as $schedule) {
-            switch ($schedule['status']) {
-                case config('constant.CALENDAR.DAY_FREE'):
-                    $schedule['class'] = 'old';
-                    break;
-                
-                case config('constant.CALENDAR.DAY_BUSY'):
-                    $schedule['class'] = 'event-over';
-                    break;
-                
-                default:
-                    $schedule['class'] = 'old';
-                    break;
-            }
+            
+            $schedule['class'] = self::detectClassTypeColorSchedule( $schedule['status'], $schedule['type']);
+            
             $year = (new Carbon($schedule['work_date']))->format('Y');
             $month = (new Carbon($schedule['work_date']))->format('m');
             $day = (new Carbon($schedule['work_date']))->format('d');
@@ -55,5 +46,22 @@ class SitterService
             $newDatas[$year][$month][$day] = $schedule;
         }
         return json_encode($newDatas);
+    }
+
+    private static function detectClassTypeColorSchedule( $status, $type ){
+
+        if( $status == config('constant.CALENDAR.DAY_BUSY') ){
+            return 'event-over';
+        }
+        
+        $types = explode(',', $type);
+        $types = array_filter($types, function( $item ) { return trim($item); });
+        return 'type-job' . implode("-", $types);
+    }
+
+    public static function checkActivityAccountStripe($stripe_acc_id){
+        $response = Http::withToken(config('app.STRIPE_API_KEY'))->get(config('app.STRIPE_API_URL').'/v1/accounts/'.$stripe_acc_id);
+        $data = $response->json();
+        return $data['charges_enabled'];
     }
 }

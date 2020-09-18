@@ -2,129 +2,122 @@ var Channel     = require("../model/Channel"),
     TokenAccess = require("../model/TokenAccess"),
     Message     = require("../model/Message"),
     CONFIG      = require("../config"),
-    Postgre     = require("../model/Postgre.js")
+    Postgre     = require("../model/Postgre.js"),
+    stripe      = require('stripe')(process.env.STRIPE_SECRET);
 
  
-module.exports.findOneOrCreate = function( req, res ){
+module.exports.findOneOrCreateChannel = function( req, res ){
 
     /// laravel call to action
-    var { localUserId, referenceUserId, refesh, browser, browserMajorVersion, 
-        browserVersion, os, osVersion, 
-        newChannelAdmin, message, 
-        dates, monthSelect, yearSelect } = req.body,
-        // { 'user-agent': userAgent } = req.headers,
-        detect                      = { browser, browserMajorVersion, browserVersion, 
-                                            os, osVersion }, //userAgent
-        response = {}
+    var { localUserId, referenceUserId, refesh, 
+        browser, browserMajorVersion, browserVersion, os, osVersion,
+        message, date, type, salary, timeBegin, timeEnd } = req.body,
+
+        response = {},
+        detect = { browser, browserMajorVersion, browserVersion, os, osVersion },
+        conditionRefesh = { token: refesh, user_id: localUserId, detect: JSON.stringify(detect) }
     if(req.error){
-        response = { code: 422, message: "入力エラーがありました", internal_message: "入力エラーがありました", 
-        errors : [ req.error ] }
+        response.code    = 422,
+        response.message = response.internal_message = "入力エラーがありました"
+        response.errors  = [ req.error ]
         return res.end(JSON.stringify(response))
     }
-
-    if( newChannelAdmin ){
-        referenceUserId = 1
-    }
     
-    /// find
-    var channelNameTemp = null
-    Postgre.TOKEN_REFESH.findOne({ where: { token: refesh, user_id: localUserId, detect: JSON.stringify(detect) } })
-    .then( refeshData => {
-        if( !refeshData ){
-            throw new Error("トークンが失敗する")
-        }
-        return getNameChanelByUserId( localUserId, referenceUserId )
-    })
-    .then( channelName => {
-        channelNameTemp = channelName
+    Promise.all([
+        Postgre.TOKEN_REFESH.findOne({ where: conditionRefesh }),
+        getNameChanelByUserId( localUserId, referenceUserId )
+    ])
+    .then(([refeshData, channelName]) => {
+        // if( !refeshData ){
+        //     throw new Error("トークンが失敗する")
+        // }
         if(!channelName){
             throw new Error("チャンネル名を作成できません")
         }
-        return Channel.findOne({ name: channelName })
+        return Promise.all([
+            Channel.findOne({ name: channelName }),
+            channelName
+        ])
     })
-    .then( channel => {
-        if( !channel ){
+    .then( ([channelData, channelNameTemp]) => {
+        
+        var channel = channelData
+        if( !channelData ){
             /// new channel
-            var newChannel = new Channel({
+            var channelData = new Channel({
                 name : channelNameTemp,
                 user  : [ localUserId, referenceUserId]
             })
-            return newChannel.save()
-        }else if( channel.backup ){
-            channel.backup = false
-            return channel.save()
+            channel = channelData.save()
         }
-        return channel
+        if( channelData.backup ){
+            channelData.backup = false
+            channel = channelData.save()
+        }
+        
+        if(message){
+            message = new Message({ channel: channel._id, user: localUserId, body: message, read: false, style: "" }).save()
+        }
+        return Promise.all([
+            message,
+            channel
+        ])
     })
 
-    .then( channel => {
-        if( channel && message ){
-            var newMessage = new Message({
-                channel: channel._id,
-                user   : localUserId,
-                body   : message,
-                read   : false,
-                style  : ""
-            })
-            return newMessage.save().then( mess => { return channel })
-        }
-        return channel
-    })
-    .then( dataChannel => {
-        response = { 
-            code: 200, 
-            message: "チャンネル成功の設定", 
-            internal_message: "チャンネル成功の設定", 
-            data : {
-                name: dataChannel.name, 
+    .then(([message, dataChannel]) => {
+        
+        response.code    = 200,
+        response.message = response.internal_message = "チャンネル成功の設定"
+        response.data    = {
+                name: dataChannel.name,
                 user: dataChannel.user
             }
-        }
-        console.log( dates, monthSelect + " / " + yearSelect)
-        
-        if( dates.length ){
-            var work_date_update = dates.map( date => {
-                return formatZeroBefore( yearSelect) + "-" + 
-                formatZeroBefore( monthSelect + 1 ) + "-" + 
-                formatZeroBefore( date )
+        if( date ){
+            Postgre.SCHEDULE.update(
+                { status: CONFIG.SCHEDULE_STATUS.PICKED },
+                { where: { work_date: [date], user_id: parseInt(referenceUserId) } }
+            )
+            Postgre.BOOKING.upsert({
+                employer_id: localUserId,
+                sitter_id: referenceUserId,
+                status: CONFIG.BOOKING_STATUS.DEFAULT,
+                sitter_accept: CONFIG.BOOKING_STATUS.DEFAULT,
+                employer_accept: CONFIG.BOOKING_STATUS.DEFAULT
+            }, {
+                employer_id: localUserId,
+                sitter_id: referenceUserId,
+                status: CONFIG.BOOKING_STATUS.DEFAULT
             })
-            if( work_date_update.length ){
-                console.log("work_date_update", work_date_update)
-                Postgre.SCHEDULE.update(
-                    { status: CONFIG.SCHEDULE_STATUS.PICKED },
-                    { where: { work_date: work_date_update, user_id: parseInt(referenceUserId) } }
-                )
-                .catch( error => {
-                    console.log("lỗi" + error.message )
+            .then( booking => {
+                console.log(booking.toJSONFor())
+                Postgre.DATE_BOOKING.desert({
+                    booking_id: booking.id,
+                    salary: salary,
+                    type: type,
+                    work_date: date,
+                    start: timeBegin,
+                    finish: timeEnd,
+                }, {
+                    booking_id: booking.id
                 })
-            }
+                return res.end(JSON.stringify(response))
+            })
+            .catch( err => {
+                console.log(err.message, "booking" )
+                return res.end(JSON.stringify(response))
+            })
         }
         
-        return res.end(JSON.stringify(response))
     })
     .catch( error => {
         
-        response = { 
-            code: 500, 
-            message: error.message, 
-            internal_message: error.message,
-            error: JSON.stringify(error)
-        }
-        console.log(error)
+        response.code    = 500,
+        response.message = response.internal_message = error.message
         return res.end(JSON.stringify(response))
     })
 }
 
 
-function formatZeroBefore (number){
-    number = parseInt(number)
-    if (isNaN(number)) { return "00" }
-
-    if (number < 10) {
-        number = "0" + number
-    }
-    return number
-}
 
 
 module.exports.channels = function( req, res ){
@@ -189,7 +182,7 @@ module.exports.channels = function( req, res ){
                 json.channelName = channel.channelName
                 json.message     = channel.message
                 
-                json.data        = { x : ( channel.user.id == userIdActiveChannel ), y: channel.user.id, z: userIdActiveChannel,  }
+                // json.data        = { x : ( channel.user.id == userIdActiveChannel ), y: channel.user.id, z: userIdActiveChannel,  }
                 json.user        = channel.user ? friends[parseInt(channel.user)] : null
                 if( json.user ){
                     json.user.online = channel.user ? onlineFriends[parseInt(channel.user)] : false
@@ -542,4 +535,52 @@ function getNameChanelByUserId( userId1, userId2 ){
     .catch( error => {
         return null
     })
+}
+
+
+
+module.exports.information_friends = function( req, res ){
+
+    var id = req.params.id ? req.params.id : null
+    if( !id ){
+        response = { 
+            code: 402, 
+            message: "入力エラーがありました", 
+            internal_message: "入力エラーがありました"
+        }
+        return res.end(JSON.stringify(response))
+    }
+    return Channel.informationUserRelationUser(id)
+    .then( channels => {
+        
+        response = { 
+            code            : 200,
+            message         : "チャンネル成功の読み取りメッセージを更新",
+            internal_message: "チャンネル成功の読み取りメッセージを更新",
+            data: channels
+        }
+        return res.end(JSON.stringify(response))
+    })
+    .catch( error => {
+        console.log( "oject không thể fetch channel")
+        response = { code: 500, message: error.message, 
+            internal_message: error.message }
+        return res.end(JSON.stringify(response))
+    })
+    
+}
+
+module.exports.createPaymentIntent = async function( req, res ){
+
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: 1099,
+        currency: 'jpy',
+        // Verify your integration in this guide by including this parameter
+        metadata: {integration_check: 'accept_a_payment'},
+    });
+    response = { 
+        code: 200, 
+        data: paymentIntent
+    }
+    return res.end(JSON.stringify(response))
 }

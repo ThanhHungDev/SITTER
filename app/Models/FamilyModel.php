@@ -15,6 +15,7 @@ class FamilyModel extends Model
         $select = $this->getFieldFamily();
         return  $this->select(DB::raw($select))
                         ->where('families.id_profile', '=', $idProfile)
+                        ->where('families.deleted', false)
                         ->orderBy('type', 'asc')
                         ->get()
                         ->toArray();
@@ -35,7 +36,9 @@ class FamilyModel extends Model
                 families.gender, 
                 families.type, 
                 families.allergic, 
-                families.chronic ";
+                families.chronic,
+                families.allergic_note, 
+                families.chronic_note ";
     }
 
     public function updateFamily($field, $data)
@@ -43,5 +46,10 @@ class FamilyModel extends Model
         return DB::table($this->table)
             ->where($field, $data[$field])
             ->update($data);
+    }
+
+    public function deleteMemberFamily($id_profile, $type)
+    {
+        return DB::table($this->table)->where(['id_profile' => $id_profile, 'type' => $type ])->update(['deleted' => true]);
     }
 }

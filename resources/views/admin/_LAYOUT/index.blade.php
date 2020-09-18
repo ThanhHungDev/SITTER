@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title> @yield('title') </title>
     <link rel="icon" href="http://sitters.jp/favicon.ico" type="image/png">
-    <link rel="stylesheet" href="{{ asset('css/app.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/app.css?'.config('constant.VERSION_CSS'))}}">
     <script >
         const SYSTEM_BASE_URL      = "{{ asset('') }}"
         const SYSTEM_CHAT_EMPLOYER = "{{ route('EMPLOYER_CHAT') }}"
@@ -66,6 +66,7 @@
     <script type="text/javascript" src="{{ asset('js/library/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_base.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
     @yield('scripts-admin')
 </body>
 </html>

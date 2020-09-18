@@ -14,6 +14,28 @@
         }
     }
 }
+
+.admin-body{
+    .body-item{
+        .item-row{
+            .col-detail{
+                .detail-action{
+                    .action-send-link{
+                        .btn-send-link{
+                            height: 30px;
+                        }
+                    }
+                    .content-approve{
+                        display: flex;
+                        margin-left: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 #details-employer-modal{
     .color-label{
         color: #38b779;
@@ -29,6 +51,110 @@
     .item{
         p{
             margin: 0;
+        }
+    }
+    .link-update{
+        position: relative;
+        width: 100%;
+        text-align: right;
+        button{
+            cursor: pointer;
+            padding: 5px;
+        }
+    }
+}
+#sitter-list-modal{
+    width: 600px;
+    padding: 10px;
+    
+    .modal-title{
+        width: 80%;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .popup-lose{
+        width: 25px;
+        height: 25px;
+        float: right;
+        text-align: center;
+        &::before{
+            content: '\2716';
+        }
+    }
+    .popup-body{
+        .search-item{
+            width: 100%;
+            padding-top: 5px;
+            .search-input{
+                width: 490px;
+                height: 30px;
+            }
+            .btn-search-item{
+                width: 80px;
+                height: 30px;
+                margin-left: 3px;
+            }
+        }
+        .item-info{
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            max-height: 400px;
+            min-height: 80px;
+            overflow-y: scroll;
+            .row{
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                border-bottom: 1px solid #aaa;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                &:last-child{
+                    border-bottom: unset;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                }
+                .row-avatar{
+                    width: 60px;
+                    height: 60px;
+                    border: 1px solid #aaa;
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+                .row-info{
+                    padding-left: 10px;
+                    width: 395px;
+                    p{
+                        margin: 0;
+                        font-size: 18px;
+                        font-weight: 400;
+                        line-height: 20px;
+                        &:last-child{
+                            color: #aaa;
+                            font-size: 14px;
+                        }
+                    }
+                }
+                .row-action{
+                    padding-left: 10px;
+                    .action-send-mail{
+                        height: 30px;
+                        background-color: #8e8d8d;
+                        border: 1px solid #8e8d8d;
+                        &:active{
+                            background-color: #c9c9c9;
+                            border: 1px solid #c9c9c9;
+                        }
+                    }
+                }
+            }
+        }
+        .item-count{
+            float: right;
         }
     }
 }

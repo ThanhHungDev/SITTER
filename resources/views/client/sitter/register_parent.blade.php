@@ -8,7 +8,7 @@
             {{ csrf_field()}}
 
             <div class="div-title height-55 back-ground-green">
-                <span class="fs-20 span-title">ご利用者様応募フォーム</span>
+                <span class="fs-20 span-title">ベビーシッター応募フォーム</span>
             </div>
 
             <div class="height-55 require-title">
@@ -48,7 +48,7 @@
                     <div class="row">
                         <div class="col-sm-9 col-12 upload-info" data-name="input_file_front">
                             <img class="icon-upload" src="{{ asset('image/icons/icon-upload.png') }}">
-                            <span class="text-upload">表面を追加</span>
+                            <span class="text-upload">オモテ</span>
                         </div>
                     </div>
                     <div class="form-validate min-height-20">
@@ -62,7 +62,7 @@
                     <div class="row">
                         <div class="col-sm-9 col-12 upload-info" data-name="input_file_back">
                             <img class="icon-upload" src="{{ asset('image/icons/icon-upload.png') }}">
-                            <span class="text-upload">表面を追加</span>
+                            <span class="text-upload">ウラ</span>
                         </div>
                     </div>
 
@@ -82,7 +82,6 @@
                     <span class="span-title">お持ちの資格・経験 <span class="color-red">※</span></span>
                 </div>
                 {{-- {{dd(old('experiences'))}} --}}
-
                 <div class="sitter-upload-info plr-23">
                     <div class="form-validate">
                         <div class="form-row">
@@ -106,7 +105,7 @@
 
                     <label class="mt-18">その他、保育に関連する資格をお持ちの場合は以下の資格名をご記入してください。</label>
                     <div class="row">
-                        <textarea class="col-sm-9 col-12 upload-info" name="remark"></textarea>
+                        <textarea class="col-sm-9 col-12 upload-info" name="remark">{{old('remark')}}</textarea>
                     </div>
 
                     <label class="mt-18">選択した書類をアップロード</label>
@@ -171,7 +170,7 @@
                 <div class="div-content-form">
                     <div class="form-row input-content form-validate">
                         <div class="col-sm-9 col-12">
-                            <input type="text" name="contact_phone" class="form-control @error('contact_phone') input-error @enderror" value="{{ old('contact_phone') }}" placeholder="例）0369113011">
+                            <input type="text" name="contact_phone" id="contact-phone" class="form-control @error('contact_phone') input-error @enderror" value="{{ old('contact_phone') }}" placeholder="例）0369113011">
                             <div class="form-error">
                                 @error('contact_phone')
                                     <label class="error">{{ $message }}</label>
@@ -241,7 +240,7 @@
             </div>
             <input type="hidden" name="token_verify" value="{{ $_REQUEST['token_verify'] }}">
             <div class="text-center mt-50 mb-50">
-                <button type="submit" class="btn btn-default btn-sitter-back">戻る</button>
+                <button type="button" class="btn btn-default btn-sitter-back">戻る</button>
                 <button type="submit" class="btn btn-default btn-sitter-register">登録する</button>
             </div>
         </form>
@@ -250,5 +249,6 @@
 @endsection
 @section('scripts')
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/additional-methods.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sitter-register-parent.min.js') }}"></script>
 @endsection

@@ -7,17 +7,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login </title>
     <link rel="icon" href="http://sitters.jp/favicon.ico" type="image/png">
-    <link rel="stylesheet" href="{{ asset('css/app.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/app.css?'.config('constant.VERSION_CSS'))}}">
 </head>
 <body>
     <div class="main-wrapper">
         <div class="main-wrapper-header">
             @include ("admin._LAYOUT.partial.header")
         </div>
-        <div class="container-login">
+        <div class="container-login admin">
             <div class="wrapper-login">
                 <div class="login-header">
-                    <span class="text-medium">ようこそ〇〇〇〇〇〇〇〇へ</span>
+                    <span class="text-medium">ようこそ家政婦さん・ベビーシッタードットコムへ</span>
                     <br/>
                     <span class="text-none">もっと頼って、ともに育む社会へ</span>
                 </div>
@@ -26,10 +26,10 @@
                     <form action="{{ Route('ADMIN_POST_LOGIN') }}" method="POST" class="form-register">
                         @csrf
                         <div class="form-header">
-                            <span>利用者ログイン</span>
+                            <span>管理者ログイン</span>
                         </div>
                         <div class="form-body">
-                            
+
                             {{-- mail --}}
                             <div class="form-row">
                                 <div class="group-control form-validate">
@@ -85,6 +85,6 @@
     <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/detect.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/login.min.js') }}"></script>    
+    <script type="text/javascript" src="{{ asset('js/login.min.js') }}"></script>
 </body>
 </html>

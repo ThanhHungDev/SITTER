@@ -30,8 +30,13 @@ const TokenAccessSchema = new Schema({
     },
     detect : { 
         type    : String
-    }
-},{ capped: true, size: 200 })
+    },
+    expireAt: {
+        type: Date,
+        default: Date.now,
+        index: { expires: '100m' },
+    },
+})
 TokenAccessSchema.pre('save', function (next) {
     
     this.period = new Date

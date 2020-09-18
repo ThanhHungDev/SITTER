@@ -39,12 +39,16 @@ function Calendar() {
     this.classInToday         = 'calendar-today'
     this.classInSunday        = 'calendar-sunday'
     this.classInSatday        = 'calendar-satday'
+    this.classInHoliday       = 'calendar-holiday'
     this.classHeader          = 'calendar-header'
     this.classTitleDay        = 'calendar-title-day'
     this.classBody            = 'calendar-body'
     this.classFooter          = 'calendar-footer'
     this.classCell            = 'calendar-cell'
     this.classCellDisable     = 'calendar-cell-disable'
+    this.classCellDisablePrevMonth = 'calendar-cell-disable-prev-month'
+    this.classCellDisableNextMonth = 'calendar-cell-disable-next-month'
+    this.classCellLessThanToday    = 'calendar-cell-disable-less-today'
     this.classPicked          = 'calendar-picked'
     this.classCellDate        = 'calendar-cell-date'
     this.classNext            = 'calendar-next'
@@ -63,19 +67,23 @@ function Calendar() {
     this.wrapperCheckBox     = 'calendar--wrapper__checkbox'
     this.wrapperInput        = 'calendar--wrapper__input'
 
-    this.idModalTextTime        = 'js-modal-header__text'
-    this.idModalCalendar        = 'js-modal-calendar'
-    this.idModalHourBegin       = 'js-hour-begin'
-    this.idModalHourEnd         = 'js-hour-end'
-    this.idModalMinuteBegin     = 'js-minute-begin'
-    this.idModalMinuteEnd       = 'js-minute-end'
+    this.idModalTextTime       = 'js-modal-header__text'
+    this.idModalCalendar       = 'js-modal-calendar'
+    this.idModalHourBegin      = 'js-hour-begin'
+    this.idModalHourEnd        = 'js-hour-end'
+    this.idModalMinuteBegin    = 'js-minute-begin'
+    this.idModalMinuteEnd      = 'js-minute-end'
+    this.idWrapperViewerChange = 'js-wrapper-model-viewer-change'
+    this.idBookingBeginTime    = 'js-begin-time'
+    this.idBookingEndTime      = 'js-end-time'
+
     this.idModalCheckFirst      = 'js-modal-check-first'
     this.idModalCheckLast       = 'js-modal-check-last'
     this.idModalButtonNew       = 'js-modal-button-new'
     this.idModalButtonEdit      = 'js-modal-button-edit'
     this.idModalButtonDelete    = 'js-modal-button-delete'
     this.idModalButtonTimeClose = 'js-modal-button-time-close'
-    this.idModalButtonGotoChat  = 'js-modal-button-chat'
+    this.idModalBooking         = 'js-modal-button-booking'
     this.typeNumber             = 'number'
     this.nameModalHourBegin     = 'hour_begin'
     this.nameModalHourEnd       = 'hour_end'
@@ -177,7 +185,7 @@ function Calendar() {
         return this.dateLoop === this.currentDate && 
         this.selectYear  === this.currentYear &&
         this.selectMonth === this.currentMonth
-    }
+    } 
     this.checkSunDay = function(){
         var dayNumber = this.dateLoop
         var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber )
@@ -190,6 +198,13 @@ function Calendar() {
         var theDateLoop = new Date( this.selectYear, this.selectMonth, dayNumber )
         
         return theDateLoop.getDay() == 6
+    }
+    this.checkHoliday = function(){
+
+        if( typeof JapaneseHolidays != 'undefined' ){
+            return JapaneseHolidays.isHoliday(new Date( this.selectYear, this.selectMonth, this.dateLoop ))
+        }
+        return false
     }
     this.leftThanToday = function (){
         
@@ -383,6 +398,31 @@ function Calendar() {
         
         return cell
     }
+    this.createEventClick = function(instance, cell ){
+
+        cell.onclick = function (event) {
+                
+            var cell = $(event.target);
+            if(!cell.hasClass(instance.classCell)){
+                cell = cell.closest("." + instance.classCell);
+            }
+            
+            instance.dragBegin = cell.attr(instance.attributeDate)
+            instance.dragEnd   = cell.attr(instance.attributeDate)
+            
+            instance.pickData(instance)
+            /// show popup create event 
+            let classPicked = instance.classPicked
+            if(document.getElementsByClassName(classPicked).length){
+
+                var modal = document.getElementById(instance.idModalCalendar)
+                if( modal && modal.classList.contains('d-none') ){
+                    instance.openModalCreateEvent(instance)
+                }
+            }
+        }
+        return cell
+    }
     this.checkDateHaveEvent = function( year, month, day ){
 
         return typeof this.data[year] != 'undefined' &&
@@ -390,7 +430,6 @@ function Calendar() {
         typeof this.data[year][month][day] != 'undefined'
     }
     this.overrideEvent = function( dates, event ){
-        event.class = 'event-new'
         
         for (var iOverride = 0; iOverride < dates.length; iOverride++){
             var day                = dates[iOverride],
@@ -415,7 +454,6 @@ function Calendar() {
     }
     this.updateEvent = function( day, event ){
 
-        event.class = 'event-update'
         var numberCurrentDate  = this.formatZeroBefore(day),
             numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
             numberCurrentYear  = this.formatZeroBefore(this.selectYear)
@@ -470,12 +508,13 @@ function Calendar() {
                                 + '<i> | </i>'
                                 + '<i>' + event.finish + '</i>'
                 cell.classList.add(this.classCellHasEvent)
+                cell.setAttribute("data-type", event.type)
                 classEvent = event.class
             }
             var textEvent           = document.createElement("span")
                 textEvent.innerHTML = contentEvent
             textEvent.classList.add(this.classCellEvent)
-            if(classEvent) textEvent.classList.add(classEvent)
+            if(classEvent) textEvent.className = textEvent.className + " " +classEvent
             cell.appendChild(textEvent)
         }
         return cell
@@ -489,6 +528,13 @@ function Calendar() {
             /// cell disable before
 
             cell.classList.add(this.classCellDisable)
+            cell.classList.add(this.classCellDisablePrevMonth)
+            var instance = this
+            cell.onclick = function() {
+
+                instance.setSelectMonth(instance.selectMonth - 1 )
+                instance.draw();
+            }
             var dateDisable = new Date(this.selectYear, this.selectMonth, 1)
             dateDisable.setDate(dateDisable.getDate() - this.firstDay + j )
             
@@ -508,7 +554,13 @@ function Calendar() {
                 this.dateLoop = 1
             }
             cell.classList.add(this.classCellDisable)
+            cell.classList.add(this.classCellDisableNextMonth)
+            var instance = this
+            cell.onclick = function() {
 
+                instance.setSelectMonth(instance.selectMonth + 1 )
+                instance.draw();
+            }
             var textCell           = document.createElement("span")
                 textCell.className = this.classCellDate
                 textCell.innerHTML = this.dateLoop
@@ -522,6 +574,8 @@ function Calendar() {
 
             if(this.canPickDrag){
                 cell = this.createEventDrag(this, cell);
+            }else{
+                cell = this.createEventClick(this, cell);
             }
 
             var textCell           = document.createElement("span")
@@ -532,8 +586,9 @@ function Calendar() {
             cell = this.drawEventToDate(cell, new Date(this.selectYear, this.selectMonth, this.dateLoop))
             // cell = this.setEventCellOnClick(cell, this.dateLoop)
 
-            if(this.isCalendarSelector && this.leftThanToday() ){
+            if( this.leftThanToday() ){
                 cell.classList.add(this.classCellDisable)
+                cell.classList.add(this.classCellLessThanToday)
             }
             // color today's date
             if(this.checkToday()){
@@ -546,6 +601,9 @@ function Calendar() {
             // color satDay
             if(this.checkSatDay()){
                 cell.classList.add(this.classInSatday)
+            }
+            if(this.checkHoliday() ){
+                cell.classList.add(this.classInHoliday)
             }
 
             this.dateLoop++
@@ -667,8 +725,8 @@ function Calendar() {
                 var checkboxFirst = document.getElementById(this.idModalCheckFirst),
                     checkboxLast  = document.getElementById(this.idModalCheckLast)
                     
-                    checkboxFirst.checked = ( event.type && event.type.indexOf(",1,") != -1 )
-                    checkboxLast.checked  = ( event.type && event.type.indexOf(",2,") != -1 )
+                    checkboxFirst.checked = ( event.type && event.type == 1 )
+                    checkboxLast.checked  = ( event.type && event.type == 2 )
         
                 document.getElementById(this.idModalHourBegin).value   = hourStart
                 document.getElementById(this.idModalMinuteBegin).value = minStart
@@ -713,6 +771,7 @@ function Calendar() {
             }
     
             if( this.inputEventData ){
+
                 this.inputEventData.value = JSON.stringify(this.data)
             }
         }
@@ -724,6 +783,9 @@ function Calendar() {
         var dates = null
         if( this.setBeforeOpenModel ){
             dates = this.eventBeforeOpenModel( instance )
+        }
+        if( !dates ||  !dates.length ){
+            return false
         }
 
         /// create modal

@@ -14,10 +14,18 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/delete-sitter','Admin\AdminController@ajaxUserDelete')->name('ADMIN_SITTER_AJAX_DELETE');
         Route::post('/accept-sitter','Admin\AdminController@ajaxUserAccept')->name('ADMIN_SITTER_AJAX_ACCEPT');
         Route::get('/employers','Admin\AdminController@employers')->name('ADMIN_EMPLOYERS');
+        Route::post('/accept-employer','Admin\AdminController@ajaxCensorAccount')->name('ADMIN_EMPLOYER_AJAX_ACCEPT');
         Route::get('/chat','Admin\AdminController@chat')->name('ADMIN_CHAT');
         Route::get('/support','Admin\AdminController@support')->name('ADMIN_SUPPORT');
         Route::get('/message-reader/{id}/{channel?}','Admin\AdminController@messageReader')->name('ADMIN_READ_MESSAGE');
         Route::post('/ajax-get-family','Admin\AdminController@ajaxGetFamily')->name('ADMIN_AJAX_GET_FAMILY');
         Route::post('/delete-employer','Admin\AdminController@ajaxUserDelete')->name('ADMIN_AJAX_EMPLOYER_DELETE');
+        Route::post('/send-email-sitter','Admin\AdminController@ajaxListSitterSendLink')->name('ADMIN_AJAX_EMPLOYER_SEND_SITTER');
+        Route::get('/list-booking','Admin\AdminController@listBooking')->name('ADMIN_LIST_BOOKING');
+        Route::get('/ajax-info-employer/{id}','Admin\AdminController@ajaxInfoEmployer')->name('AJAX_INFO_EMPLOYER');
+        Route::get('/ajax-info-sitter/{id}','Admin\AdminController@ajaxInfoSitter')->name('AJAX_INFO_SITTER');
+        Route::post('/ajax-booking-cancel','Admin\AdminController@ajaxBookingCancelByAdmin')->name('AJAX_BOOKING_CANCEL_ADMIN');
+
+        Route::get('/test-refund','Admin\AdminController@refundPayment')->name('testRefund');
     });
 });

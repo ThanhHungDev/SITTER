@@ -36,9 +36,10 @@ class SitterForgotPass extends Mailable
         );
         
         return $this->view('emails.sitter_forgot_pass')
-                    ->subject('【〇〇〇〇〇〇〇〇〇〇】利用者登録ありがとうございます')
+                    ->subject('【家政婦さん・ベビーシッタードットコム】パスワード再発行のお知らせ')
                     ->with([
                         'dataSendMail' => $dataSendMail,
+                        'url'          => route('SITTER_RENEW_PASSWORD').'?code='.$dataSendMail['verify_token']
                     ]);
     }
 }

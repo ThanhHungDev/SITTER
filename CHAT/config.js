@@ -57,19 +57,24 @@ var CONFIG = {
         PRIVATE_KEY: 'OAGhOjAuZ5WqNOm7hdqNeo-SSJqGApaXivfY5ps0Eiw'
     },
     EVENT : {
-        CONNECTTION              : 'connection',
-        DISCONNECT               : 'disconnect',
-        SEND_MESSAGE             : 'send-message',
-        RESPONSE_MESSAGE         : 'response-message',
-        JOIN_CHANNEL             : "join-channel",
-        SEND_TYPING              : "send-typing",
-        RESPONSE_TYPING          : 'response-typing',
-        USER_ONLINE              : "USER_ONLINE",
-        USER_ONLINE_NOTI         : "USER_ONLINE_NOTI",
-        USER_OFFLINE_NOTI        : "USER_OFFLINE_NOTI",
-        DUPLICATION_TAB          : "DUPLICATION_TAB",
-        READ_MESSAGE_ALL         : "READ_MESSAGE_ALL",
-        READ_MESSAGE_ALL_RESPONSE: "READ_MESSAGE_ALL_RESPONSE"
+        CONNECTTION                 : 'connection',
+        DISCONNECT                  : 'disconnect',
+        SEND_MESSAGE                : 'send-message',
+        RESPONSE_MESSAGE            : 'response-message',
+        JOIN_CHANNEL                : "join-channel",
+        SEND_TYPING                 : "send-typing",
+        RESPONSE_TYPING             : 'response-typing',
+        USER_ONLINE                 : "USER_ONLINE",
+        USER_ONLINE_NOTI            : "USER_ONLINE_NOTI",
+        USER_OFFLINE_NOTI           : "USER_OFFLINE_NOTI",
+        DUPLICATION_TAB             : "DUPLICATION_TAB",
+        READ_MESSAGE_ALL            : "READ_MESSAGE_ALL",
+        READ_MESSAGE_ALL_RESPONSE   : "READ_MESSAGE_ALL_RESPONSE",
+        USER_GET_BOOKING            : "USER_GET_BOOKING",
+        RESPONSE_USER_GET_BOOKING   : "RESPONSE_USER_GET_BOOKING",
+        USER_CHANGE_BOOKING         : "USER_CHANGE_BOOKING",
+        RESPONSE_USER_CHANGE_BOOKING: "RESPONSE_USER_CHANGE_BOOKING",
+        RESPONSE_USER_CHANGE_BOOKING_ERROR: "RESPONSE_USER_CHANGE_BOOKING_ERROR"
     },
     CHANNEL: {
         SINGLE_PREFIX: "SINGLE",
@@ -83,6 +88,14 @@ var CONFIG = {
     SCHEDULE_STATUS: {
         DEFAULT: 0,
         PICKED: 1
+    },
+    BOOKING_STATUS: {
+        DEFAULT: 0,
+        PICKED: 1
+    },
+    ORDER_STATUS: {
+        DEFAULT: 0,
+        ERROR: 1
     }
 }
 module.exports = CONFIG;

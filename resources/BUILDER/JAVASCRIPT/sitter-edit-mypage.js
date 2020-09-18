@@ -1,6 +1,6 @@
 $(document).ready(function(){
     loadDataSkills();
-    loadKidQty();
+    loadExpKidQty();
     $('#sitter-skills li').on('click', function name(params) {
         $(this).toggleClass('active');
         loadDataSkills();
@@ -8,7 +8,8 @@ $(document).ready(function(){
     });
 
     $('#exp_parenting').on('change', function name(params) {
-        loadKidQty();
+        loadExpKidQty();
+        $('#sitter-edit-form').valid();
     });
 
     $('#slider').on('click', function() {
@@ -36,14 +37,14 @@ $(document).ready(function(){
         }
     });
 
-    function loadKidQty(){
+    function loadExpKidQty(){
         var check = parseInt($('#exp_parenting').val());
         if(check == 1){
-            $('#kid_qty').attr('disabled', false);
+            $('#exp_kid_qty').attr('disabled', false);
         }
         else{
-            $('#kid_qty option:first').prop('selected',true);
-            $('#kid_qty').attr('disabled', true);
+            $('#exp_kid_qty option:first').prop('selected',true);
+            $('#exp_kid_qty').attr('disabled', true);
         }
     };
 
@@ -106,6 +107,7 @@ $(document).ready(function(){
                 checkKidAge: true
             },
             kid_qty:'required',
+            exp_kid_qty:'required',
             exp_parenting:'required',
             exp_sitter:'required',
             time_support:'required',
@@ -113,6 +115,10 @@ $(document).ready(function(){
             salary_house:'required',
             self_introduce:'required',
             service_introduce:'required',
+            title:{
+                required: true,
+                maxlength: 100
+            },
             skills: {
                 required: true
             },
@@ -141,6 +147,9 @@ $(document).ready(function(){
             // },
             check_time: {
                 checkValidTime: true,
+            },
+            check_job: {
+                checkValidJobType: true,
             }
         },
         messages: {
@@ -165,6 +174,9 @@ $(document).ready(function(){
                 checkKidAge: '保育可能年齢が不正です。'
             },
             kid_qty: {
+                required: 'この項目は必須です',
+            },
+            exp_kid_qty: {
                 required: 'この項目は必須です',
             },
             exp_sitter: {
@@ -197,6 +209,10 @@ $(document).ready(function(){
             schedule: {
                 checkSchedules: 'この項目は必須です',
             },
+            title: {
+                required: 'この項目は必須です',
+                maxlength: 'この項目は1桁以上、100桁以下でなければなりません。',
+            },
             // minute_begin:{
             //     required: '開始時間の分は必須です。',
             //     min: '分は00から59でなければなりません。',
@@ -220,6 +236,9 @@ $(document).ready(function(){
             check_time: {
                 checkValidTime: '終了時間は開始時間より後でなければなりません。',
             },
+            check_job: {
+                checkValidJobType: "ベビーシッターか家事代行のどちらか", //、もしくは両方を選択してください。
+            }
         },
         errorPlacement: function (error, element) {
             var element = element.closest('.form-validate').find('.form-error');
@@ -254,6 +273,13 @@ $.validator.addMethod('checkValidTime', function () {
     return checkValidTime();
 });
 
+$.validator.addMethod('checkValidJobType', function () {
+    if($('#js-modal-calendar').hasClass('d-none')){
+        return true;
+    }
+    return checkValidJobType();
+});
+
 $('#kid_age_start, #kid_age_end').on('change', function(){
     $('#kid_age').valid();
 });
@@ -263,11 +289,19 @@ $(document).on('input', '#js-hour-begin, #js-minute-begin, #js-hour-end, #js-min
     if(text.length >= 2){
         text = text.substr(0,2);
     }
+    console.log("vào đay 'input', '#js-h")
     $(this).val(text);
     $('#check-time').valid();
+    $('#check-job').valid();
     return false;
 });
 
+$(document).on('change', '#js-modal-check-first, #js-modal-check-last', function() {
+    console.log("'change', '#js-modal-check-first, #js-modal-check-last'")
+    $('#check-time').valid();
+    $('#check-job').valid();
+    return false;    
+});
 
 
 function chooseFile() {
@@ -483,6 +517,7 @@ function runSlide(){
         autoplay: true,
         pauseOnHover: true,
         swipe: true,
+        arrows: false,
     });
     $('#slider-nav').slick({
         asNavFor: '#slider',

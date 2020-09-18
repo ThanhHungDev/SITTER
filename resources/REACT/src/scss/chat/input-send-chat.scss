@@ -5,7 +5,7 @@
   border: 1px solid $gray-200;
   border-left: none;
   position: relative;
-  padding: 5px 80px 0 80px;
+  padding: 5px 45px 0 100px;
   
   textarea{
     width: 100%!important;
@@ -41,23 +41,26 @@
     color: $blue;
   }
   .hero-icon{
+    &.calendar{
+      left: 5px;
+    }
 
     &.emoticon{
-      left: 10px;
+      left: 35px;
     }
 
     &.file{
-      left: 45px;
+      left: 65px;
     }
     &.send{
       display: inline-block;
       z-index: 1;
-      right: 45px;
+      right: 10px;
     }
     &.react{
-      z-index: 1;
-      display: inline-block;
-      right: 10px;
+      z-index: -1;
+      display: none;
+      right: 0px;
     }
   }
 

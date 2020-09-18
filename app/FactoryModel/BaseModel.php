@@ -2,22 +2,27 @@
 
 namespace App\FactoryModel;
 
+use Illuminate\Support\Facades\DB;
+
 use App\Models\UserModel;
 use App\Models\SkillModel;
 use App\Models\GalaryModel;
+use App\Models\SalaryModel;
+use App\Models\SitterModel;
+use App\Models\BookingModel;
 use App\Models\ChannelModel;
 use App\Models\MessageModel;
+use App\Models\ScheduleModel;
 use App\Models\ExperienceModel;
+use App\Models\VerifyRateModel;
 use App\Models\TokenRefeshModel;
 use App\Models\VerifyEmailModel;
+use App\Models\SitterReviewModel;
 use App\Models\ActivitySkillModel;
+use App\Models\PasswordResetModel;
 use App\Models\SitterProfileModel;
 use App\Models\EmployerProfileModel;
-use App\Models\PasswordResetModel;
-use App\Models\SitterModel;
-use App\Models\SalaryModel;
-use App\Models\ScheduleModel;
-use Illuminate\Support\Facades\DB;
+use App\Models\DateBookingModel;
 
 class BaseModel implements FactoryModelInterface{
 
@@ -36,6 +41,10 @@ class BaseModel implements FactoryModelInterface{
     public static $SalaryModel;
     public static $PasswordResetModel;
     public static $ScheduleModel;
+    public static $VerifyRateModel;
+    public static $SitterReviewModel;
+    public static $BookingModel;
+    public static $DateBookingModel;
 
     public function createUserModel(){
         
@@ -163,5 +172,31 @@ class BaseModel implements FactoryModelInterface{
             self::$ScheduleModel = new ScheduleModel();
         }
         return new ScheduleModel();
+    }
+
+    public function createVerifyRateModel(){
+        if(!self::$VerifyRateModel){
+            self::$VerifyRateModel = new VerifyRateModel();
+        }
+        return new VerifyRateModel();
+    }
+    public function createSitterReviewModel(){
+        if(!self::$SitterReviewModel){
+            self::$SitterReviewModel = new SitterReviewModel();
+        }
+        return new SitterReviewModel();
+    }
+    public function createBookingModel(){
+        if(!self::$BookingModel){
+            self::$BookingModel = new BookingModel();
+        }
+        return new BookingModel();
+    }
+
+    public function createDateBookingModel(){
+        if(!self::$DateBookingModel){
+            self::$DateBookingModel = new DateBookingModel();
+        }
+        return new DateBookingModel();
     }
 }

@@ -1,11 +1,12 @@
 <?php
 namespace App\Services;
 
-use Illuminate\Support\Carbon;
-use Intervention\Image\Facades\Image;
-use App\Models\TokenRefeshModel;
 use App\Models\UserModel;
 use App\Models\GalaryModel;
+use Illuminate\Support\Carbon;
+use App\Models\VerifyRateModel;
+use App\Models\TokenRefeshModel;
+use Intervention\Image\Facades\Image;
 use App\Models\VerifyEmailModel as verifyEmailModel;
 use App\Models\PasswordResetModel as passwordResetModel;
 
@@ -84,6 +85,30 @@ class CommonService
             }
         }
     }
+
+    public static function checkVerifyRate($params){
+
+        $token =  isset($params['token']) ? $params['token'] : '';
+
+        if(empty($token)){
+            return config('constant.TOKEN_VERIFY.WRONG');
+        }
+
+        $verifyRate = VerifyRateModel::where('token', $token)->first();
+        $verifiedAt = isset($verifyRate['verified_at']) ? $verifyRate['verified_at'] : '';
+        $expireAt = isset($verifyRate['expire_at']) ? $verifyRate['expire_at'] : '';
+
+        if(!empty($verifiedAt)) {
+            return config('constant.TOKEN_VERIFY.ACTIVED');
+        }
+        if(!empty($expireAt)){
+            if(Carbon::now()->gt($expireAt)){
+                return config('constant.TOKEN_VERIFY.EXPIRED');
+            }else {
+                return config('constant.TOKEN_VERIFY.NOT_ACTIVE');
+            }
+        }
+    }
     /*
     check token forgot password
     */
@@ -108,12 +133,14 @@ class CommonService
 
     }
 
-    public function removeFile($type_upload_file, $file_name)
+    public function removeFile($type_upload_file, $file_name, $memo = 0)
     {
         switch ($type_upload_file) {
             case config('constant.UPLOAD_FILE.AVATAR'):
-                $path = 'storage/uploads/avatars/thumbnail/'.$file_name;
-                $update = (new UserModel())->where('avatar', $path)->update(['avatar' => '']);
+                $gender = (int)$memo;
+                $avatarURL = getAvatarDefault($gender);
+                $path = '/storage/uploads/avatars/thumbnail/'.$file_name;
+                $update = (new UserModel())->where('avatar', $path)->update(['avatar' => $avatarURL]);
                 removeAvatar($file_name);
                 break;
             default:

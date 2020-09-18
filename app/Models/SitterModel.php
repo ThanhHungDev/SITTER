@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class SitterModel extends Model
 {
     protected $table = 'sitters';
-    protected $fillable = ['user_id', 'age', 'pref', 'city', 'kid_age_start', 'kid_age_end', 'kid_qty', 'exp_parenting', 'exp_sitter', 'time_support', 'self_introduce', 'service_introduce', 'updated_at', 'created_at'];
+    protected $fillable = ['user_id', 'age', 'pref', 'city', 'kid_age_start', 'kid_age_end', 'kid_qty', 'exp_kid_qty', 'exp_parenting', 'exp_sitter', 'time_support', 'self_introduce', 'service_introduce', 'title', 'updated_at', 'created_at'];
 
     public function user()
     {

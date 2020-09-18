@@ -27,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // $this->app->bind(RepositoryInterface::class, UserRepository::class);
         $this->app->bind(FactoryModelInterface::class, BaseModel::class);
+        \Stripe\Stripe::setApiKey(config('app.STRIPE_API_KEY'));
     }
 }

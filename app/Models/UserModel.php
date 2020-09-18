@@ -10,7 +10,7 @@ class UserModel extends Model
 {
     protected $table = 'users';
 
-    protected $fillable = ['avatar','email','password','first_name','last_name','last_name_furigana','birth_date','gender','post_code','pref','town','address','phone','role_id','token_verify','active','deleted','order','created_at','updated_at'];
+    protected $fillable = ['avatar','email','password','first_name','last_name','last_name_furigana','birth_date','gender','post_code','pref','town','address','phone','role_id','token_verify','active','deleted','order','stripe_account_id','stripe_active','created_at','updated_at'];
     public function sitterProfile(){
 
         return $this->hasOne( SitterProfileModel::class, 'user_id', 'id' );
@@ -35,6 +35,16 @@ class UserModel extends Model
             return $this->hasMany( GalaryModel::class, 'user_id', 'id' );
         }
         return $this->hasMany( GalaryModel::class, 'user_id', 'id' )
+        ->where( $condition );
+
+    }
+
+    public function reviews( $condition = array()){
+
+        if( empty($condition ) ){
+            return $this->hasMany( SitterReviewModel::class, 'sitter_id', 'id' );
+        }
+        return $this->hasMany( SitterReviewModel::class, 'sitter_id', 'id' )
         ->where( $condition );
 
     }
@@ -68,6 +78,16 @@ class UserModel extends Model
             return $this->hasMany( VerifyEmailModel::class, 'user_id', 'id' );
         }
         return $this->hasMany( VerifyEmailModel::class, 'user_id', 'id' )
+        ->where( $condition );
+
+    }
+
+    public function VerifyRates( $condition = array()){
+
+        if( empty($condition ) ){
+            return $this->hasMany( VerifyRateModel::class, 'user_id', 'id' );
+        }
+        return $this->hasMany( VerifyRateModel::class, 'user_id', 'id' )
         ->where( $condition );
 
     }
@@ -134,6 +154,8 @@ class UserModel extends Model
         })
         //join get info profile
         ->join('sitters as sits', 'sits.user_id', '=', 'user.id')
+        //join get info sitter profiles
+        ->leftJoin('sitter_profiles as prof', 'prof.user_id', '=', 'user.id')
         //join get info salary
         ->leftJoin('salaries as sal', function($join)
         {
@@ -141,7 +163,11 @@ class UserModel extends Model
             $join->on('sal.type', '=', DB::raw("'1'"));
         })
         ->select('user.id', 'user.gender', 'sits.self_introduce', 'sal.salary', 'user.avatar as avatar', 'user.first_name', 'user.last_name', 'user.first_name_furigana', 'user.last_name_furigana')
-        ->where('user.role_id', 2)
+        ->where('user.role_id', config('constant.ROLE.SITTER'))
+        ->where('user.admin_confirm', config('constant.ADMIN_CONFIRM.ACCEPT'))
+        ->where('user.active', true)
+        ->where('prof.publish', true)
+        ->where('user.deleted', false)
         ->orderBy('user.id','DESC');
         return $builder;
     }
@@ -162,6 +188,8 @@ class UserModel extends Model
         ->leftJoin('activity_experiences as actexps', 'actexps.user_id', '=', 'user.id')
         //join get info profile
         ->join('sitters as sits', 'sits.user_id', '=', 'user.id')
+        //join get info sitter profiles
+        ->leftJoin('sitter_profiles as prof', 'prof.user_id', '=', 'user.id')
         //join get info salary
         ->leftJoin('salaries as sal', function($join)
         {
@@ -175,24 +203,58 @@ class UserModel extends Model
         //group data
         ->groupBy('user.id', 'user.gender', 'sits.self_introduce', 'sal.salary', 'user.avatar', 'user.first_name', 'user.last_name', 'user.first_name_furigana', 'user.last_name_furigana')
         //sitter user type
-        ->where('user.role_id', 2);
+        ->where('user.role_id', config('constant.ROLE.SITTER'))
+        ->where('user.admin_confirm', config('constant.ADMIN_CONFIRM.ACCEPT'))
+        ->where('user.active', true)
+        ->where('prof.publish', true)
+        ->where('user.deleted', false);
 
         //filter by city/prefecture
         if(!empty($data['wdate'])){
-            $builder->whereIn('schl.work_date', $data['wdate']);
-            //filter by time in - time out
-            if (!empty($data['time_in']) && !empty($data['time_out'])) {
-                $_time_in = $data['time_in'];
-                $_time_out = $data['time_out'];
-                $builder->where(function ($query) use ($_time_in, $_time_out){
-                    $query->whereBetween('schl.start', [$_time_in, $_time_out]);
-                    $query->orWhereBetween('schl.finish', [$_time_in, $_time_out]);
-                    $query->orWhere(function ($sub) use ($_time_in, $_time_out){
-                        $sub->where('schl.start', '<=', $_time_in);
-                        $sub->where('schl.finish', '>=', $_time_out);
-                    });
+            $_time_in = $data['time_in'];
+            $_time_out = $data['time_out'];
+            $_working_date = $data['wdate'];
+            if(count($_working_date) > 1){
+                $builder->where(function ($query) use ($_working_date, $_time_in, $_time_out) {
+                    $cnt = 0;
+                    foreach ($_working_date as $key => $value) {
+                        $cnt++;
+                        if ($cnt == 0) {
+                            $query->where(1,1);
+                        }else{
+                            $query->orWhere(function ($sub_query) use ($value, $_time_in, $_time_out) {
+                                $sub_query->Where('schl.work_date', $value);
+                                //filter by time in - time out
+                                if (!empty($_time_in) && !empty($_time_out)) {
+                                    $sub_query->where(function ($child_query) use ($_time_in, $_time_out){
+
+                                        $child_query->whereBetween('schl.start', [$_time_in, $_time_out]);
+                                        $child_query->orWhereBetween('schl.finish', [$_time_in, $_time_out]);
+                                        $child_query->orWhere(function ($sub) use ($_time_in, $_time_out){
+                                            $sub->where('schl.start', '<=', $_time_in);
+                                            $sub->where('schl.finish', '>=', $_time_out);
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    }
                 });
+            }else{
+                $builder->whereIn('schl.work_date', $_working_date);
+                //filter by time in - time out
+                if (!empty($_time_in) && !empty($_time_out)) {
+                    $builder->where(function ($query) use ($_time_in, $_time_out){
+                        $query->whereBetween('schl.start', [$_time_in, $_time_out]);
+                        $query->orWhereBetween('schl.finish', [$_time_in, $_time_out]);
+                        $query->orWhere(function ($sub) use ($_time_in, $_time_out){
+                            $sub->where('schl.start', '<=', $_time_in);
+                            $sub->where('schl.finish', '>=', $_time_out);
+                        });
+                    });
+                }
             }
+
         }
         //filter by city/prefecture
         if(!empty($data['wplace'])){
@@ -229,23 +291,41 @@ class UserModel extends Model
                     $query->where('sits.kid_age_end', '>=', 6);
                 });
             }else if($data['cage'] == '1year'){
-                $builder->where('sits.kid_age_start', 12);
+                $builder->where(function ($query){
+                    $query->where('sits.kid_age_start', '<=', 23);
+                    $query->where('sits.kid_age_end', '>=', 12);
+                });
             }else if($data['cage'] == '2year'){
-                $builder->where('sits.kid_age_start', 12);
+                $builder->where(function ($query){
+                    $query->where('sits.kid_age_start', '<=', 35);
+                    $query->where('sits.kid_age_end', '>=', 24);
+                });
             }else if($data['cage'] == '3to6year'){
-                $builder->where('sits.kid_age_start', 12);
+                $builder->where(function ($query){
+                    $query->where('sits.kid_age_start', '<=', 83);
+                    $query->where('sits.kid_age_end', '>=', 36);
+                });
             }else if($data['cage'] == 'gt7year'){
-                $builder->where('sits.kid_age_start', 12);
+                $builder->where(function ($query){
+                    $query->where('sits.kid_age_start', '<=', 120);
+                    $query->where('sits.kid_age_end', '>=', 84);
+                });
             }
         }
         //filter by salary
         if (!empty($data['wcond'])) {
             if($data['wcond'] == '1'){
-                $builder->whereBetween('sal.salary', [1000, 1490]);
+                $builder->whereBetween('sal.salary', [1000, 1500]);
             }else if($data['wcond'] == '2'){
-                $builder->whereBetween('sal.salary', [1500, 1990]);
+                $builder->whereBetween('sal.salary', [1500, 2000]);
             }else if($data['wcond'] == '3'){
-                $builder->where('sal.salary', '>=', 2000);
+                $builder->whereBetween('sal.salary', [2000, 2300]);
+            }else if($data['wcond'] == '4'){
+                $builder->whereBetween('sal.salary', [2300, 2600]);
+            }else if($data['wcond'] == '5'){
+                $builder->whereBetween('sal.salary', [2600, 3000]);
+            }else if($data['wcond'] == '6'){
+                $builder->where('sal.salary', '>=', 3000);
             }
         }
         //filter detail by multi salary
@@ -259,11 +339,17 @@ class UserModel extends Model
                         $query->where(1,1);
                     }else{
                         if($value == '1'){
-                            $query->orWhereBetween('sal.salary', [1000, 1490]);
+                            $query->orWhereBetween('sal.salary', [1000, 1500]);
                         }else if($value == '2'){
-                            $query->orWhereBetween('sal.salary', [1500, 1990]);
+                            $query->orWhereBetween('sal.salary', [1500, 2000]);
                         }else if($value == '3'){
-                            $query->orWhere('sal.salary', '>=', 2000);
+                            $query->orWhereBetween('sal.salary', [2000, 2300]);
+                        }else if($value == '4'){
+                            $query->orWhereBetween('sal.salary', [2300, 2600]);
+                        }else if($value == '5'){
+                            $query->orWhereBetween('sal.salary', [2600, 3000]);
+                        }else if($value == '6'){
+                            $query->orWhere('sal.salary', '>=', 3000);
                         }
                     }
                 }
@@ -297,13 +383,25 @@ class UserModel extends Model
                                 $sub_query->where('sits.kid_age_end', '>=', 6);
                             });
                         }else if($value == '1year'){
-                            $query->orWhere('sits.kid_age_start', 12);
+                            $query->where(function ($sub_query){
+                                $sub_query->where('sits.kid_age_start', '<=', 23);
+                                $sub_query->where('sits.kid_age_end', '>=', 12);
+                            });
                         }else if($value == '2year'){
-                            $query->orWhere('sits.kid_age_start', 12);
+                            $query->where(function ($sub_query){
+                                $sub_query->where('sits.kid_age_start', '<=', 35);
+                                $sub_query->where('sits.kid_age_end', '>=', 24);
+                            });
                         }else if($value == '3to6year'){
-                            $query->orWhere('sits.kid_age_start', 12);
+                            $query->where(function ($sub_query){
+                                $sub_query->where('sits.kid_age_start', '<=', 83);
+                                $sub_query->where('sits.kid_age_end', '>=', 36);
+                            });
                         }else if($value == 'gt7year'){
-                            $query->orWhere('sits.kid_age_start', 12);
+                            $query->where(function ($sub_query){
+                                $sub_query->where('sits.kid_age_start', '<=', 120);
+                                $sub_query->where('sits.kid_age_end', '>=', 84);
+                            });
                         }
                     }
                 }
@@ -319,7 +417,7 @@ class UserModel extends Model
                     if ($cnt == 0) {
                         $query->where(1,1);
                     }else{
-                        $query->orWhere('sits.kid_qty', $value);
+                        $query->orWhere('sits.kid_qty', ">=", $value);
                     }
                 }
             });
@@ -338,7 +436,15 @@ class UserModel extends Model
 
     public function checkUserIsactiveByParams($value, $field)
     {
-        return $this->select('id', 'first_name', 'last_name')->where([$field => $value, 'active' => true])->first()->toarray();
+        return $this->select('id', 'first_name', 'last_name')->where([$field => $value, 'active' => true])->first();
+    }
+
+    public function checkSitterIsactiveByParams($value, $field)
+    {
+        $adminConfirm = config('constant.ADMIN_CONFIRM.ACCEPT');
+        return $this->select('id', 'first_name', 'last_name', 'stripe_account_id', 'stripe_active')
+                    ->where([$field => $value, 'active' => true, 'admin_confirm' => $adminConfirm])
+                    ->first();
     }
 
     public function changePasswordByField($field_name, $data)
@@ -389,7 +495,7 @@ class UserModel extends Model
         }
 
         $builder->where('u.role_id', $condition['role_type'])
-                ->where('u.active', true)
+                // ->where('u.active', true)
                 ->where('u.deleted', false)
                 ->groupByRaw(' u.id, e.id ');
 
@@ -418,6 +524,7 @@ class UserModel extends Model
                 u.gender,
                 u.phone,
                 u.created_at,
+                u.admin_confirm,
                 string_agg(DISTINCT concat(g.name::text,'|',g.type),',') as url";
     }
 

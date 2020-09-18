@@ -2,6 +2,7 @@
 @section('title', 'Sitters Admin')
 @section('stylesheets-admin')
     <link rel="stylesheet" href="{{ asset('css/library/jquery-ui.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/library/jquery.toast.min.css') }}">
 @endsection
 @extends('admin._LAYOUT.index')
 
@@ -144,17 +145,24 @@
                                 </label>
                             </div> --}}
                             <div class="action-details">
-                                <button type="button" data-action="{{route('ADMIN_AJAX_GET_FAMILY')}}" data-id-profile = "{{$item->id_profile}}" class="btn-details get-detail fz-b-15">詳細を見る</button>
+                                <button type="button" data-action="{{route('ADMIN_AJAX_GET_FAMILY')}}" data-id-profile = "{{$item->id_profile}}" data-user-id = "{{ $item->user_id }}" class="btn-details get-detail fz-b-15">詳細を見る</button>
                             </div>
                             <div class="action-delete">
-                            <button class="btn-delete fz-b-15" data-id="{{$item->user_id}}">削除</button>
+                                <button class="btn-delete fz-b-15" data-id="{{$item->user_id}}">削除</button>
                             </div>
-                            {{-- <div class="action-public">
-                                <button class="btn-public fz-b-15">承認</button>
+                            <div class="action-send-link">
+                                <button class="btn-send-link fz-b-15 js-list-sitter" data-id="{{$item->user_id}}" data-email="{{$item->email}}">評価依頼</button>
                             </div>
-                            <div class="action-unpublic">
-                                <button class="btn-unpublic fz-b-15">非承認</button>
-                            </div> --}}
+                            @if ($item->admin_confirm != config('constant.ADMIN_CONFIRM.ACCEPT'))
+                                <div class="content-approve">
+                                    <div class="action-activity" data-id= '{{ $item->user_id }}' data-status = '{{ config('constant.ADMIN_CONFIRM.ACCEPT')}}'>
+                                        <button onclick="approveProfileEmployer(this)" class="btn-activity fz-b-15">承認</button>
+                                    </div>
+                                    <div class="action-unactivity" data-id= '{{ $item->user_id }}' data-status = '{{ config('constant.ADMIN_CONFIRM.UNACCEPT')}}'>
+                                        <button onclick="approveProfileEmployer(this)" class="btn-unactivity fz-b-15">非承認</button>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -163,7 +171,6 @@
         
     </div>
 </div>
-@endsection
 {{-- modal details  --}}
 <div id="details-employer-modal" class="modal item-details-popup">
     <a class="popup-lose" rel="modal:close">
@@ -202,10 +209,42 @@
         <div class="child-info">
             
         </div>
+        <div class="link-update">
+            <button id="link-update" value="">ンクをコピーする</button>
+        </div>
     </div>
 </div>
+
+{{-- modal find sitter  --}}
+<div id="sitter-list-modal" class="modal sitter-list-popup">
+    <a class="popup-lose" rel="modal:close">
+    </a>
+    <div class="modal-title">シッターリスト</div>
+    <div class="popup-body">
+        <div class="search-item">
+            <input type="text" class="search-input" placeholder="検索">
+            <button class="btn-search-item js-search-item">検索</button>
+        </div>
+        <div class="item-info" id="item-list-sitter">
+            {{-- <div class="row">
+                <div class="row-avatar">
+                    <img src="" alt="" class="avatar">
+                </div>
+                <div class="row-info">
+                    <p class="info-name">Hoang Minh</p>
+                    <p class="info-mail">hoang@gmail.com</p>
+                </div>
+                <div class="row-action">
+                    <button class="action-send-mail" data-empl-id="1" data-sitter-id="1">Send Mail</button>
+                </div>
+            </div> --}}
+        </div>
+        <div class="item-count" id="item-count"></div>
+    </div>
+</div>
+
 {{-- modal-confirm --}}
-@include('modals.modal-confirm', ['title'=> 'Confirm Delete', 'content'=> 'Are you delete it?','action' => 'deleteEmployer()', 'modal_id' =>'deleteEmployer'])
+@include('modals.modal-confirm', ['title'=> '削除を確認', 'content'=> '削除しますか','action' => 'deleteEmployer()', 'modal_id' =>'deleteEmployer'])
 <input type="hidden" name="idDelete" value="">
 <input type="hidden" name="actionDelEmp" value="{{route('ADMIN_AJAX_EMPLOYER_DELETE')}}">
 {{-- end modal confirm  --}}
@@ -225,18 +264,32 @@
             <label class="color-label" for="">ご年齢</label>
             <p data-age="child"></p>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-4 d-flex align-content-between item">
             <label class="color-label" for="">アレルギー </label>
             <p data-alegic="child"></p>
         </div>
+        <div class="col-md-8 d-flex align-content-between item">
+            <label class="color-label" for=""></label>
+            <p data-alegic-note="child"></p>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4 d-flex align-content-between item">
             <label class="color-label" for="">持病、特別なケア </label>
             <p data-chronic="child"></p>
+        </div>
+        <div class="col-md-8 d-flex align-content-between item">
+            <label class="color-label" for=""> </label>
+            <p data-chronic-note="child"></p>
         </div>
     </div>
 </section>
 
 {{-- end child default --}}
+@endsection
+
 
 @section('scripts-admin')
     {{-- script login if u have --}}
@@ -244,7 +297,6 @@
     <script type="text/javascript" src="{{ asset('js/library/datepicker-ja.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_employer.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.toast.min.js') }}"></script>
     <script>
         $( function() {
@@ -254,5 +306,9 @@
                 }
             });
         });
+        const SITTER = "{{config('constant.ROLE.SITTER')}}";
+        const EMPLOYER_SEND_SITTER = "{{route('ADMIN_AJAX_EMPLOYER_SEND_SITTER')}}";
+        const ADMIN_CONFIRM_ACCEPT = "{{config('constant.ADMIN_CONFIRM.ACCEPT')}}";
+        const ADMIN_EMPLOYER_AJAX_ACCEPT = "{{ route('ADMIN_EMPLOYER_AJAX_ACCEPT') }}";
     </script>
 @endsection

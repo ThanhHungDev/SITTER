@@ -1,6 +1,4 @@
 .sitter-common {
-    padding-top: 50px;
-
     .row {
         margin-left: unset;
         margin-right: unset;
@@ -73,8 +71,16 @@
         }
     }
 
+    .fs-24 {
+        font-size: 24px !important;
+    }
+
     .fs-20 {
         font-size: 20px !important;
+    }
+
+    .fs-20-16 {
+        font-size: 20px;
     }
     
     .fs-18 {
@@ -113,6 +119,10 @@
         height: 80px;
     }
     
+    .min-height-85 {
+        min-height: 85px;
+    }
+
     .height-85 {
         height: 85px;
     }
@@ -149,11 +159,11 @@
         border-top: 1px solid #2dc187 !important;
     }
     
-    .width-100 {
+    .width-400 {
         width: 400px;
     }
     
-    .width-50 {
+    .width-td-half {
         width: 200px;
     }
     
@@ -162,6 +172,10 @@
         width: 100%;
         height: 256px;
         margin-bottom: 0;
+    }
+
+    .w-100{
+        width: 100%;
     }
 
     .pd-18 {
@@ -213,13 +227,13 @@
         padding: 0 10px;
     }
 
-    select, input[type=text] {
-        &.input-error {
-            background-color: #fce4e4;
-            border: 1px solid #cc0033;
-            outline: none;
-        }
-    }
+    // select, input[type=text] {
+    //     &.input-error {
+    //         background-color: #fce4e4;
+    //         border: 1px solid #cc0033;
+    //         outline: none;
+    //     }
+    // }
 
     .form-error {
         .error {
@@ -269,9 +283,73 @@
             vertical-align: middle;
         }
     }
+
+    .txt-green {
+        color: #06784b;
+    }
+
+    .align-center {
+        text-align: center;
+    }
+
+    .list-booking-wrapper {
+        margin-bottom: 34px;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            th {
+                background-color: #06784B;
+                color: #ffffff;
+                padding: 5px;
+                border: 0.5px solid #06784B;
+            }
+            td {
+                padding: 5px;
+                border: 0.5px solid #06784B;
+            }
+        }
+    }
+
+    .pagination-list-booking {
+        ul{
+            display: flex;
+            flex-flow: row;
+            justify-content: flex-end;
+            li{
+                list-style: none;
+                padding: 5px;
+                a{
+                    color: #06784B;
+                    text-decoration: none;
+                    font-weight: bold;
+                    &.active{
+                        color: #333333;
+                    }
+                }
+            }
+        }
+        
+    }
+
+    .tb-td-w-stt {
+        width: 5%;
+        text-align: center;
+    }
+
+    .tb-td-w-40 {
+        width: 40%;
+    }
+
+    .tb-td-w-15 {
+        width: 15%;
+    }
+
     // add common here
 
     .sitter-after-register, .sitter-register {
+        padding-top: 50px;
+
         .require-title {
             display: flex;
             align-items: center;
@@ -482,12 +560,18 @@
         width: 180px;
         height: 45px;
         background-color: #FCD036;
+        font-weight: 600;
+        padding: 4px;
+        font-size: 18px;
     }
     
     .btn-sitter-back {
         width: 180px;
         height: 45px;
         background-color: #C9C9C9;
+        font-weight: 600;
+        padding: 4px;
+        font-size: 18px;
     }
     
     /* sitter mypage */
@@ -500,15 +584,21 @@
                 display: flex;
                 align-items: center;
                 font-weight: bold;
-                height: 100%;
                 width: 100%;
                 padding-left: 18px;
                 padding-right: 18px;
             }
+
+            &.min-height-85 span {
+                min-height: inherit;
+            }
+
+            &.height-55 span {
+                height: 100%;
+            }
         }
 
         .content-top {
-            min-height: 100px;
             .sitter-top {
                 display: flex;
                 justify-content: center;
@@ -527,18 +617,21 @@
                     width: 120px;
                     height: 40px;
                     background-color: #c9c9c9;
+                    padding: 4px;
                 }
 
                 .btn-sitter-update {
                     width: 120px;
                     height: 40px;
                     background-color: #fdd037;
+                    padding: 4px;
                 }
                 
                 .btn-sitter-public {
                     width: 120px;
                     height: 40px;
                     background-color: #fc6536;
+                    padding: 4px;
                 }
                 
                 .btn-sitter-message {
@@ -546,6 +639,7 @@
                     height: 40px;
                     background-color: #fff;
                     border: 1px solid #d3d3d3;
+                    padding: 4px;
                 }
                 
                 .btn-sitter-message img {
@@ -587,27 +681,32 @@
             .sitter-content-left {
                 width: 640px;
 
-                .slider-wrap {  
-                    .slider {
-                        img {
-                            width: 640px;
-                            height: 427px;
-                            object-fit: cover;
-    
-                            &.icon-upload {
-                                z-index: 1000 !important;
-                                opacity: 5 !important;
-                                object-fit: scale-down;
-                            }
-                        }
-                    }
-                    
-                    .slider-nav {
-                        img {
-                            width: 160px;
-                            height: 107px;
+                
+                .slider {
+                    img {
+                        width: 640px;
+                        height: 427px;
+                        object-fit: cover;
+
+                        &.icon-upload {
+                            z-index: 1000 !important;
+                            opacity: 5 !important;
                             object-fit: scale-down;
                         }
+                    }
+                }
+                
+                .slider-nav {
+                    img {
+                        // width: 160px;
+                        height: 107px;
+                        object-fit: scale-down;
+                    }
+                    .slick-prev{
+                        display: none !important;
+                    }
+                    .slick-next{
+                        display: none !important;
                     }
                 }
 
@@ -646,13 +745,17 @@
                 height: fit-content;
 
                 table.sitter-info {
-                    padding: 7px 17px 17px;
+                    padding: 7px 17px;
                     display: inherit;
                     width: 100%;
                     border-spacing: 0px;
                     min-height: 445px;
                     border: 1px solid #2dc187;
-                    background-color: #f0ffc8;
+                    // background-color: #f0ffc8;
+                    background-image: url('../image/sitter_right.png');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
                 }
 
                 .table td{
@@ -660,6 +763,10 @@
                     font-size: 14px;
                     padding: 9px 0 8px 0px;
                     vertical-align: center;
+                }
+
+                select:disabled {
+                    background: #dddddd;
                 }
             }
         }
@@ -681,7 +788,6 @@
 
             .sitter-skills {
                 margin-top: 45px;
-                margin-bottom: 34px;
 
                 ul {
                     padding-inline-start: 0;
@@ -743,37 +849,29 @@
             
                 .sitter-content-left {
                     width: 100%;
+                    
+                    .slider img {
+                        width: auto;
+                        &.icon-upload {
+                            z-index: 1000 !important;
+                            opacity: 100;
+                        }
+                    }
+        
+                    .slider-nav img {
+                        width: auto;
+                    }
 
                     .slider-wrap {
                         text-align: center;
                         position: relative;
                         width: 100%;
-
-                        .slider img {
-                            width: auto;
-                            &.icon-upload {
-                                z-index: 1000 !important;
-                                opacity: 100;
-                            }
-                        }
-            
-                        .slider-nav img {
-                            width: auto;
-                        }
                     }
                 }
             }
         }
 
-        .top-title .line {
-            width: 80px;
-        }
-
-        .height-85 {
-            height:calc(85px + 5px);
-        }
-
-        .width-50 {
+        .width-td-half {
             width: 170px;
         }
     }         
@@ -802,6 +900,28 @@
     }
 }
 
+@include DivResponsive(420px){
+    .sitter-common {
+        .fs-20-16{
+            font-size: 16px;
+        }
+
+        .sitter {
+            .content-top {
+                .top-title {
+                    .line {
+                        width: 92px;
+                    }
+
+                    p {
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+
 @include DivResponsive(375px){
     .sitter-common {
         .sitter .sitter-mypage {
@@ -818,8 +938,26 @@
             }
         }
 
-        .width-50 {
+        .width-td-half {
             width: 150px;
+        }
+    }
+}
+
+@include DivResponsive(320px){
+    .sitter-common {
+        .sitter{
+            .content-top {
+                .top-title {
+                    .line {
+                        width: 80px;
+                    }
+    
+                    p {
+                        font-size: 15px;
+                    }
+                }
+            }
         }
     }
 }
@@ -908,8 +1046,8 @@
     }
 
     @include DivResponsive(850px){
-        width: 80%;
-        margin-right: 50px;
+        width: 90%;
+        // margin-right: 50px;
 
         .ui-state-default {
             width: 50%;

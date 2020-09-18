@@ -27,7 +27,7 @@ class Chat extends Component {
             var refesh = TOKEN_REFESH_DOM.getAttribute('data-refesh'),
                 userId = TOKEN_REFESH_DOM.getAttribute('data-user')
 
-            ///////////////////////////////////////////////////////
+            // ///////////////////////////////////////////////////
             // var name = 'id'
             // var url = window.location.href;
             // name = name.replace(/[\[\]]/g, '\\$&');

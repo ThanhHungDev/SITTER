@@ -35,9 +35,10 @@ class SitterRegister extends Mailable
         // );
         
         return $this->view('emails.sitter_register')
-                    ->subject("【〇〇〇〇〇〇〇〇〇〇】利用者登録ありがとうございます")
+                    ->subject("【家政婦さん・ベビーシッタードットコム】会員登録ありがとうございます")
                     ->with([
                         'dataSendMail' => $this->mailData,
+                        'url'          => route('SITTER_REGISTER_NEXT_STEP').'?token_verify='.$this->mailData['token_verify']
                     ]);
     }
 }

@@ -26,14 +26,22 @@
 @import "PAGE/employers/employer_register.scss";
 @import "PAGE/employers/employer_comfirm.scss";
 @import "PAGE/employers/employer_view_sitter.scss";
+@import "PAGE/employers/review_sitter.scss";
+@import "PAGE/employers/review_sitter.scss";
 @import "PAGE/search_result_page.scss";
 @import "PAGE/advance_search_page.scss";
 @import "PAGE/employers/employer_mypage.scss";
+@import "PAGE/employers/employer_collect_card.scss";
 
 @import "PAGE/admin/admin_sitter.scss"; 
 @import "PAGE/admin/admin_employer.scss"; 
 @import "PAGE/admin/admin_chat.scss"; 
+@import "PAGE/admin/admin_booking.scss"; 
+
 @import "PAGE/common.scss";
+@import "PAGE/policy.scss";
+@import "PAGE/tokuteisho.scss";
+@import "PAGE/stripe_form.scss";
 
 /** calendar root*/
 @import "_calendar";

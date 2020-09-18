@@ -20,11 +20,6 @@
                     {{-- <button class="btn btn-sitter-public" id="btn-sitter-public">公開する</button> --}}
                     <a class="btn btn-sitter-message" href="{{ route('SITTER_CHAT') }}"><img src="{{ asset('image/icons/icon-message.png') }}">チャットする</a>
                 </div>
-                <div class="top-title">
-                    <div class="line"></div>
-                    <p>プロフィール公開中</p>
-                    <div class="line"></div>
-                </div>
             </div>
 
             @include('client.sitter.partials.errors_form')
@@ -32,8 +27,9 @@
             <div class="sitter-mypage">
                 <div class="sitter-content-left">
                     <div>
-                        <div class="head height-85">
-                            <span class="fs-20">☆笑顔と個性を大切にサポートいたします☆ダンス・ストレッチ指導経験あり。</span>
+                        <div class="min-height-85 mb-50 form-validate">
+                            <textarea class="fs-20-16 w-100" name="title">{{ $data['sitter']['title'] ?? '' }}</textarea>
+                            <div class="form-error"></div>
                         </div>
                         <div class="slider-wrap">
                             <div class="slider" id="slider">
@@ -57,7 +53,7 @@
                     </div>
                     <div>
                         <div class="head height-55">
-                            <span class="fs-20">自己紹介</span>
+                            <span class="fs-20-16">自己紹介</span>
                         </div>
     
                         <div class="edit-sitter-introduce form-validate">
@@ -68,7 +64,7 @@
     
                     <div>
                         <div class="head height-55">
-                            <span class="fs-20">サービス内容</span>
+                            <span class="fs-20-16">サービス内容</span>
                         </div>
     
                         <div class="edit-sitter-content form-validate">
@@ -81,7 +77,7 @@
                 <div class="sitter-content-right">
                     <table class="table sitter-info">
                         <tr>
-                            <td class="width-100 fs-18" colspan="2">サポート基本情報</td>
+                            <td class="width-400 fs-24 txt-green" colspan="2">サポート基本情報</td>
                         </tr>
                         <tr>
                             <td colspan="2" class="form-group bt-1">
@@ -99,7 +95,7 @@
                                         <div class="form-error"></div>
                                     </div>
                                     <div class="col-4 fs-16">
-                                        代
+                                        代 {{ getTextGender($data['gender']) }}
                                     </div>
                                 </div>
                                 
@@ -157,20 +153,33 @@
                         <tr>
                             <td class="bt-1">子育て経験</td>
                             <td class="bt-1">
-                                <div class="form-row">
-                                    <div class="col-12 select-blue form-validate">
-                                        @php 
-                                            $exp_parenting = $data['sitter']['exp_parenting'] ?? 2
-                                        @endphp
+                                <div class="form-validate">
+                                    <div class="form-row">
+                                        <div class="col-6 select-blue">
+                                            @php 
+                                                $exp_parenting = $data['sitter']['exp_parenting'] ?? 2
+                                            @endphp
+    
+                                            <select class="form-control" name="exp_parenting" id="exp_parenting">
+                                                <option value="" @if($exp_parenting == 2) selected @endif></option>
+                                                <option value=1 @if($exp_parenting == 1) selected @endif>あり</option>
+                                                <option value=0 @if($exp_parenting == 0) selected @endif>無</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 select-blue">
+                                            @php $kid_qty = $data['sitter']['exp_kid_qty'] ?? '' @endphp
 
-                                        <select class="form-control" name="exp_parenting" id="exp_parenting">
-                                            <option value="" @if($exp_parenting == 2) selected @endif></option>
-                                            <option value=1 @if($exp_parenting == 1) selected @endif>あり</option>
-                                            <option value=0 @if($exp_parenting == 0) selected @endif>無</option>
-                                        </select>
-                                        <div class="form-error"></div>
+                                            <select class="form-control @error('exp_kid_qty') input-error @enderror" name="exp_kid_qty" id="exp_kid_qty" disabled>
+                                                <option value=""></option>
+                                                @foreach( range(1, 6) as $key => $value)
+                                                    <option value={{$key + 1}} @if($kid_qty == $key + 1) selected @endif>{{$value}}人</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
+                                    <div class="form-error"></div>
                                 </div>
+                                
                             </td>
                         </tr>
 
@@ -181,7 +190,7 @@
                                 <div class="form-row">
                                     <div class="col-12 select-blue form-validate">
                                         @php $kid_qty = $data['sitter']['kid_qty'] ?? '' @endphp
-                                        <select class="form-control @error('kid_qty') input-error @enderror" name="kid_qty" id="kid_qty" disabled>
+                                        <select class="form-control @error('kid_qty') input-error @enderror" name="kid_qty" id="kid_qty">
                                             <option value=""></option>
                                             @foreach( range(1, 6) as $key => $value)
                                                 <option value={{$key + 1}} @if($kid_qty == $key + 1) selected @endif>{{$value}}人</option>
@@ -275,12 +284,19 @@
                         </tr>
                     </table>
     
-                    <div class="calendar-page mt-18 form-validate" id="sitter-mypage-edit">
+                    <div class="calendar-page mt-18" id="sitter-mypage-edit">
                         <div class="d-none" id="data"></div>
                         <input type="text" id="js-event-data" name="schedule" hidden value={{ $data['jsonSchedules'] }}>
                         <div id="draw-calendar"></div>
-                        <input type="text" id="check-time" name="check_time" hidden>
-                        <div class="form-error"></div>
+                        <div class="form-validate">
+                            <input type="text" id="check-time" name="check_time" hidden>
+                            <div class="form-error"></div>
+                        </div>
+                        <div class="form-validate">
+                            <input type="text" id="check-job" name="check_job" hidden>
+                            <div class="form-error"></div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -336,12 +352,12 @@
         var APP_URL = {!! json_encode(url('/')) !!}
     </script>
     <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('/js/library/modal.jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery.toast.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery-clockpicker.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/library/japanese-holidays.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/sitter-common.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/sitter-edit-mypage.min.js') }}"></script>
-    <script src="{{ asset('js/calendar.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/calendar.min.js') }}"></script>
 @endsection

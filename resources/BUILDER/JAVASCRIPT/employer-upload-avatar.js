@@ -11,17 +11,16 @@ $('.delete_avatar').click(function () {
         let action = $('.form-delete-avatar').attr('action');
         let alt    = $('img[type="avatar"]').attr('alt');
         let typeUploadFild = $('input[name="type_upload_file"]').val();
+        let memo = $('input[name="gender_hidden"]').val();
         $('img[type="avatar"]').attr('src', img_df);
         if(alt != ''){
-            deleteImageByType(typeUploadFild, alt, action);
-        }else{
-            alert('waiting..');
+            deleteImageByType(typeUploadFild, alt, action, memo);
         }
         
     }
 })
 
-function deleteImageByType(type, img_name, action) {
+function deleteImageByType(type, img_name, action, memo) {
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -33,7 +32,8 @@ function deleteImageByType(type, img_name, action) {
         dataType: 'json',
         data    : {
             type: type,
-            fileName: img_name
+            fileName: img_name,
+            memo: memo
         },
         success: function( data ){
             $('.delete_avatar').attr('data-status', '');
@@ -69,7 +69,8 @@ function uploadAvatar(input) {
         contentType: false,
         processData: false,
         success: function( data ){
-            data = JSON.parse(data);
+            // console.log(data);
+            // data = JSON.parse(data);
             let urlAvatar = linkImage + data.path;
             $('img[type="avatar"]').attr('src', urlAvatar);
             $('img[type="avatar"]').attr('alt', data.name);

@@ -28,7 +28,7 @@ module.exports.refesh = function( req, res ){
 
     /// kiểm tra token có trong db không
     /// lưu ý khi dùng postgree trong nodejs phải có where theo nguyên tắc của sequelize
-    console.log(userId, " userId không tìm thấy ")
+    // console.log(userId, " userId không tìm thấy ")
     Postgre.TOKEN_REFESH.findOne({ where: { user_id: userId } }) ///, token : refesh <---- important
     .then( tokenData => {
         

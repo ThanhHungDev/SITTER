@@ -24,11 +24,19 @@ class VerifyEmailModel extends Model
 
     public function getDataByToken($toke_verify)
     {
-        return $this->select('*')->where('token_verify', $toke_verify)->first()->toarray();
+        return $this->select('*')->where('verify_emails.token_verify', $toke_verify)
+        ->leftjoin('users as u', 'verify_emails.user_id', '=', 'u.id')
+        ->firstOrFail()->toarray();
     }
 
     public function updateAfterRegister($user_id)
     {
         return $this->where('user_id', $user_id)->update(['email_verified_at' => date("Y-m-d H:i:s")]);
+    }
+
+    public function getTokenById($user_id)
+    {
+        return $this->select('token_verify')->where('user_id', $user_id)
+        ->first()->token_verify;
     }
 }

@@ -4,7 +4,7 @@
 <div class="container-forgot">
     <div class="wrapper-forgot">
         <div class="forgot-header">
-            <span class="text-medium">ようこそ〇〇〇〇〇〇〇〇へ</span>
+            <span class="text-medium">ようこそ家政婦さん・ベビーシッタードットコムへ</span>
             <br/>
             <span class="text-none">もっと頼って、ともに育む会社へ</span>
         </div>
@@ -17,6 +17,13 @@
                 </div>
                 <div class="form-body">
                     {{-- mail --}}
+                    @if (count($errors) > 0)
+                        <div class="alert-danger">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
                     <div class="form-row">
                         <div class="group-control form-validate">
                             <input type="text" class="form-control" name='email' placeholder="メールアドレス" value="{{ old('email') }}"/>

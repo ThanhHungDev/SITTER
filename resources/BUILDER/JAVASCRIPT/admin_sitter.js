@@ -52,6 +52,22 @@ $(document).ready(function () {
         let action = $(this).attr('data-url') 
         location.assign(action)
     })
+    //copy clipboard
+    $('#link-update').on('click', function () {
+        let copyText = $(this).val()
+        let temp = $('<input>') //create input 
+        $(this).append(temp)
+        temp.val(copyText).select() //select text
+        document.execCommand("copy")
+        temp.remove() //remove
+        $.toast({
+            // heading: 'Success!',
+            text: 'コピーしました', 
+            showHideTransition: 'slide',
+            icon: 'success',
+            position: 'top-right',
+        });
+    })
 })
 
 function ajaxGetDetailsSitter(action, emlemnt) {
@@ -98,6 +114,8 @@ function ajaxGetDetailsSitter(action, emlemnt) {
 }
 
 function setDataToDetail(data) {
+    $('.link-update').css('display', 'none') 
+    $('#link-update').val('')
     let imageQualifi = document.getElementById('image-qualifi')
     imageQualifi.innerHTML = ''
     data.galaries.forEach(item => {
@@ -115,6 +133,10 @@ function setDataToDetail(data) {
     $('#full-address').text(data.contact.contact_address)
     $('#num-phone').text(data.contact.contact_phone)
     $('#relationship').text(data.contact.contact_relationship)
+    if (data.admin_unaccept) {
+        $('.link-update').css('display', 'block') 
+        $('#link-update').val(data.url_update)
+    }
 }
 
 function ajaxUpdatePublish(action, data, emlement) {
@@ -216,7 +238,10 @@ function ajaxConfirmSitter(action, data) {
         type    : 'post',
         success: function( rs ){
             if (rs.code == 200) {
-                deleteHTMLItemSitter('action-confrim-', rs.id)
+                if (data.admin_confirm == ADMIN_CONFIRM_ACCEPT ) {
+                    deleteHTMLItemSitter('action-confrim-', rs.id)
+                }
+                
                 $.toast({
                     heading: 'Success!',
                     text: rs.messages,

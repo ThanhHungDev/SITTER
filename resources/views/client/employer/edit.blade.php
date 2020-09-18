@@ -20,14 +20,17 @@
                 <a href="{{ Route('EMPLOYER_CHAT') }}">
                     <button type="button" class="btn btn-chat"><img src="{{asset('image/icons/icon-message.png')}}" alt="" srcset=""> チャットする</button>
                 </a>
+                <a href="{{ Route('EMPLOYER_EDIT_CARD') }}">
+                    <button type="button" class="btn btn-card">クレジットカード</button>
+                </a>
             </div>
             {{-- end nav link --}}
 
             <div class="body-mypage">
-                <div class="row wapper-mypage">
+                <div class="wapper-mypage">
                     {{-- avatar content --}}
-                    <div class="col-md-4 col-xs-12 left-mypage">
-                        <div class="em-wapper-image">
+                    <div class="left-mypage">
+                        {{-- <div class="em-wapper-image">
                             <div class="em-avatar boder-img">
                                 @if($profile['avatar'] != '')
                                     <img type="avatar" src="{{ asset($profile['avatar']) }}" alt="{{handelGetAvatarName($profile['avatar'])}}">
@@ -35,7 +38,13 @@
                                     <img type="avatar" class="image" src="{{ asset('image').'/'. ($profile['gender'] == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}" alt="">
                                 @endif
                                 <img src="{{ asset('image/icons/icon-upload.png') }}" class="upload-icon" alt="upload avatar">
-                                <div data-status="@if(!empty($profile['avatar'])){{'active'}}@endif" class="delete_avatar">
+                                @php
+                                    $showDelete = '';
+                                    if(!empty($profile['avatar']) && ($profile['avatar'] != '/image/df_male.jpg' && $profile['avatar'] != '/image/df_female.jpg')){
+                                        $showDelete = 'active';
+                                    }
+                                @endphp
+                                <div data-status="{{$showDelete}}" class="delete_avatar">
                                     <i class="far fa-trash-alt"></i>
                                 </div>
                             </div>
@@ -45,6 +54,15 @@
                                 @endforeach
                             </div>
                             <input type="file" accept="image/*" onchange="uploadAvatar(this);" name="avatar" style = "display:none" id="">
+                        </div> --}}
+                        <div class="em-wapper-image">
+                        
+                            @foreach ($galaries as $item_galaries)
+                            <div class="boder-img">
+                                <img src="{{ asset($item_galaries->path.$item_galaries->name) }}" alt="{{$item_galaries->url}}">
+                            </div>
+                            @endforeach
+                            
                         </div>
                         <div class="em-note">
                             <p>身分証は公開されません</p>
@@ -53,13 +71,13 @@
                     {{-- avatar content --}}
 
                     {{-- infor family --}}
-                    <div class="col-md-8 col-xs-12 right-mypage em-wapper-edit">
+                    <div class="right-mypage em-wapper-edit">
                         <div class="em-wapper-info">
                             {{-- error msg --}}
                             @if($errors->any())
                                 <div class="alert alert-danger mt-md-3">
                                     <span class="d-fex justify-content-center">
-                                        <i class="fas fa-exclamation-triangle"></i> Errors!
+                                        <i class="fas fa-exclamation-triangle"></i> エラー!
                                     </span>
                                 </div>
                             @endif
@@ -93,13 +111,13 @@
                                 </div>
                                 <div class="em-row clear-both">
                                     <div class="col-md-6 form-validate">
-                                        <label class="label-color" for="">市区町村と番地</label>
+                                        <label class="label-color" for="">市区町村</label>
                                         <input id="town" type="text" value="{{ old('town', @$profile['town']) }}" name="town">
                                         <div class="form-error"></div>
                                     </div>
                                     <div class="col-md-6 form-validate">
-                                        <label class="label-color" for="">建物名・部屋番号</label>
-                                        <input type="text" value="{{ old('address', @$profile['address']) }}" name="address">
+                                        <label class="label-color" for="">番地以降(建物名・部屋番号など)</label>
+                                        <input id="address" type="text" value="{{ old('address', @$profile['address']) }}" name="address">
                                         <div class="form-error"></div>
                                     </div>
                                 </div>
@@ -284,7 +302,7 @@
                             <div class="em-content-info list-child">
 
                                 <?php $numberChild = 0;?>
-
+                                {{-- sau khi nhấn edit --}}
                                 @if(!empty(old('child_number')))
                                     <?php  $child_item = old('child_number');?>
 
@@ -391,14 +409,47 @@
                                                 {{-- end gender --}}
 
                                                 {{-- allergic --}}
+                                                <div class="col-md-12 em-row">
+                                                    <label class="label-color" for="">アレルギー</label>
+                                                </div>
                                                 <div class="col-md-12 flex-box item-inline">
-                                                    <input type="checkbox" @if(old('allergic_'.($i_tem), @$child[$i_tem]['allergic']) == 1) checked @endif value="1" name="{{ 'allergic_'.($i_tem) }}" > <label for="">アレルギーの有無</label>
+                                                    <div class="input-display-flex ">
+                                                        <input  data-index='{{$i_tem}}' value="1" type="radio"  @if(old('allergic_'.($i_tem), @$child[$i_tem]['allergic']) == 1) checked @endif name="{{ 'allergic_'.($i_tem) }}" > <label class="fw-normal" for="">有</label>
+                                                        <input  data-index='{{$i_tem}}' value="0" @if(old('allergic_'.($i_tem), @$child[$i_tem]['allergic']) == 0) checked @endif type="radio" name="{{ 'allergic_'.($i_tem) }}" > <label class="fw-normal" for="">無</label>
+                                                    </div>
+                                                    <div class="form-error"></div>
+                                                    @if($errors->has('allergic_'.($i_tem)))
+                                                        <div class="text-errors">{{ $errors->first('allergic_'.($i_tem)) }}</div>
+                                                    @endif
+                                                </div>
+                                                @php 
+                                                    $class_name_allergic = '';
+                                                    if(old('allergic_'.($i_tem), @$child[$i_tem]['allergic']) == 0):
+                                                        $class_name_allergic = 'dl-none';
+                                                    endif;
+                                                @endphp
+                                                <div class="col-md-12 flex-box item-inline {{'allergic_note_'.($i_tem)}} {{$class_name_allergic}}">
+                                                    <textarea class="child-textarea" name="{{ 'allergic_'.($i_tem) }}" id="" cols="30" rows="10">{{old('allergic_note_'.($i_tem), @$child[$i_tem]['allergic_note'])}}</textarea>
                                                 </div>
                                                 {{-- end allergic --}}
 
                                                 {{-- chronic --}}
+                                                <div class="col-md-12 em-row">
+                                                    <label class="label-color" for="">持病、特別なケア</label>
+                                                </div>
                                                 <div class="col-md-12 flex-box item-inline">
-                                                    <input type="checkbox" @if(old('chronic_'.($i_tem), @$child[$i_tem]['chronic']) == 1) checked @endif value="1" name="{{ 'chronic_'.($i_tem) }}" > <label for="">持病、特別なケアの有無</label>
+                                                    
+                                                    <input  data-index='{{$i_tem}}' value="1" type="radio" @if(old('chronic_'.($i_tem), @$child[$i_tem]['allergic']) == 1) checked @endif name="{{ 'chronic_'.($i_tem) }}" > <label class="fw-normal" for="">有</label>
+                                                    <input  data-index='{{$i_tem}}' value="0" @if(old('chronic_'.($i_tem), @$child[$i_tem]['chronic']) == 0)) checked @endif type="radio" name="{{ 'chronic_'.($i_tem) }}" > <label class="fw-normal" for="">無</label>
+                                                </div>
+                                                @php 
+                                                    $class_name_chronic = '';
+                                                    if(old('chronic_'.($i_tem), @$child[$i_tem]['chronic']) == 0):
+                                                        $class_name_chronic = 'dl-none';
+                                                    endif;
+                                                @endphp
+                                                <div class="col-md-12 flex-box item-inline {{'chronic_note_'.($i_tem)}} {{$class_name_chronic}}">
+                                                    <textarea class="child-textarea" name="{{ 'chronic_note_'.($i_tem) }}" id="" cols="30" rows="10">{{old('chronic_note_'.($i_tem), @$child[$i_tem]['chronic_note'])}}</textarea>
                                                 </div>
                                                 {{-- end chronic --}}
                                                 <input type="hidden" name="{{ 'child_id_'.($i_tem) }}" value="{{ isset($child[$i_tem]['id']) ? $child[$i_tem]['id'] : '' }}">
@@ -407,6 +458,7 @@
                                         {{-- end child --}}
                                     @endfor
                                 @else
+                                    {{-- lúc chưa nhấn edit --}}
                                     @foreach ($child as $itemChild)
                                         {{-- child --}}
                                         <div class="contain-child-{{$itemChild['id']}}">
@@ -510,14 +562,47 @@
                                                 {{-- end gender --}}
 
                                                 {{-- allergic --}}
+                                                <div class="col-md-12 em-row">
+                                                    <label class="label-color" for="">アレルギー</label>
+                                                </div>
                                                 <div class="col-md-12 flex-box item-inline">
-                                                    <input type="checkbox" @if(old('allergic_'.($numberChild), $itemChild['allergic']) == 1) checked @endif value="1" name="{{ 'allergic_'.($numberChild) }}" > <label for="">アレルギーの有無</label>
+                                                    <div class="input-display-flex ">
+                                                        <input  data-index='{{$numberChild}}' value="1" type="radio"  @if(old('allergic_'.($numberChild), @$itemChild['allergic']) == 1) checked @endif name="{{ 'allergic_'.($numberChild) }}" > <label class="fw-normal" for="">有</label>
+                                                        <input  data-index='{{$numberChild}}' value="0" @if(old('allergic_'.($numberChild),@$itemChild['allergic']) == 0) checked @endif type="radio" name="{{ 'allergic_'.($numberChild) }}" > <label class="fw-normal" for="">無</label>
+                                                    </div>
+                                                    <div class="form-error"></div>
+                                                    @if($errors->has('allergic_'.($numberChild)))
+                                                        <div class="text-errors">{{ $errors->first('allergic_'.($numberChild)) }}</div>
+                                                    @endif
+                                                </div>
+                                                @php 
+                                                    $class_name_allergic = '';
+                                                    if(old('allergic_'.($numberChild), @$itemChild['allergic']) == 0):
+                                                        $class_name_allergic = 'dl-none';
+                                                    endif;
+                                                @endphp
+                                                <div class="col-md-12 flex-box item-inline {{'allergic_note_'.($numberChild)}} {{$class_name_allergic}}">
+                                                    <textarea class="child-textarea" name="{{ 'allergic_note_'.($numberChild) }}" id="" cols="30" rows="10">{{old('allergic_note_'.($numberChild), @$itemChild['allergic_note'])}}</textarea>
                                                 </div>
                                                 {{-- end allergic --}}
 
                                                 {{-- chronic --}}
+                                                
+                                                <div class="col-md-12 em-row">
+                                                    <label class="label-color" for="">持病、特別なケア</label>
+                                                </div>
                                                 <div class="col-md-12 flex-box item-inline">
-                                                    <input type="checkbox" @if(old('chronic_'.($numberChild), $itemChild['chronic']) == 1) checked @endif value="1" name="{{ 'chronic_'.($numberChild) }}" > <label for="">持病、特別なケアの有無</label>
+                                                    <input  data-index='{{$numberChild}}' value="1" type="radio" @if(old('chronic_'.($numberChild), @$itemChild['chronic']) == 1) checked @endif name="{{ 'chronic_'.($numberChild) }}" > <label class="fw-normal" for="">有</label>
+                                                    <input  data-index='{{$numberChild}}' value="0" @if(old('chronic_'.($numberChild), @$itemChild['chronic']) == 0)) checked @endif type="radio" name="{{ 'chronic_'.($numberChild) }}" > <label class="fw-normal" for="">無</label>
+                                                </div>
+                                                @php 
+                                                    $class_name_chronic = '';
+                                                    if(old('chronic_'.($numberChild), @$itemChild['chronic']) == 0):
+                                                        $class_name_chronic = 'dl-none';
+                                                    endif;
+                                                @endphp
+                                                <div class="col-md-12 flex-box item-inline {{'chronic_note_'.($numberChild)}} {{$class_name_chronic}}">
+                                                    <textarea class="child-textarea" name="{{ 'chronic_note_'.($numberChild) }}" id="" cols="30" rows="10">{{old('chronic_note_'.($numberChild), @$itemChild['chronic_note'])}}</textarea>
                                                 </div>
                                                 {{-- end chronic --}}
 
@@ -547,7 +632,7 @@
                             {{-- end message --}}
                         </div>
                         <div class="em-note">
-                            <p>上記情報がベビーシッターさんにお伝えされます</p>
+                            <p>上記情報をベビーシッターさんにお伝えいたします</p>
                         </div>
                     </div>
                     {{-- end infor family --}}
@@ -555,12 +640,29 @@
             </div>
             {{-- nav link --}}
             <div class="nav-mypage nav-bottom">
-                <a href="#">
-                    <button class="btn btn-register">登録する</button>
-                </a>
-                <a href="{{ Route('EMPLOYER_CHAT') }}">
-                    <button type="button" class="btn btn-chat"><img src="{{asset('image/icons/icon-message.png')}}" alt="" srcset=""> チャットする</button>
-                </a>
+                <div class="nav-action">
+                    <div class="top-action">
+                        <a href="{{ Route('EMPLOYER_EDIT_PROFILE')}} ">
+                            <button class="btn btn-edit">編集する</button>
+                        </a>
+                    </div>
+                    <div class="bottom-action">
+                        <a href="{{ Route('TOP_PAGE')}} ">
+                            <button class="btn btn-home">マイページ</button>
+                        </a>
+                        <a href="{{ Route('search-sitters')}} ">
+                            <button class="btn btn-search">検索</button>
+                        </a>
+                        <a href="{{ Route('EMPLOYER_MYPAGE')}} ">
+                            <button class="btn btn-profile">プロフィール</button>
+                        </a>
+                        {{-- <button class="btn btn-register">登録する</button> --}}
+                        <a href="{{ Route('EMPLOYER_CHAT') }}">
+                            <button class="btn btn-chat"><img src="{{asset('image/icons/icon-message.png')}}" alt="" srcset=""> チャット
+                            </button>
+                        </a>
+                    </div>
+                </div>
             </div>
             {{-- end nav link --}}
         </form>
@@ -654,11 +756,51 @@
                 <div class="form-error pl-3"></div>
             </div>
 
-            <div class="col-md-12 flex-box item-inline">
-                <input type="checkbox" value="1" name="{{ 'allergic_0' }}" > <label for="">アレルギーの有無</label>
+            {{-- <div class="col-md-12 flex-box item-inline">
+                <input type="checkbox" value="1" name="{{ 'allergic_0' }}" > <label class="label-color" for="">アレルギーの有無</label>
             </div>
             <div class="col-md-12 flex-box item-inline">
-                <input type="checkbox" value="1" name="{{ 'chronic_0' }}" > <label for="">持病、特別なケアの有無</label>
+                <textarea class="child-textarea" name="allergic_note_0" id="" cols="30" rows="10"></textarea>
+            </div>
+            <div class="col-md-12 flex-box item-inline">
+                <input type="checkbox" value="1" name="{{ 'chronic_0' }}" > <label class="label-color" for="">持病、特別なケアの有無</label>
+            </div>
+            <div class="col-md-12 flex-box item-inline">
+                <textarea class="child-textarea" name="chronic_note_0" id="" cols="30" rows="10"></textarea>
+            </div> --}}
+            <div class="col-md-12 em-row">
+                <label class="label-color" for="">アレルギー</label>
+            </div>
+            <div class="col-md-12 flex-box item-inline">
+                <div class="input-display-flex ">
+                    <input  data-index='0' value="1" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">有</label>
+                    <input  data-index='0' value="0" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">無</label>
+                </div>
+                <div class="form-error"></div>
+            </div>
+            <div class="col-md-12 allergic_note_0 dl-none">
+                <div class="input-display-flex">
+                    <textarea class="child-textarea" name="{{ 'allergic_note_0' }}"  cols="30" rows="10"></textarea>
+                </div>
+                <div class="form-error"></div>
+            </div>
+            
+            <!-- bệnh mãn tính -->
+            <div class="col-md-12 em-row">
+                <label class="label-color" for="">持病、特別なケア</label>
+            </div>
+            <div class="col-md-12 flex-box item-inline">
+                <div class="input-display-flex ">
+                    <input  data-index='0' value="1" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">有</label>
+                    <input  data-index='0' value="0" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">無</label>
+                </div>
+                <div class="form-error"></div>
+            </div>
+            <div class="col-md-12 chronic_note_0 dl-none">
+                <div class="input-display-flex">
+                    <textarea class="child-textarea" name="{{ 'chronic_note_0' }}"  cols="30" rows="10"></textarea>
+                </div>
+                <div class="form-error"></div>
             </div>
         </div>
     </div>
@@ -671,6 +813,7 @@
 <form action="{{ route('REMOVE_FILE') }}" class="form-delete-avatar" method="post"></form>
 <input type="hidden" name="type_upload_file" value="{{config('constant.UPLOAD_FILE.AVATAR')}}">
 <input type="hidden" name="link_image" value="{{ asset('') }}">
+<input type="hidden" name="gender_hidden" value="{{$profile['gender']}}">
 <input type="hidden" name="link_image_df" value="{{ asset('image').'/'. ($profile['gender'] == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}">
 
 {{-- modal confirm --}}
@@ -682,8 +825,8 @@
         消去してもよろしいですか
     </div>
     <div class="footer-modal">
-        <button class="btn btn-accept">OK</button>
-        <a  href="#close" rel="modal:close"><button class="btn btn-close">Close</button></a>
+        <button class="btn btn-accept">はい</button>
+        <a  href="#close" rel="modal:close"><button class="btn btn-close">いいえ</button></a>
     </div>
 </div>
 {{-- end modal confirm --}}
@@ -693,7 +836,6 @@
 @section('scripts')
     <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('/js/library/modal.jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.jpostal.js') }}"></script>    
     <script type="text/javascript" src="{{ asset('/js/employer-edit.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/employer-upload-avatar.min.js') }}"></script>

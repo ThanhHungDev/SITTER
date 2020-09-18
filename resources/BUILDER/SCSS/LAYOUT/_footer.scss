@@ -1,10 +1,10 @@
-.footer_container{
+.footer_container{        background: #ededed;
+    background-color: #ededed;
     .container_body{
         height: auto;
         max-width: $container-2;
         margin: 0 auto;
         display: flex;
-        padding-left: 20px;
         align-items: center;
         color: $black-light;
         font-size: 16px;
@@ -14,8 +14,7 @@
             align-items: center;
             a {
                 .link-img{
-                    width: 100px;
-                    padding-top: 3px;
+                    width: 310px;
                 }
             }
             .site-name {
@@ -33,32 +32,65 @@
                     a {
                         text-decoration: none;
                         color: $black-light;
+                        &:hover{
+                            text-decoration: underline;
+                        }
                     }
                 }
             }
         }
-
-        @media(max-width: 650px) {//(máy tính bảng loại to, hiển thị chiều ngang)
+        @media only screen and (max-width: $small_screen){
             flex-direction: column;
             .footer-logo{
                 height: 70px;
+                padding-top: 10px;
                 a {
                     .link-img{
-                        width: 90px;
+                        width: calc(100vw * 0.7);
                     }
                 }
                 .site-name {
                     padding-top: 0;
+                    margin-top: 10px;
                 }
             }
             .footer-link{
                 ul {
                     margin: 0;
-                    padding: 0;
+                    padding: 0  0 10px 10px;
                     li {
                         list-style: none;
-                        display: block;
+                        display: inline-block;
                         text-align: center;
+
+                    }
+                }
+            }
+        }
+        @media only screen and(min-width: $small_screen + 1) and (max-width: $medium_screen - 1) {
+            flex-direction: column;
+            .footer-logo{
+                height: 70px;
+                padding-top: 10px;
+                a {
+                    .link-img{
+                        width: 260px;
+                    }
+                }
+                .site-name {
+                    padding-top: 0;
+                    margin-top: 10px;
+                }
+            }
+            .footer-link{
+                ul {
+                    margin: 0;
+                    padding: 0  0 10px 10px;
+                    li {
+                        list-style: none;
+                        display: inline-block;
+                        text-align: center;
+
                     }
                 }
             }
@@ -76,6 +108,23 @@
         align-items: center;
         &.admin{
             background-color: #3d3d3d;
+        }
+        .desktop{
+            display: block;
+        }
+        .mobile{
+            display: none;
+        }
+        @media only screen and (max-width: $small_screen){
+            font-size: 13px;
+            line-height: 16px;
+            text-align: center;
+            .desktop{
+                display: none;
+            }
+            .mobile{
+                display: block;
+            }
         }
     }
 }

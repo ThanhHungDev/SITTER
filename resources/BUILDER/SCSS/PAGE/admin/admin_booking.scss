@@ -1,0 +1,173 @@
+.container-booking{
+    padding: 0 15px 25px 15px;
+    position: relative;
+    .title-booking{
+        background-color: #06784B;
+        height: 35px;
+        span{
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            padding-left: 15px;
+        }
+    }
+    .list-booking{
+        padding: 15px;
+        box-sizing: border-box;
+        overflow-x: auto;
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            
+            thead{
+                tr{
+                    height: 30px;
+                    background-color: #d6f3b3;
+                    font-size: 16px;
+                    font-weight: 600;
+                    td{
+                        text-align: center;
+                    }
+                    .id{
+                        width: 5%;
+                    }
+                    .name_employer{
+                        width: 15%;
+                    } 
+                    .name_sitter{
+                        width: 15%;
+                    } 
+                    .time{
+                        width: 20%;
+                    }
+                    .action_chat{
+                        width: 15%;
+                    }
+                    .action_cancel{
+                        width: 15%;
+                    }
+                }
+            }
+            tbody{
+                tr{
+                    td{
+                        &:first-child{
+                            text-align: center;
+                        }
+                    }
+                    &:nth-child(even){
+                        background-color: #fcffec;
+                    }
+                }
+            }
+            tr{
+                td{
+                    padding: 0 5px;
+                    border: 1px solid;
+                }
+            }
+        }
+    }
+    .paging{
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 15px;
+        .pagination{
+            display: flex;
+            flex-direction: row;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            
+            li{
+                padding: 0 2px;
+                a {
+                    text-decoration: none; 
+                }
+            }
+            .active{
+                a{
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+#info-item-modal{
+    height: 90vh;
+    overflow-x: auto;
+    .popup-lose {
+        width: 25px;
+        height: 25px;
+        float: right;
+        margin: -5px -18px;
+        text-align: center;
+        &::before {
+            content: '\2716';
+        }
+    }
+}
+#cancel-modal{
+    height: 150px;
+    width: 300px;
+    overflow: hidden;
+    .popup-lose {
+        width: 25px;
+        height: 25px;
+        float: right;
+        margin: -5px -18px;
+        text-align: center;
+        &::before {
+            content: '\2716';
+        }
+    }
+    .title{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 40px;
+        width: 300px;
+        background-color: #d6f3b3;
+        text-align: center;
+        z-index: -1;
+        span{    
+            display: block;
+            margin-top: 3px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
+    .popup-body{
+        margin-top: 40px;
+        .message-content{
+            margin: 0 auto;
+            text-align: center;
+        }
+    }
+    .action{
+        position: absolute;
+        bottom: 0;
+        left: 40px;
+        margin: 10px auto ;
+        button{
+            height: 30px;
+            width: 100px;
+            margin: 0 5px;
+            border: unset;
+            border-radius: 5px;
+        }
+        .action-accept{
+            background-color: #28a745;
+            &:hover{
+                background-color: #218838;
+            }
+        }
+        .action-cancel{
+            background-color: #c4c7ca;
+            &:hover{
+                background-color: #9d9fa0;
+            }
+        }
+    }
+}

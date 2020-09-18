@@ -18,8 +18,18 @@ $(function () {
                 $('.childs-hidden').find('select[name="y_birth_child_0"]').attr('name', 'y_birth_child_' + index);
                 $('.childs-hidden').find('select[name="m_birth_child_0"]').attr('name', 'm_birth_child_' + index);
                 $('.childs-hidden').find('select[name="d_birth_child_0"]').attr('name', 'd_birth_child_' + index);
+
+                $('.childs-hidden').find('input[name="allergic_0"]').attr('data-index', index);
+                $('.childs-hidden').find('input[name="chronic_0"]').attr('data-index', index);
                 $('.childs-hidden').find('input[name="allergic_0"]').attr('name', 'allergic_' + index);
                 $('.childs-hidden').find('input[name="chronic_0"]').attr('name', 'chronic_' + index);
+                
+                $('.childs-hidden').find('textarea[name="allergic_note_0"]').attr('name', 'allergic_note_' + index);
+                $('.childs-hidden').find('textarea[name="chronic_note_0"]').attr('name', 'chronic_note_' + index);
+                $('.childs-hidden').find('.allergic_note_0').attr('class','allergic_note_' + index + " input-sub-content" +  " form-validate" + ' dl-none');
+                $('.childs-hidden').find('.chronic_note_0').attr('class', 'chronic_note_' + index + " input-sub-content" +  " form-validate" + ' dl-none');
+
+                
                 let itemHtmlChild = '';
                 itemHtmlChild = $('.childs-hidden').html();
                 $('.list-childs').append(itemHtmlChild );
@@ -34,6 +44,10 @@ $(function () {
                 $('.childs-hidden').find('select[name="d_birth_child_'+ index +'"]').attr('name','d_birth_child_0');
                 $('.childs-hidden').find('input[name="allergic_'+ index +'"]').attr('name', 'allergic_0');
                 $('.childs-hidden').find('input[name="chronic_'+ index +'"]').attr('name', 'chronic_0');
+                $('.childs-hidden').find('textarea[name="allergic_note_'+ index +'"]').attr('name', 'allergic_note_0');
+                $('.childs-hidden').find('textarea[name="chronic_note_'+ index +'"]').attr('name', 'chronic_note_0');
+                $('.childs-hidden').find('.allergic_note_' + index ).attr('class', "allergic_note_0" + " input-sub-content" +  " form-validate" + ' dl-none');
+                $('.childs-hidden').find('.chronic_note_'+ index).attr('class', "chronic_note_0" + " input-sub-content" +  " form-validate" + ' dl-none' );
             }
         }
         
@@ -97,6 +111,34 @@ $(function () {
     })
 
     //========== end validate form register =========
+
+    //show hidden textarea 
+    $(document).on("click",'input[name^="allergic_"]',function() {
+        let index = $(this).attr('data-index');
+        let data = $(this).val();
+        let name = '.'+'allergic_note_' + index;
+        if(data == 0){
+            $('textarea[name="'+'allergic_note_' + index+'"]').val('');
+            $(name).hide();
+        }
+        if(data == 1){
+            $('textarea[name="'+'allergic_note_' + index+'"]').val('');
+            $(name).show();
+        }
+    })
+    $(document).on("click",'input[name^="chronic_"]',function() {
+        let index = $(this).attr('data-index');
+        let data = $(this).val();
+        let name = '.'+'chronic_note_' + index;
+        if(data == 0){
+            $('textarea[name="'+'chronic_note_' + index+'"]').val('');
+            $( name).hide();
+        }
+        if(data == 1){
+            $('textarea[name="'+'chronic_note_' + index+'"]').val('');
+            $( name).show();
+        }
+    })
 })
 
 function validateChilds(number_child) {

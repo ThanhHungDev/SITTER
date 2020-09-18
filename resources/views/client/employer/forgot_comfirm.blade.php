@@ -3,7 +3,7 @@
 @section('content')
 <div class="sitter-common">
     <div class="max-width-780 sitter-after-register">
-        <h1>please check email to confirm thank you!</h1>
+        <h1>ご登録ありがとうございます。登録メールをご確認ください。</h1>
     </div>
 </div>
 @endsection

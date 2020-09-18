@@ -32,8 +32,8 @@
         <div class="sitter-mypage">
             <div class="sitter-content-left">
                 <div>
-                    <div class="head height-85">
-                        <span class="fs-20">☆笑顔と個性を大切にサポートいたします☆ダンス・ストレッチ指導経験あり。</span>
+                    <div class="head min-height-85">
+                        <span class="fs-20-16">{{ $data['sitter']['title'] }}</span>
                     </div>
                     <div class="slider-wrap">
                         <div class="slider" id="slider">
@@ -56,7 +56,7 @@
                 </div>
                 <div>
                     <div class="head height-55">
-                        <span class="fs-20">自己紹介</span>
+                        <span class="fs-20-16">自己紹介</span>
                     </div>
 
                     <div class="sitter-introduce">
@@ -68,7 +68,7 @@
 
                 <div>
                     <div class="head height-55">
-                        <span class="fs-20">サービス内容</span>
+                        <span class="fs-20-16">サービス内容</span>
                     </div>
 
                     <div class="sitter-content">
@@ -80,18 +80,22 @@
 
             </div>
             <div class="sitter-content-right">
+                <div class="balance">
+                    <span class="fs-20">給料残額: <b>￥{{ moneyFormat($data['balance']) }}</b></span>
+                    <a href="{{ route('SITTER_STRIPE_ACC') }}">未入金残高を確認する</a>
+                </div>
                 <table class="table sitter-info">
                     <tr>
-                        <td class="width-100 fs-18" colspan="2">サポート基本情報</td>
+                        <td class="width-400 fs-24 txt-green" colspan="2">サポート基本情報</td>
                     </tr>
                     <tr>
                         <td colspan="2" class="bt-1">
-                            <span>{{ $data['sitter']['age'] ?? '' }}代女性</span><br/>
-                            <span>{{ $data['sitter']['pref'] ?? ''  }} > {{ $data['sitter']['city'] ?? ''  }}</span>
+                        <span>{{ $data['sitter']['age'] ?? '' }}代{{ getTextGender($data['gender']) }}</span><br/>
+                            <span class="txt-green">{{ $data['sitter']['pref'] ?? ''  }}</span><span> > {{ $data['sitter']['city'] ?? ''  }}</span>
                         </td>
                     </tr>
                     <tr>
-                        <td class="width-50 bt-1">保育可能年齢</td>
+                        <td class="width-td-half bt-1">保育可能年齢</td>
                         <td class="bt-1">
                             {{ isset($data['sitter']['kid_age_start']) ? config('constant.KID_AGE')[$data['sitter']['kid_age_start']].'～' : ''  }}
                             {{ isset($data['sitter']['kid_age_end']) ? config('constant.KID_AGE')[$data['sitter']['kid_age_end']] : ''  }}
@@ -101,13 +105,13 @@
                         <td class="bt-1">子育て経験</td>
                         <td class="bt-1">
                             @if(isset($data['sitter']['exp_parenting']))
-                                @if($data['sitter']['exp_parenting'])あり@else 無 @endif
+                                @if($data['sitter']['exp_parenting'])あり @else 無 @endif {{ isset($data['sitter']['exp_kid_qty']) ? '／'.$data['sitter']['exp_kid_qty'].'人' : '' }}
                             @else
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <td class="width-50 bt-1">受入可能人数</td>
+                        <td class="width-td-half bt-1">受入可能人数</td>
                         <td class="bt-1">{{ isset($data['sitter']['kid_qty']) ? $data['sitter']['kid_qty'].'人' : '' }}</td>
                     </tr>
                     <tr>
@@ -126,11 +130,11 @@
                     <tr>
                         <td class="bt-1">
                             <span class="fs-15">ベビーシッター</span><br/>
-                            <span class="fs-20">￥{{ ($data['salarySitter']) ?? ''  }}　/1時間</span>
+                            <span class="fs-20">￥{{ isset($data['salarySitter']) ? moneyFormat($data['salarySitter']) : ''  }}　/1時間</span>
                         </td>
                         <td class="bt-1">
                             <span class="fs-15">家事代行</span><br/>
-                            <span class="fs-20">￥{{ $data['salaryHouse'] ?? ''  }}　/1時間</span>
+                            <span class="fs-20">￥{{ isset($data['salaryHouse']) ? moneyFormat($data['salaryHouse']) : ''  }}　/1時間</span>
                         </td>
                     </tr>
                 </table>
@@ -158,6 +162,10 @@
 
             
         </div>
+
+        <div class="list-booking-wrapper" id="list-booking">
+        </div>
+        
     </div>
 </div>
 @endsection
@@ -165,5 +173,6 @@
     <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery.toast.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/sitter-common.min.js') }}"></script>
-    <script src="{{ asset('js/calendar.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/library/japanese-holidays.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/calendar.min.js') }}"></script>
 @endsection

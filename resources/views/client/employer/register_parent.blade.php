@@ -4,12 +4,10 @@
 @section('content')
 <div class="wapper-parent">
     <div class="head">
-        <h3>ベビーシッター応募フォーム</h3>
+        <h3>ご利用者様応募フォーム</h3>
     </div>
     <div class="note">
-        <p>
-          <span class="text-danger">※</span>は必須項目です
-        </p>
+        <p><span class="text-danger">※</span>は必須項目です</p>
     </div>
     <div class="wapper-form">
         <form class="register_parent_form" action="{{route('EMPLOYER_POST_REGISTER_PARENT')}}" method="post" enctype="multipart/form-data">
@@ -17,9 +15,8 @@
             @if($errors->any())
                 <div class="alert alert-danger mt-md-3">
                     <span class="d-fex justify-content-center">
-                        <i class="fas fa-exclamation-triangle"></i> Errors!
+                        <i class="fas fa-exclamation-triangle"></i> エラー!
                     </span>
-                
                 </div>
             @endif
             <div class="bg-form">
@@ -57,7 +54,7 @@
 
                             <p class="validate-image text-danger"></p>
                             <div class="upload-file" data-name= "input_file_front">
-                                <span>表面を追加</span>
+                                <span>オモテ</span>
                             </div>
                             <div class="form-validate">
                                 <input value="{{old('input_file_front')}}" data-type="upload" type="file" accept=""  name="input_file_front" >
@@ -69,7 +66,7 @@
                             @endif
 
                             <div class="upload-file" data-name= "input_file_back">
-                                <span>表面を追加</span>
+                                <span>ウラ</span>
                             </div>
                             @if($errors->has('input_file_back'))
                                 <div class="text-errors">{{ $errors->first('input_file_back') }}</div>
@@ -406,23 +403,58 @@
                                         @endif
                                     </div>
                                     <!-- di ứng -->
-                                    <div class="input-sub-content form-validate">
-                                        <div class="input-display-flex">
-                                            <input type="checkbox" @if(old('allergic_'.($i-1)) == 1) checked @endif value="1" name="{{ 'allergic_'.($i-1) }}" > <label for="">アレルギーの有無</label>
+                                    <div class="input-sub-content form-validate pb-0">
+                                        <label for="">アレルギー</label>
+                                        <div class="input-display-flex ">
+                                            <input  data-index='{{$i-1}}' value="1" type="radio" @if(old('allergic_'.($i-1)) == 1) checked @endif name="{{ 'allergic_'.($i-1) }}" > <label class="fw-normal" for="">有</label>
+                                            <input  data-index='{{$i-1}}' value="0" @if(old('allergic_'.($i-1)) == 0)) checked @endif type="radio" name="{{ 'allergic_'.($i-1) }}" > <label class="fw-normal" for="">無</label>
                                         </div>
                                         <div class="form-error"></div>
                                         @if($errors->has('allergic_'.($i-1)))
                                             <div class="text-errors">{{ $errors->first('allergic_'.($i-1)) }}</div>
                                         @endif
                                     </div>
-                                    <!-- bệnh mãn tính -->
-                                    <div class="input-sub-content form-validate">
+                                    @php 
+                                        $class_name_allergic = '';
+                                        if(old('allergic_'.($i-1)) == 0):
+                                            $class_name_allergic = 'dl-none';
+                                        endif;
+                                    @endphp
+                                    <div class="input-sub-content form-validate {{'allergic_note_'.($i-1)}} {{ $class_name_allergic ?? '' }}">
                                         <div class="input-display-flex">
-                                            <input type="checkbox" @if(old('chronic_'.($i-1)) == 1) checked @endif value="1" name="{{ 'chronic_'.($i-1) }}" > <label for="">持病、特別なケアの有無</label>
+                                            <textarea class="child-textarea" name="{{ 'allergic_note_'.($i-1) }}"  cols="30" rows="10">{{old('allergic_note_'.($i-1))}}</textarea>
+                                        </div>
+                                        <div class="form-error"></div>
+                                        @if($errors->has('allergic_note_'.($i-1)))
+                                            <div class="text-errors">{{ $errors->first('allergic_note_'.($i-1)) }}</div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- bệnh mãn tính -->
+                                    <div class="input-sub-content form-validate pb-0">
+                                        <label for="">持病、特別なケア</label>
+                                        <div class="input-display-flex ">
+                                            <input  data-index='{{$i-1}}' value="1" type="radio" @if(old('chronic_'.($i-1)) == 1) checked @endif name="{{ 'chronic_'.($i-1) }}" > <label class="fw-normal" for="">有</label>
+                                            <input  data-index='{{$i-1}}' value="0" @if(old('chronic_'.($i-1)) == 0)) checked @endif type="radio" name="{{ 'chronic_'.($i-1) }}" > <label class="fw-normal" for="">無</label>
                                         </div>
                                         <div class="form-error"></div>
                                         @if($errors->has('chronic_'.($i-1)))
                                             <div class="text-errors">{{ $errors->first('chronic_'.($i-1)) }}</div>
+                                        @endif
+                                    </div>
+                                    @php 
+                                        $class_name_chronic = '';
+                                        if(old('chronic_'.($i-1)) == 0):
+                                            $class_name_chronic = 'dl-none';
+                                        endif;
+                                    @endphp
+                                    <div class="input-sub-content form-validate {{'chronic_note_'.($i-1)}} {{$class_name_chronic ?? ''}}">
+                                        <div class="input-display-flex">
+                                            <textarea class="child-textarea" name="{{ 'chronic_note_'.($i-1) }}"  cols="30" rows="10">{{old('chronic_note_'.($i-1))}}</textarea>
+                                        </div>
+                                        <div class="form-error"></div>
+                                        @if($errors->has('chronic_note_'.($i-1)))
+                                            <div class="text-errors">{{ $errors->first('chronic_note_'.($i-1)) }}</div>
                                         @endif
                                     </div>
                                 </div>
@@ -536,23 +568,45 @@
                                     @endif
                                 </div>
                                 <!-- di ứng -->
-                                <div class="input-sub-content form-validate">
-                                    <div class="input-display-flex">
-                                        <input value="1" type="checkbox" name="allergic_0" data-ul = 0 > <label for="">アレルギーの有無</label>
+                                <div class="input-sub-content form-validate pb-0">
+                                    <label for="">アレルギー</label>
+                                    <div class="input-display-flex ">
+                                        <input  data-index='0' value="1" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">有</label>
+                                        <input  data-index='0' value="0" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">無</label>
                                     </div>
                                     <div class="form-error"></div>
                                     @if($errors->has('allergic_0'))
                                         <div class="text-errors">{{ $errors->first('allergic_0') }}</div>
                                     @endif
                                 </div>
-                                <!-- bệnh mãn tính -->
-                                <div class="input-sub-content form-validate">
+                                <div class="input-sub-content form-validate allergic_note_0 dl-none">
                                     <div class="input-display-flex">
-                                        <input value="1" type="checkbox" name="chronic_0" data-ul = 0 > <label for="">持病、特別なケアの有無</label>
+                                        <textarea class="child-textarea" name="{{ 'allergic_note_0' }}"  cols="30" rows="10"></textarea>
+                                    </div>
+                                    <div class="form-error"></div>
+                                    @if($errors->has('allergic_note_0'))
+                                        <div class="text-errors">{{ $errors->first('allergic_note_0') }}</div>
+                                    @endif
+                                </div>
+                                <!-- bệnh mãn tính -->
+                                <div class="input-sub-content form-validate pb-0">
+                                    <label for="">持病、特別なケア</label>
+                                    <div class="input-display-flex ">
+                                        <input  data-index='0' value="1" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">有</label>
+                                        <input  data-index='0' value="0" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">無</label>
                                     </div>
                                     <div class="form-error"></div>
                                     @if($errors->has('chronic_0'))
                                         <div class="text-errors">{{ $errors->first('chronic_0') }}</div>
+                                    @endif
+                                </div>
+                                <div class="input-sub-content form-validate chronic_note_0 dl-none">
+                                    <div class="input-display-flex">
+                                        <textarea class="child-textarea" name="{{ 'chronic_note_0' }}"  cols="30" rows="10"></textarea>
+                                    </div>
+                                    <div class="form-error"></div>
+                                    @if($errors->has('chronic_note_0'))
+                                        <div class="text-errors">{{ $errors->first('chronic_note_0') }}</div>
                                     @endif
                                 </div>
                             </div>
@@ -608,6 +662,8 @@
             </div>
             <input type="hidden" name="token_verify" value="{{@$token_verify}}">
         </form>
+        {{-- end form register --}}
+
         <!-- content child default -->
         <div class="childs-hidden" style="display: none;">
             <div class="input-group child-item">
@@ -689,16 +745,33 @@
                         <div class="form-error"></div>
                     </div>
                     <!-- di ứng -->
-                    <div class="input-sub-content form-validate">
-                        <div class="input-display-flex">
-                            <input type="checkbox" value="1" name="allergic_0" > <label for="">アレルギーの有無</label>
+                    <div class="input-sub-content form-validate pb-0">
+                        <label for="">アレルギー</label>
+                        <div class="input-display-flex ">
+                            <input  data-index='0' value="1" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">有</label>
+                            <input  data-index='0' value="0" type="radio" name="{{ 'allergic_0' }}" > <label class="fw-normal" for="">無</label>
                         </div>
                         <div class="form-error"></div>
                     </div>
-                    <!-- bệnh mãn tính -->
-                    <div class="input-sub-content form-validate">
+                    <div class="input-sub-content form-validate allergic_note_0 dl-none">
                         <div class="input-display-flex">
-                            <input type="checkbox" value="1" name="chronic_0" > <label for="">持病、特別なケアの有無</label>
+                            <textarea class="child-textarea" name="{{ 'allergic_note_0' }}"  cols="30" rows="10"></textarea>
+                        </div>
+                        <div class="form-error"></div>
+                    </div>
+                    
+                    <!-- bệnh mãn tính -->
+                    <div class="input-sub-content form-validate pb-0">
+                        <label for="">持病、特別なケア</label>
+                        <div class="input-display-flex ">
+                            <input  data-index='0' value="1" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">有</label>
+                            <input  data-index='0' value="0" type="radio" name="{{ 'chronic_0' }}" > <label class="fw-normal" for="">無</label>
+                        </div>
+                        <div class="form-error"></div>
+                    </div>
+                    <div class="input-sub-content form-validate chronic_note_0 dl-none">
+                        <div class="input-display-flex">
+                            <textarea class="child-textarea" name="{{ 'chronic_note_0' }}"  cols="30" rows="10"></textarea>
                         </div>
                         <div class="form-error"></div>
                     </div>
@@ -709,11 +782,11 @@
     </div>
     
 </div>
-@endsection
 @include('modals.employers.privacy')
 @include('modals.employers.terms')
+@endsection
+
 @section('scripts')
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/register_parent.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
 @endsection

@@ -7,36 +7,47 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title> Couple </title>
     <link rel="icon" href="http://sitters.jp/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 
 <body>
     <script>
 
         const CONFIG_EVENT            = {
-            CONNECTTION              : 'connection',
-            DISCONNECT               : 'disconnect',
-            SEND_MESSAGE             : 'send-message',
-            RESPONSE_MESSAGE         : 'response-message',
-            JOIN_CHANNEL             : "join-channel",
-            SEND_TYPING              : "send-typing",
-            RESPONSE_TYPING          : 'response-typing',
-            SEND_PEER                : "SEND_PEER",
-            RESPONSE_PEER            : "RESPONSE_PEER",
-            REQUEST_GET_PEER         : "REQUEST_GET_PEER",
-            RESPONSE_GET_PEER        : "RESPONSE_GET_PEER",
-            USER_ONLINE              : "USER_ONLINE",
-            USER_ONLINE_NOTI         : "USER_ONLINE_NOTI",
-            USER_OFFLINE_NOTI        : "USER_OFFLINE_NOTI",
-            DUPLICATION_TAB          : "DUPLICATION_TAB",
-            READ_MESSAGE_ALL         : "READ_MESSAGE_ALL",
-            READ_MESSAGE_ALL_RESPONSE: "READ_MESSAGE_ALL_RESPONSE"
+            CONNECTTION                 : 'connection',
+            DISCONNECT                  : 'disconnect',
+            SEND_MESSAGE                : 'send-message',
+            RESPONSE_MESSAGE            : 'response-message',
+            JOIN_CHANNEL                : "join-channel",
+            SEND_TYPING                 : "send-typing",
+            RESPONSE_TYPING             : 'response-typing',
+            SEND_PEER                   : "SEND_PEER",
+            RESPONSE_PEER               : "RESPONSE_PEER",
+            REQUEST_GET_PEER            : "REQUEST_GET_PEER",
+            RESPONSE_GET_PEER           : "RESPONSE_GET_PEER",
+            USER_ONLINE                 : "USER_ONLINE",
+            USER_ONLINE_NOTI            : "USER_ONLINE_NOTI",
+            USER_OFFLINE_NOTI           : "USER_OFFLINE_NOTI",
+            DUPLICATION_TAB             : "DUPLICATION_TAB",
+            READ_MESSAGE_ALL            : "READ_MESSAGE_ALL",
+            READ_MESSAGE_ALL_RESPONSE   : "READ_MESSAGE_ALL_RESPONSE",
+            USER_GET_BOOKING            : "USER_GET_BOOKING",
+            RESPONSE_USER_GET_BOOKING   : "RESPONSE_USER_GET_BOOKING",
+            USER_CHANGE_BOOKING         : "USER_CHANGE_BOOKING",
+            RESPONSE_USER_CHANGE_BOOKING: "RESPONSE_USER_CHANGE_BOOKING",
+            RESPONSE_USER_CHANGE_BOOKING_ERROR: "RESPONSE_USER_CHANGE_BOOKING_ERROR",
+            
         }
+        const ROUTE_VIEW_SITTER   = "http://sitters.jp/view-sitter";    //"{{ Route('VIEW_SITTER', [ 'id' => 0 ]) }}"
+        const ROUTE_VIEW_EMPLOYER = "http://sitters.jp/view-employer";  //"{{ Route('VIEW_EMPLOYER', [ 'id' => 0 ]) }}"
+        // const ROUTE_VIEW_SITTER   = "{{ Route('VIEW_SITTER', [ 'id' => null ]) }}"
+        // const ROUTE_VIEW_EMPLOYER = "{{ Route('VIEW_EMPLOYER', [ 'id' => null ]) }}"
     </script>
     <noscript>
         You need to enable JavaScript to run this app.
     </noscript>
     <div style="max-width: 1100px; margin: 50px auto;">
-        <div id="TOKEN_REFESH" data-refesh="bd9d632eccb7a30716d1febc7d9afb" data-user="6"></div>
+        <div id="TOKEN_REFESH" data-refesh="bd9d632eccb7a30716d1febc7d9afb" data-user="31"></div>
         <div id="CHAT_ELEMENT" class="position-relative">loading...</div>
     </div>
     

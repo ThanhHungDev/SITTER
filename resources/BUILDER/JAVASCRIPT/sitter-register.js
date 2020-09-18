@@ -146,12 +146,12 @@ $(document).ready(function () {
             },
             password: {
                 required: true,
-                minlength: 8,
+                minlength: 6,
                 maxlength: 32
             },
             confirm_password: {
                 required: true,
-                minlength: 8,
+                minlength: 6,
                 maxlength: 32,
                 equalTo: '#password'
             },
@@ -219,13 +219,13 @@ $(document).ready(function () {
             },
             password: {
                 required: 'パスワードを入力して下さい。',
-                minlength: 'パスワードは半角英数文字8文字以上にする必要があります。',
-                maxlength: 'パスワードは半角英数文字8文字以上にする必要があります。' 
+                minlength: 'パスワードは半角英数文字6文字以上にする必要があります。',
+                maxlength: 'パスワードは半角英数文字6文字以上にする必要があります。' 
             },
             confirm_password: {
                 required: 'パスワード確認入力して下さい。',
-                minlength: 'パスワードは半角英数文字8文字以上にする必要があります。',
-                maxlength: 'パスワードは半角英数文字8文字以上にする必要があります。',
+                minlength: 'パスワードは半角英数文字6文字以上にする必要があります。',
+                maxlength: 'パスワードは半角英数文字6文字以上にする必要があります。',
                 equalTo: 'パスワード確認はパスワードと一致しません。'
             },
             check_accept: {
@@ -248,7 +248,7 @@ function check_birthday() {
     if ( year == '' || month == '' || day == '' ) {
         return true;
     } else {
-        let date = new Date(year, month, day);
+        let date = new Date(year + '/' + month + '/ '+ day);
         if (date.getDate() != day) {
             return false;
         }
@@ -291,10 +291,11 @@ $('#inp-post-code').jpostal({
     ],
     address : {
         '#sl-box-pref'  : '%3',
-        '#inp-town'  : '%4, %5' 
+        '#inp-town'  : '%4',
+        '#inp-address': '%5',
     }
 });
-$('#inp-post-code').keyup(function () {
+$('#inp-post-code').focusout(function () {
     let strPostCode = $(this).val();
     if (strPostCode.length <= 8 ) {
         if (strPostCode.length>3 && strPostCode.indexOf('-') < 0) {
@@ -303,4 +304,8 @@ $('#inp-post-code').keyup(function () {
     }else {
         $(this).val(strPostCode.substr(0,8))
     }
-})
+});
+
+$(document).on('blur', '#reg-phone, #inp-post-code', function() {
+    $(this).val(convertNumberJP($(this).val()));
+});

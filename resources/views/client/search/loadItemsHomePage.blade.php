@@ -1,17 +1,17 @@
 @isset($list_items)
     @if(count($list_items) > 0)
-        <div class="title_section">
-            <span>ベビーシッターをお願いする</span>
-            {{-- <div class="paging_wrapper">
-                <div class="paging">
-                    {{ $list_items->links() }}
-                </div>
-                <div class="more_items">
-                    <a href="{{route('search-sitters')}}">
-                        一覧をみる >
-                    </a>
-                </div>
-            </div> --}}
+        <h3 class="title_section">
+            お手伝いをお願いする
+        </h3>
+        <div class="emp_bottom sp">
+            <div class="paging">
+                {{ $list_items->links() }}
+            </div>
+            <div class="more_items">
+                <a href="{{route('search-sitters')}}">
+                    ベビーシッター一覧をみる>
+                </a>
+            </div>
         </div>
         <div class="items" >
             @foreach($list_items as $value)
@@ -20,9 +20,9 @@
                         <div class="cover">
                             <a href="{{ route('VIEW_SITTER', ['id'=>$value->id]) }}">
                                 @if($value->avatar != '')
-                                    <img class="item-img" src="{{ asset($value->avatar) }}"/>
+                                    <img alt="sitter" class="item-img" src="{{ asset($value->avatar) }}"/>
                                 @else
-                                    <img class="item-img" src="{{ asset('image').'/'. ($value->gender == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}" alt=""/>
+                                    <img alt="sitter" class="item-img" src="{{ asset('image').'/'. ($value->gender == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}" />
                                 @endif
                                 <div class="description">
                                     <div class="text">
@@ -50,7 +50,7 @@
             </div>
             <div class="more_items">
                 <a href="{{route('search-sitters')}}">
-                    一覧をみる >
+                    ベビーシッター一覧をみる>
                 </a>
             </div>
         </div>

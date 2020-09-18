@@ -30,4 +30,8 @@ interface FactoryModelInterface
     public function createSalaryModel();
     public function createPasswordResetModel();
     public function createScheduleModel();
+    public function createVerifyRateModel();
+    public function createSitterReviewModel();
+    public function createBookingModel();
+    public function createDateBookingModel();
 }

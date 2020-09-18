@@ -101,7 +101,8 @@ class BaseController extends Controller
             $data           = $request->all();
             $typeUploadFile = $data['type'];
             $fileName       = $data['fileName'];
-            $status         = $this->serviceCommon->removeFile($typeUploadFile, $fileName);
+            $memo           = $data['memo'] ?? '';
+            $status         = $this->serviceCommon->removeFile($typeUploadFile, $fileName, $memo);
             if($status){
                 $res['code']   = 200;
                 $res['status'] = true;

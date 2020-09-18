@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\UserModel;
 use App\Models\GalaryModel;
 use App\Models\FamilyModel;
+use App\Models\VerifyEmailModel;
 use Illuminate\Http\Request;
 use App\Services\SitterService;
 use App\Services\CommonService;
@@ -18,7 +19,9 @@ use Illuminate\Support\Facades\Auth;
 use App\FactoryModel\FactoryModelInterface;
 use App\Http\Requests\CLIENT\VALIDATE_EMPLOYER_EDIT;
 use App\Http\Requests\CLIENT\VALIDATE_EMPLOYER_REG_PARENT;
+use App\Models\ScheduleModel;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EmployerController extends Controller
 {
@@ -147,6 +150,8 @@ class EmployerController extends Controller
                     'gender'              => $dataPost['gender_child_'.$i],
                     'allergic'            => (isset($dataPost['allergic_'.$i]) && ($dataPost['allergic_'.$i] == '1')) ? true : false,
                     'chronic'             => (isset($dataPost['chronic_'.$i]) && ($dataPost['chronic_'.$i] == '1')) ? true : false,
+                    'allergic_note'            => (isset($dataPost['allergic_note_'.$i])) ? $dataPost['allergic_note_'.$i] : null,
+                    'chronic_note'             => (isset($dataPost['chronic_note_'.$i])) ? $dataPost['chronic_note_'.$i] : null
                 ];
                 if(!empty($child_id)){
                     $dataChild['id'] = $child_id;
@@ -233,5 +238,145 @@ class EmployerController extends Controller
             ];
         }
         return response()->json($res);
+    }
+
+    public function detail(REQUEST $request, $id = null)
+    {
+        $typeGalaries = [config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT'), config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')];
+        
+        $data['profile']    = (new EmployerProfileModel())->getByField($id);
+        $data['galaries']   = (new GalaryModel())->getByField('user_id', $id, $typeGalaries);
+
+        if($data['profile']['id']){
+            $data['family'] = (new FamilyModel())->getByField($data['profile']['id']);
+        }
+        return view('client.employer.detail', $data);
+    }
+
+    public function reviewSitter(Request $request){
+        $param = $request->all();
+        $user_id = $param['sitter'];
+        $data = [];
+
+        $userModel = $this->factoryModel->createUserModel();
+        $user = $userModel::findOrFail($user_id);
+        $data['gender'] = $user->gender;
+
+        $status = $this->serviceCommon->checkVerifyRate($param);
+
+        switch ($status) {
+            case config('constant.TOKEN_VERIFY.WRONG'):
+            case config('constant.TOKEN_VERIFY.EXPIRED'):
+                return view('errors.404');
+                break;
+            case config('constant.TOKEN_VERIFY.ACTIVED'):
+                return view('client.employer.review_sitter_success');
+                break;
+            case config('constant.TOKEN_VERIFY.NOT_ACTIVE'):
+                if($user){
+                    $sitter = $user->sitter;
+                    $data['sitter'] = $sitter;
+                    $data['token'] = $param['token'];
+                    return view('client.employer.review_sitter', compact('data'));
+                }
+                return view('errors.404');
+                break;
+            
+            default:
+                return view('errors.404');
+                break;
+        }
+    }
+
+    public function postReviewSitter(Request $request){
+        DB::beginTransaction();
+        try{
+            $params = $request->except('_token');
+            $employerId = Auth::user()->id;
+            $params['employer_id'] = $employerId;
+            $sitterReviewModel = $this->factoryModel->createSitterReviewModel();
+            $sitterReviewModel::create($params);
+
+            DB::commit();
+            $verifyEmailModel = $this->factoryModel->createVerifyRateModel();
+            $verifyEmailModel->where('token', $params['token'])->update(['verified_at' => Carbon::now()]);
+            return view('client.employer.review_sitter_success');
+        } catch(\Exception $e) {
+            DB::rollback();
+            $errors = new MessageBag(['入力エラー']);
+            return redirect()->back()->withInput()->withErrors($errors);
+        }
+    }
+
+    public function booking(Request $request ){
+
+        if (!Auth::check()){
+
+            return abort(403);
+        }
+        $datesBookingJson = $request->input('booking');
+        $bookings = json_decode($datesBookingJson, true);
+        /// now, get 1 booking
+        $bookingInput = count($bookings) ? $bookings[0] : null;
+        $booking = (new ScheduleModel())->inforSitterBookingByCondition($bookingInput)->first();
+        return view('client.employer.time-booking', compact('booking'));
+    }
+    public function ajaxBookingSitter(Request $request)
+    {
+        $condition = [
+            'status' => 0,
+            'sitter_accept' => 1,
+            'employer_accept' => 1,
+        ];
+        $employer_id = Auth::user()->id;
+        $bookingModel = $this->factoryModel->createBookingModel();
+        $list_item = $bookingModel->getBookingByEmployer($employer_id, $condition);
+        $data['list_items']  = $list_item;
+        return view('client.employer.loadItemBooking', $data)->render();
+    }
+
+    public function editPaymentMethod(Request $request)
+    {
+        // $stripeAccountId = Auth::user()->stripe_account_id;
+        return view('client.employer.edit-card');
+    }
+
+    public function postEditPaymentMethod(Request $request)
+    {
+        $stripeCustomerId = Auth::user()->stripe_account_id;
+        $input     = $request->all();
+        $stripe = new \Stripe\StripeClient(config('constant.STRIPE_SECRET_KEY'));
+        if($stripeCustomerId){
+            // update
+            $status = $stripe->customers->update(
+                $stripeCustomerId,
+                ['source' => $input['stripeToken']]
+            );
+            
+        } else {
+            // create
+            $dataStripe = $stripe->customers->create([
+                "description" => 'Update payment menthod card',
+                "source"      => $input['stripeToken'],                                  // obtained with Stripe.js
+                "name"        => Auth::user()->first_name. ' ' .Auth::user()->last_name,
+                "email"       => Auth::user()->email
+            ]);
+            
+            $userModel = $this->factoryModel->createUserModel();
+            $user      = $userModel::findOrFail(Auth::user()->id);
+            if(!$user->stripe_account_id){
+                //insert data user
+                $user->stripe_account_id = $dataStripe->id;
+                $user->active = true;
+                $user->save();
+            } 
+            
+        }
+        return redirect()->route('EMPLOYER_MYPAGE');
+    }
+
+    public function registerPaymentSuccess()
+    {
+        return view('client.employer.register_payment_success');
     }
 }

@@ -15,11 +15,11 @@
                 <form action="{{route('search-sitters')}}">
                     <div class="input_section custom">
                         <div class="select_opt dpicker">
-                        <input name="wdate" class="date-picker-input date-picker-custom" autocomplete="off" type="text" id="slt_datepicker" placeholder="日付で探す"/>
+                            <input name="wdate" class="date-picker-input date-picker-custom" onfocus="blur()" autocomplete="off" type="text" id="slt_datepicker" placeholder="日付で探す"/>
                         </div>
                     </div>
                     <div class="input_section custom">
-                        <select name="cage" class="select_opt" name="" id="">
+                        <select name="cage" class="select_opt">
                             <option value="">子供の年齢</option>
                             <option value="0mth" {{($data_params['cage'] === '0mth')? 'selected': ''}}>0歳0ヶ月</option>
                             <option value="1to2mth" {{($data_params['cage'] === '1to2mth')? 'selected': ''}}>0歳1ヶ月~2ヶ月</option>
@@ -35,7 +35,7 @@
                         <input type="hidden"/>
                     </div>
                     <div class="input_section custom">
-                        <select name="wplace" class="select_opt" name="" id="">
+                        <select name="wplace" class="select_opt">
                             <option value="">地域を選択</option>
                             @foreach ($jp_locations as $key => $value)
                                     <?php
@@ -77,17 +77,20 @@
                         </select>
                     </div>
                     <div class="input_section custom">
-                        <select name="wcond" class="select_opt" name="" id="">
+                        <select name="wcond" class="select_opt">
                             <option value="">条件を指定</option>
-                            <option value="1" {{($data_params['wcond'] === '1')? 'selected': ''}}>￥1,000~￥1,490</option>
-                            <option value="2" {{($data_params['wcond'] === '2')? 'selected': ''}}>￥1,500~￥1,990</option>
-                            <option value="3" {{($data_params['wcond'] === '3')? 'selected': ''}}>￥2,000以上</option>
+                            @foreach (config('constant.SALARY_FILTER_RANGE') as $k => $v)
+                                <option {{($data_params['wcond'] == $k)? 'selected': ''}} value="{{$k}}">{{$v}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="input_section div-btn">
                         <input type="submit" class="btn-submit" value="探す">
                     </div>
                 </form>
+                <div class="btn-link advance-search">
+                    <a href="{{route('advance-search')}}">詳細検索 ></a>
+                </div>
             </div>
         </div>
     </section>
@@ -105,9 +108,9 @@
                                     <div class="cover">
                                         <a href="{{ route('VIEW_SITTER', ['id'=>$value->id]) }}">
                                             @if($value->avatar != '')
-                                                <img class="item-img" src="{{ asset($value->avatar) }}"/>
+                                                <img alt="sitter" class="item-img" src="{{ asset($value->avatar) }}"/>
                                             @else
-                                                <img class="item-img" src="{{ asset('image').'/'. ($value->gender == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}" alt=""/>
+                                                <img alt="sitter" class="item-img" src="{{ asset('image').'/'. ($value->gender == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}"/>
                                             @endif
                                             <div class="description">
                                                 <div class="text">
@@ -145,6 +148,14 @@
                         <h2>見つかりません</h2>
                 @endif
             @endisset
+            <div class="booking-search">
+                <div class="title-booking">
+                    <span>予約一覧</span>
+                </div>
+                <div class="content-booking" id="booking-list">
+            
+                </div>
+            </div>
         </div>
     </section>
 </div>
@@ -155,9 +166,11 @@
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/datepicker-ja.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/search_result.min.js') }}"></script>
     <script>
         $( function() {
             let datePicker_slt = $('#dates_selected').val();
+            var dateToday = new Date();
             if(datePicker_slt != ''){
                 let arr_dates = datePicker_slt.split(",");
                 let arr_output = [];
@@ -166,15 +179,30 @@
                     var datestring = date.getFullYear()  + "/" + (date.getMonth()+1) + "/" + date.getDate();
                     arr_output.push(datestring);
                 });
-                console.log(arr_output);
-
                 $( "#slt_datepicker" ).multiDatesPicker({
-                    addDates: arr_output
+                    addDates: arr_output,
+                    minDate: dateToday,
+                    onSelect: function(selectedDate) {
+                        var option = this.id == "from" ? "minDate" : "maxDate",
+                            instance = $(this).data("datepicker"),
+                            date = $.datepicker.parseDate(instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
                 });
             }
             else{
-                $( "#slt_datepicker" ).multiDatesPicker();
+                $( "#slt_datepicker" ).multiDatesPicker({
+                    minDate: dateToday,
+                    onSelect: function(selectedDate) {
+                        var option = this.id == "from" ? "minDate" : "maxDate",
+                            instance = $(this).data("datepicker"),
+                            date = $.datepicker.parseDate(instance.settings.dateFormat || $.datepicker._defaults.dateFormat, selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
+                });
             }
         } );
+        const URL_BOOKING_SITTER = "{{ route('AJAX_EMPLOYER_BOOKING_SITTER') }}";
+        const IS_LOGIN = '{{ $is_login }}';
     </script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client\Sitter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CLIENT\VALIDATE_LOGIN;
 use App\Services\CommonService;
+use App\Services\SitterService;
 use App\FactoryModel\FactoryModelInterface;
 use App\Mail\SitterForgotPass;
 
@@ -17,12 +18,14 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    private $sitterService     = null;
     private $commonService     = null;
     private $model             = null;
 
-    public function __construct(FactoryModelInterface $_model, CommonService $commonService) {
+    public function __construct(FactoryModelInterface $_model, CommonService $commonService, SitterService $sitterService) {
         $this->model         = $_model;
         $this->commonService = $commonService;
+        $this->sitterService = $sitterService;
     }
 
     function login(){
@@ -40,13 +43,28 @@ class AuthController extends Controller
         $data     = $request->only('email', 'password');
         $remember = $request->input('save-password') ? true : false;
         $detect   = $request->input('detect');
-
-        $data['active']  = 1;
+        
         $data['role_id'] = config('constant.ROLE.SITTER');
 
-        if (Auth::attempt($data, $remember)){
+        $user_temp = $this->model->createUserModel()->checkSitterIsactiveByParams($data['email'], 'email');
 
+        // check user is active?
+        if(!$user_temp){
+            $errors = new MessageBag([
+                "errorActive" => "アカウントが存在しないか、非アクティブです!"
+            ]);
+            return redirect()->back()->withInput()->withErrors($errors);
+        }
+
+        // check stripe is active?
+        if(!$user_temp->stripe_active){
+            $token_stripe = $this->model->createVerifyEmailModel()->getTokenById($user_temp->id);
+            return redirect(route('SITTER_REG_STRIPE_ACC').'?token='.$token_stripe);
+        }
+
+        if (Auth::attempt($data, $remember)){
             $user         = Auth::user();
+
             $tokenRefresh = $this->commonService->getTokenRefresh($detect, $user['id']);
 
             if (!$tokenRefresh) {
@@ -83,26 +101,21 @@ class AuthController extends Controller
 
     public function postForgot(VALIDATE_LOGIN $request)
     {
-        if (Auth::check()) {
-            return redirect()->route('SITTER_MYPAGE');
-        }
-        
         $requestData = $request->all();
-        $checkActive = $this->model->createUserModel()->checkUserIsactiveByParams($requestData['email'], 'email');
+        $checkActive = $this->model->createUserModel()->checkSitterIsactiveByParams($requestData['email'], 'email');
         
         if(empty($checkActive)){
             $result = [
-                "status"  => false,
-                "message" => "Account is not existed or inactive!"
+                "message" => "アカウントが存在しないか、非アクティブです!"
             ];
-            $errors = new MessageBag($result);
-            return redirect()->back()->withInput()->withErrors($errors);
+            return redirect()->back()->withInput()->withErrors($result);
         }
         
         $code     = substr(md5(time().$requestData['email']), 0, 30);
         $dateSend = Carbon::now()->toDateTimeString();
         $dateExp  = Carbon::now()->addSeconds(config('constant.EXP_TOKEN'))->toDateTimeString();
 
+        $checkActive = $checkActive->toArray();
         $dataSendCode['verify_code'] = $code;
         $dataSendCode['date_send']   = $dateSend;
         $dataSendCode['user_id']     = $checkActive['id'];
@@ -113,26 +126,11 @@ class AuthController extends Controller
         $dataSendCode['name']     = $checkActive['first_name'].' '.$checkActive['last_name'];
         $dataSendCode['exp_date'] = $dateExp;
         Mail::to($requestData['email'])->send(new SitterForgotPass($dataSendCode));
-        return redirect()->route('SITTER_REGISTER_COMFIRM');
-    }
-
-    public function registerComfirm()
-    {
-        if (Auth::check()) {
-            return redirect()->route('SITTER_MYPAGE');
-        }
-        $data = [
-            'title' => 'Step 1 Register',
-            'messager' => 'please check email to confirm thank you!',
-        ];
-        return view('client.sitter.comfirm', $data);
+        return redirect()->route('SITTER_RENEW_CONFIRM');
     }
 
     public function renewPassword(Request $request)
     {
-        if (Auth::check()) {
-            return redirect()->route('SITTER_MYPAGE');
-        }
         //check expired token
         $status = $this->commonService->checkExpiryTokenPassword($request);
         switch ($status) {
@@ -171,5 +169,10 @@ class AuthController extends Controller
         }
         
         return redirect()->route('SITTER_LOGIN');
+    }
+
+    public function renewConfirm()
+    {
+        return view('client.sitter.renew_confirm');
     }
 }

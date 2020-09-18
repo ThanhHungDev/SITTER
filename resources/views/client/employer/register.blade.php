@@ -8,7 +8,7 @@
             @csrf
             <div class="form-header">
                 <span>
-                    ようこそ○○○○○○○○○○へ<br/>会員登録してお気に入りのサポーターを見つけよう
+                    ようこそ家政婦さん・ベビーシッタードットコムへ<br/>会員登録してお気に入りのサポーターを見つけよう
                 </span>
             </div>
             <div class="form-body">
@@ -206,12 +206,12 @@
                 {{-- town --}}
                 <div class="form-row">
                     <div class="row">
-                        <label class="form-label">市区町村と番地<span class="note-warring">※</span></label>
+                        <label class="form-label">市区町村<span class="note-warring">※</span></label>
                     </div>
                     <div class="row">
                         <div class="group-control w-p100 form-validate">
                             <div class="w-510">
-                                <input type="text" class="form-control" name='town' placeholder="新宿区西新宿2-7-1" value="{{ old('town') }}" id="inp-town"/>
+                                <input type="text" class="form-control" name='town' placeholder="市区町村" value="{{ old('town') }}" id="inp-town"/>
                             </div>
                             <div class="form-error">
                                 @error('town')
@@ -224,12 +224,12 @@
                 {{-- address --}}
                 <div class="form-row">
                     <div class="row">
-                        <label class="form-label">建物名・部屋番号</label>
+                        <label class="form-label">番地以降(建物名・部屋番号など)</label>
                     </div>
                     <div class="row">
                         <div class="group-control w-p100">
                             <div class="w-510">
-                                <input type="text" class="form-control" name='address' placeholder="小田急第一生命ビル13階" value="{{ old('address') }}" id="inp-address"/>
+                                <input type="text" class="form-control" name='address' placeholder="番地以降(建物名・部屋番号など)" value="{{ old('address') }}" id="inp-address"/>
                             </div>
                         </div>
                     </div>
@@ -282,7 +282,7 @@
                         <div class="group-control w-p100 flex-column">
                             <div class="form-validate">
                                 <div class="w-510">
-                                    <input type="password" class="form-control" name='password' id="password" placeholder="パスワード（半角英数字8文字以上）" value="{{ old('password') }}"/>
+                                    <input type="password" class="form-control" name='password' id="password" placeholder="パスワード（半角英数字6文字以上）" value="{{ old('password') }}"/>
                                 </div>
                                 <div class="form-error">
                                     @error('password')
@@ -323,12 +323,12 @@
         </form>
     </div>
 </div>
+@include('modals.employers.privacy')
+@include('modals.employers.terms')
 @endsection
-@include('modals.sitters.privacy')
-@include('modals.sitters.terms')
+
 @section('scripts')
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.jpostal.js') }}"></script>    
     <script type="text/javascript" src="{{ asset('js/employer-register.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
 @endsection
