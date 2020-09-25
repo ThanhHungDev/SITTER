@@ -141,7 +141,7 @@
     </div>
 </div>
 <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('/js/sitter-common.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('/js/review_sitter.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/js/library/jquery-ui.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/js/library/datepicker-ja.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/js/library/jquery-ui.multidatespicker.js') }}"></script>
@@ -156,6 +156,6 @@
     const ROUTE_LOAD_REVIEWS  = "{{ Route('AJAX_LOAD_REVIEWS') }}"
     const LIMIT_RECORD_REVIEW = 3
 </script>
-<script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/app.min.js' . Config::get('app.version')) }}"></script>
 <script type="text/javascript" src="{{ asset('js/library/jquery.rateit.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/review-load-sitter.min.js') }}"></script>

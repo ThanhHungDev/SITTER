@@ -26,12 +26,17 @@ const ChannelSchema = new Schema(
 })
 
 ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgnore ){
+
     
     _userId = _userId.toString()
-    var condition = { user: _userId } 
+    var conditionChannel = { user: _userId }
+    var conditionMessage = { backup: { $ne : true } }
     if( typeof _backup != "undefined" ){
 
-        condition.backup = _backup
+        conditionChannel.backup = _backup
+        
+    }else{
+        conditionMessage.backup = { $ne : null }
     }
 
     if( typeof _idIgnore == "undefined" ){
@@ -42,7 +47,7 @@ ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgn
 
     return this
     .aggregate([
-        { $match: condition },
+        { $match: conditionChannel },
         { $sort : { updatedAt : 1 } },
         { $limit : 100 },
         { $unwind: "$user" },
@@ -53,6 +58,7 @@ ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgn
                 let: { channelId: '$_id' },
                 as: "message",
                 pipeline: [
+                    { "$match": conditionMessage },
                     { "$match": { "$expr": { "$eq": ["$$channelId", "$channel"] }}},
                     { 
                         $project: { 
@@ -91,7 +97,7 @@ ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgn
 ChannelSchema.statics.idFriendsbyUserId = function( _userId ){
     return this
     .aggregate([
-        { $match: { user: _userId } },
+        { $match: { user: _userId.toString() } },
         { $sort : { updatedAt : 1 } },
         { $limit : 100 },
         { $unwind: "$user" },
@@ -293,6 +299,16 @@ ChannelSchema.statics.informationUserRelationUser = function( _userId ){
     .then( idFriends => {
         
         return Postgre.USER.findAll({ where: { id: { [Op.in]: idFriends } } })
+    })
+}
+
+ChannelSchema.statics.findChannelByUsers = function( users ){
+    var objectOr = users.map( userBooking => {
+        return { '$and': [ { user: userBooking[0].toString() },  { user: userBooking[1].toString() } ] }
+    })
+
+    return this.find({
+        '$or': objectOr
     })
 }
 

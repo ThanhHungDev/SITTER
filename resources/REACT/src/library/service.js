@@ -37,8 +37,9 @@ window.onclick = function (event) {
 
 
 export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponent ) {
-    console.log("getAccessTokenByRefesh")
-    var data       = { userId, refesh, ... detect },
+    
+    
+    var data       = { userId, refesh, detect: JSON.stringify(detect) },
         tokensUser = null
     fetch(CONFIG.SERVER.ASSET() + '/api/refesh', {
         method: 'POST',
@@ -59,7 +60,7 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
             tokenAccess: response.data.tokenAccess,
             tokenRefesh: response.data.tokenRefesh
         }
-        console.log("setime out " + parseInt(response.data.expire) * 1000 )
+        console.log("getAccessTokenByRefesh setime out  window.location.href = CONFIG.SERVER_PHP.URL" + parseInt(response.data.expire) )
         setTimeout(function(){
             window.location.href = CONFIG.SERVER_PHP.URL
         }, parseInt(response.data.expire) * 1000 )
@@ -71,31 +72,12 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
     })
     .then( dataFetchChannel => {
 
-        var data = { access: dataFetchChannel.auth.tokens.tokenAccess, ...dataFetchChannel.detect }
+        var data = { 
+            userId: parseInt(userId),
+            access: dataFetchChannel.auth.tokens.tokenAccess, 
+            detect: JSON.stringify(dataFetchChannel.detect)
+        }
         return fetchChannelMessage( data )
-    })
-    .then( dataChannel => {
-        if( !dataChannel ){
-            alert( "ログインセッションが正しくありません。 再度ログインするか、管理者に連絡してください")
-            return false
-        }
-        
-        var hasAdminChannel = false
-        
-        if( dataChannel.length ){
-            for (let iChannel = 0; iChannel < dataChannel.length; iChannel++) {
-                var channelName = (dataChannel[iChannel]).channelName
-                if( channelName.match('SINGLE-([0-9 -]*)-1') ){
-                    hasAdminChannel = true
-                }
-            }
-        }
-
-        if(!hasAdminChannel){
-
-            return getChannelAdmin({ userId, refesh, ... detect}, tokensUser.tokenAccess)
-        }
-        return dataChannel
     })
     .then( dataChannel => {
         if( dataChannel ){
@@ -109,20 +91,6 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
 }
 
 
-export function resfeshTokenIfExpire( auth, instanceChat ){
-    console.log( auth, "auth in resfeshTokenIfExpire" )
-    var diff = ((new Date).getTime() - new Date(auth.tokens.period).getTime()) / 1000
-    if (diff >= auth.tokens.expire) {
-        /// fetch new token
-        var dataRefesh = { 
-            userId: auth.id, 
-            refesh: auth.tokens.tokenRefesh, 
-            detect: this.props.client 
-        }
-        console.log(dataRefesh, "refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn refesh token vì hết hạn ")
-        resfeshTokenExpire(dataRefesh, instanceChat)
-    }
-}
 
 export function socketInitialConnect(socketIOClient, instanceApp) {
     
@@ -164,57 +132,17 @@ export function caller( channelInfor, user, client ){
     })
 }
 
-export function sendMessageToChannel(message, style, attachment, channelId, access, detect, instanceComponent, dataRefesh) {
 
-    console.log({ message, channelId, access, detect, instanceComponent, dataRefesh }, "before sendMessageToChannel")
-    if (!dataRefesh) {
-        socket.emit(EVENT.SEND_MESSAGE, { message, style, attachment, channelId, access, ...detect })
-        /// 
-        instanceComponent.props.dispatch(addMessage({ type: true, read: true, content: message, style, attachment }))
-        return false
-    }
-    console.log(dataRefesh, "refesh token trước khi send chat vì hết hạn")
-    /// đóng băng phần input textarea nhập chat 
+export function sendMessageToChannel(message, style, attachment, channelId, access, detect, instanceComponent) {
 
-    //// userId : user._id, refesh : user.tokens.tokenRefesh, detect: this.props.client 
-    var { userId, refesh, detect } = dataRefesh
-    var dataFetch = { userId, refesh, ...detect }
-
-    fetch(CONFIG.SERVER.ASSET() + '/api/refesh', {
-        method: 'POST',
-        body: JSON.stringify(dataFetch),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(response => {
-        console.log( response , "/api/refesh")
-        if (response.code != 200) {
-            
-            throw new Error("token refesh không đúng")
-        }        
-        var tokensUser = { 
-            expire: response.data.expire,
-            period: response.data.period,
-            tokenAccess: response.data.tokenAccess,
-            tokenRefesh: response.data.tokenRefesh
-        }
-        var userLogin = { ... response.data.user, tokens : tokensUser }
-        localStorage.setItem('user', JSON.stringify(userLogin))
-        access = userLogin.tokens.tokenAccess
-        socket.emit(EVENT.SEND_MESSAGE, { message, style, attachment, channelId, access, ...detect })
-        instanceComponent.props.dispatch(setterUser(userLogin))
-        instanceComponent.props.dispatch(addMessage({ type: true, read: true, content: message, style, attachment }))
-    })
-    .catch(error => {
-        alert("メッセージの送信に失敗しました。 再度ログインするか、管理者に連絡してください")
-        return false
-    })
+    socket.emit(EVENT.SEND_MESSAGE, { message, style, attachment, channelId, access, detect: JSON.stringify(detect) })
+    /// 
+    instanceComponent.props.dispatch(addMessage({ type: true, read: true, content: message, style, attachment }))
+    return false
 }
-export function sendTypingMessageToChannel(channelId, access, detect ) {
+export function sendTypingMessageToChannel(channelId, channelName, access ) {
     
-    socket.emit(EVENT.SEND_TYPING, { channelId, access, ...detect })
+    socket.emit(EVENT.SEND_TYPING, { channelId, channelName, access })
     return false
 }
 
@@ -410,8 +338,8 @@ function getTypeFile( filename ){
 }
 function validateFetchChannelMessage(data) {
     try {
-        var { access, browser, browserMajorVersion, browserVersion, os, osVersion } = data
-        if (!access || !browser || !browserMajorVersion || !browserVersion || !os || !osVersion) {
+        var { access } = data
+        if ( !access ) {
             throw new Error("遮る")
         }
         return true
@@ -422,7 +350,7 @@ function validateFetchChannelMessage(data) {
 }
 
 function fetchChannelMessage( data ) {
-    console.log(data, "validateFetchChannelMessage")
+    
     var isValid = validateFetchChannelMessage(data)
     if (!isValid) {
         alert("エラーが発生しました。しばらくしてからもう一度お試しください1")
@@ -432,7 +360,9 @@ function fetchChannelMessage( data ) {
         
         data.userIdActiveChannel = ID_VIEW_USER_CHAT
     }
-    return fetch(CONFIG.SERVER.ASSET() + '/api/channels', {
+
+    var action = CONFIG.SERVER.ASSET() + '/api/channels'
+    return fetch(action, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
@@ -441,7 +371,8 @@ function fetchChannelMessage( data ) {
     })
     .then(res => res.json())
     .then(response => {
-        console.log( response , "/api/channels")
+
+        console.log( response , action)
         if (response.code != 200) {
             
             throw new Error("エラーが発生しました。しばらくしてからもう一度お試しください2")
@@ -451,33 +382,6 @@ function fetchChannelMessage( data ) {
     })
     .catch(error => {
         console.log(error, " have error ")
-        return false
-    })
-}
-function getChannelAdmin( data, access ) { 
-
-    var { userId, refesh }   = data
-        data.localUserId     = userId
-        data.referenceUserId = 1
-        data.refesh          = refesh
-        data.access          = access
-
-    return fetch(CONFIG.SERVER.ASSET() + '/api/channel', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(response => {
-        console.log(response, "getChannelAdmin")
-        if (response.code != 200) {
-            alert("エラーが発生しました。しばらくしてからもう一度お試しください")
-        }
-        return fetchChannelMessage( data )
-    })
-    .catch(error => {
         return false
     })
 }
@@ -570,8 +474,15 @@ function socketListenner( socket, instanceApp ){
         
         console.log(EVENT.RESPONSE_MESSAGE, data)
         var { user, token, message, style, attachment, channel, detect } = data 
-        var userLocal = JSON.parse(localStorage.getItem('user'))
-        if( userLocal && userLocal.id == user && userLocal.tokens.tokenAccess == token ){
+        var userLocal   = JSON.parse(localStorage.getItem('user')),
+            detectLocal = localStorage.getItem('detect')
+
+        if( 
+            userLocal && 
+            userLocal.id == user && 
+            userLocal.tokens.tokenAccess == token &&
+            detect == detectLocal
+            ){
             return false
         }
         instanceApp.props.dispatch( addMessageSendToMe({ type: (userLocal.id == user), content: message, style, attachment, channel }) )
@@ -580,9 +491,10 @@ function socketListenner( socket, instanceApp ){
     })
     socket.on(EVENT.RESPONSE_TYPING, data => {
 
-        var { user, token, channel } = data 
-        var userLocal = JSON.parse(localStorage.getItem('user'))
-        if( userLocal && userLocal.id == user && userLocal.tokens.tokenAccess == token ){
+        var { token, channel } = data
+        var userLocal   = JSON.parse(localStorage.getItem('user'))
+
+        if( userLocal.tokens.tokenAccess == token ){
             return false
         }else{
             

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 class BookingModel extends Model
@@ -95,4 +97,90 @@ class BookingModel extends Model
             date_bookings.salary
         ";
     }
+    
+    /**
+     * findBookingsHidden select all booking id condition: 
+     * case 1: payment success and work_date <= yesterday
+     * case 2: not access remove before date working 1 day
+     * 
+     * sql : 
+     * select DISTINCT ON( bookings.sitter_id, bookings.employer_id ) sitter_id, 
+     * "bookings"."id" 
+     * from "bookings" inner join "date_bookings" on "bookings"."id" = "date_bookings"."booking_id" 
+     * where 
+     * ("status" = ? and "date_bookings"."work_date" <= ? and "cron_filter" = ?) 
+     * or 
+     * ("status" = ? and "date_bookings"."work_date" <= ? and "cron_filter" = ?) 
+     * order by 
+     * "bookings"."sitter_id" asc, 
+     * "bookings"."employer_id" asc, 
+     * "date_bookings"."work_date" desc
+     *
+     * @return Illuminate\Database\Eloquent\Model
+     */
+    public function findBookingsHidden(){
+        
+        return $this->join('date_bookings', 'bookings.id', '=', 'date_bookings.booking_id')
+        ->where("cron_filter", "=", Config::get('constant.BOOKING_HIDDEN_CHANNEL.DEFAULT'))
+        ->orderBy('bookings.sitter_id')
+        ->orderBy('bookings.employer_id')
+        ->orderBy('date_bookings.work_date', 'DESC')
+        ->orderBy('bookings.status')
+        ->select(
+            DB::raw("DISTINCT ON( bookings.sitter_id, bookings.employer_id ) sitter_id"),
+            'bookings.id',
+            'date_bookings.work_date',
+            'bookings.sitter_id',
+            'bookings.employer_id',
+            DB::raw("
+            (
+                CASE
+                    WHEN status = 1 AND date_bookings.work_date <= '" . Carbon::yesterday()->format('Y-m-d') . "'
+                            THEN 1
+                    WHEN status = 0 and date_bookings.work_date <= '" . Carbon::tomorrow()->format('Y-m-d') . "'
+                            THEN 2
+                    ELSE 0
+                END 
+            ) AS filter
+            ")
+        );
+    }
+
+
+
+    /**
+     * updateBookingsHidden 
+     * 
+     * update all booking id condition: 
+     * case 1: payment success and work_date <= yesterday
+     * case 2: not access remove before date working 1 day
+     * 
+     * @param  mixed $condition['less-than-booking'] type : array( 
+     *      [ 'work_date' => 'value', 'sitter_id' => number, 'employer_id' => number ],
+     *      ....
+     * )
+     *
+     * @return int
+     */
+    public function hiddenBookingByCondition($condition){
+
+        $filter = $this->join('date_bookings', 'bookings.id', '=', 'date_bookings.booking_id');
+
+        
+        if( isset($condition['less-than-booking']) ){
+
+            foreach($condition['less-than-booking'] as $key => $booking ){
+
+                $filter = $filter->orWhere(function ($query) use ($booking) {
+                    $query->where("date_bookings.work_date", "<=", $booking['work_date'])
+                          ->where('sitter_id', "=", $booking['sitter_id'])
+                          ->where('employer_id', "=", $booking['employer_id']);
+                });
+            }
+        }
+        $filter->update([ 'cron_filter' => Config::get('constant.BOOKING_HIDDEN_CHANNEL.FILTERED') ]);
+    }
+
+
+
 }

@@ -175,8 +175,12 @@
                         .action-details{
                             margin-right: 10px;
                             .btn-details{
+                                display: block;
                                 width: 120px;
                                 height: 30px;
+                                text-align: center;
+                                text-decoration: none;
+                                color: #000;
                                 background-color: #c9c9c9;
                                 border: 1.5px solid #c9c9c9;
                                 &:hover{

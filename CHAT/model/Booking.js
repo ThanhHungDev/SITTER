@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         employer_accept: { 
             type: DataTypes.INTEGER 
         },
+        cron_filter: {
+            type: DataTypes.INTEGER,
+            default: 0
+        },
         created_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW
@@ -55,12 +59,16 @@ module.exports = (sequelize, DataTypes) => {
         return model
             .findOne({ where: condition })
             .then(function(booking) {
-                
+
+                console.log("====================upsert===============")
+                console.log(values,condition)
+                console.log("====================end condition===============")
                 if (!booking) {
+                    console.log("====================upsert insert new===============")
                     // Item doesn't exist, so we create it
                     return model.create(values)
                 }
-    
+                console.log("====================upsert update===============")
                 // Item already exists, so we update it
                 return booking.update(values, condition)
             })

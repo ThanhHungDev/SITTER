@@ -21,6 +21,6 @@
 
 @section('scripts-admin')
 
-    <script src="{{ asset('chat/js/vendors~main.index.bundle.js') }}"></script>
-    <script src="{{ asset('chat/js/index.bundle.js') }}"></script>
+    <script src="{{ asset('chat/js/vendors~main.index.bundle.js' . Config::get('app.version')) }}"></script>
+    <script src="{{ asset('chat/js/index.bundle.js' . Config::get('app.version')) }}"></script>
 @endsection

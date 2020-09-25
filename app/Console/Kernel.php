@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\Transfer::class,
+        Commands\HiddenChannelSitters::class,
     ];
 
     /**
@@ -24,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:tranfers')->everyMinute();//test local
-        // ->monthlyOnLastDay('00:00');
+        $schedule->command('command:transfer')->lastDayOfMonth('00:00');
+        $schedule->command('channel:update');
     }
 
     /**

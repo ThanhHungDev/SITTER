@@ -25,7 +25,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/ajax-info-employer/{id}','Admin\AdminController@ajaxInfoEmployer')->name('AJAX_INFO_EMPLOYER');
         Route::get('/ajax-info-sitter/{id}','Admin\AdminController@ajaxInfoSitter')->name('AJAX_INFO_SITTER');
         Route::post('/ajax-booking-cancel','Admin\AdminController@ajaxBookingCancelByAdmin')->name('AJAX_BOOKING_CANCEL_ADMIN');
-
+        Route::get('/info-sitter/{id}','Admin\AdminController@infoSitter')->name('INFO_SITTER');
+        Route::get('/info-employer/{id}','Admin\AdminController@infoEmployer')->name('INFO_EMPLOYER');
         Route::get('/test-refund','Admin\AdminController@refundPayment')->name('testRefund');
+
+        /** new thread for crontab linux */
+        Route::get("/test-cron", 'Admin\AdminController@testCrontab');
     });
 });

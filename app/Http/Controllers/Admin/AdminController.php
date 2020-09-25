@@ -5,21 +5,23 @@ namespace App\Http\Controllers\Admin;
 use App\Models\UserModel;
 use App\Models\FamilyModel;
 use App\Models\GalaryModel;
-use App\Models\PaymentModel;
 use App\Models\RefundModel;
+use App\Models\PaymentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Mail\AdminSendLinkRate;
 use App\Services\SitterService;
 use App\Models\SitterReviewModel;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Mail\AdminSendCancelBooking;
 use App\Models\EmployerProfileModel;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminSendLinkCreateStripe;
-use Illuminate\Support\Facades\DB;
 use App\FactoryModel\FactoryModelInterface;
+use App\Models\BookingModel;
 
 class AdminController extends Controller
 {
@@ -290,7 +292,7 @@ class AdminController extends Controller
 
     public function listBooking(Request $request)
     {
-        dd((new PaymentModel())->getListForPayout());
+        // dd((new PaymentModel())->getListForPayout());
         $condition = [
             'status' => 0,
             'sitter_accept' => 1,
@@ -358,7 +360,7 @@ class AdminController extends Controller
     public function ajaxBookingCancelByAdmin(Request $request)
     {
         $params = $request->all();
-        $bookingModel = $this->model->createBookingModel();
+        $bookingModel = new BookingModel();
         $rs = [
             'messages' => 'Cancel not complete!',
             'code'     => 200,
@@ -378,6 +380,35 @@ class AdminController extends Controller
                 }
 
                 DB::commit();
+                //// backup channel chat and message 
+                $action = env("REALTIME_URL") . "/api/hidden-channel";
+        
+                $client = new \GuzzleHttp\Client();
+                $res    = $client->put($action, 
+                    array(
+                        'form_params' => array(
+                            'key' => env("KEY_SITTER_PHP"),
+                            'data' => json_encode([ (int)$params['id'] ])
+                        )
+                    ));
+                $status = $res->getStatusCode();
+                if( $status == 200 ){
+                    $date = $params['date']; /// format client sending: 2020/10/27 01:00～07:00
+                    $date = explode(" ", $date);
+                    $date  = (new Carbon($date[0]))->format('Y-m-d'); /// change format to 2020-10-27
+
+                    $condition = array(
+                        'less-than-booking' => array([
+                            'work_date'   => $date,
+                            'sitter_id'   => (int)$params['sitter_id'],
+                            'employer_id' => (int)$params['employer_id'],
+                        ])
+                    );
+                    /// update code booking
+                    $bookingModel->hiddenBookingByCondition($condition);
+                }
+                //// end backup channel chat and message 
+
                 $this->sendMailByAdmin($params);
                 $rs = [
                     'messages' => 'Cancel complete!',
@@ -394,7 +425,7 @@ class AdminController extends Controller
 
     public function refundPayment($params)
     {
-        \Stripe\Stripe::setApiKey(config('constant.STRIPE_SECRET_KEY'));
+        \Stripe\Stripe::setApiKey(config('app.STRIPE_API_KEY'));
         $res = [
             'status' => '',
             'refund_id' => ''
@@ -539,5 +570,112 @@ class AdminController extends Controller
         Mail::to($sitter['email'])->send(new AdminSendCancelBooking($dataSendMailSitter));
         Mail::to($employer['email'])->send(new AdminSendCancelBooking($dataSendMailEmp));
     }
+    public function infoSitter($id = 0)
+    {
+        $typeGalaries = config('constant.GALARY_TYPE.SITTER_AVATAR');
 
+        $modelUser  = $this->model->createUserModel();
+        $modelSkill = $this->model->createSkillModel();
+        $user   = $modelUser->where('id', $id)->where('admin_confirm', config('constant.ADMIN_CONFIRM.ACCEPT'))->first();
+        $isPublish = $user->sitterProfile()->where('publish',true)->first();
+        if( !$isPublish ){
+            return abort(404);
+        }
+        $sitter = $user->sitter;
+
+        $sitter['ID_VIEW_SITTER']  = $id;
+        $sitter['skills']          = $modelSkill->all(['id', 'name'])->toArray();
+        $sitter['skills_activity'] = $user->skills->pluck('id')->toArray();
+        $sitter['jp_locations']    = $this->JP_LOCATION;
+        $sitter['gender']          = $user->gender;
+        $sitter['galary']          = $user->galaries->where('type', $typeGalaries)->toArray();
+        $sitter['time_support']    = (new Carbon($sitter['time_support']))->format('h:i');
+        $sitter['information']     = $user;
+        $sitter['sitter_skills']   = $user->skills->pluck('name')->toArray();
+
+        $sitter['employerId'] = $id;
+        $sitter['refresh']    = null;
+
+        $salary = array_reduce($user->salaries->toArray(),
+        function ($value, $item)
+        {
+            switch ($item['type']) {
+                case config('constant.SALARY_TYPE.SALARY_SITTER'):
+                    $value['salary_sitter'] = $item['salary'];
+                    break;
+                case config('constant.SALARY_TYPE.SALARY_HOUSE'):
+                    $value['salary_house'] = $item['salary'];
+                    break;
+            }
+            return $value;
+        });
+        $sitter['salary']    = $salary;
+
+        $schedules           = $user->schedules;
+        $sitter['schedules'] = $this->sitterService->convertScheduleDataToJson($schedules);
+        $sitter['rating']    = (new SitterReviewModel())->getRatingTotal($id);
+        return view('admin.info-sitter', $sitter);
+    }
+    public function infoEmployer($id)
+    {
+        $userId = $id;
+        $typeGalaries = [config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT'), config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')];
+        
+        $data['profile']    = (new EmployerProfileModel())->getByField($userId);
+        $data['galaries']   = (new GalaryModel())->getByField('user_id', $userId, $typeGalaries);
+
+        if($data['profile']['id']){
+            $data['family'] = (new FamilyModel())->getByField($data['profile']['id']);
+        }
+        return view('admin.info-employer', $data);
+    }
+    
+    /**
+     * testCrontab is action test cron run remove channel
+     *
+     * @return string
+     */
+    public function testCrontab(){
+        $description = ' Command Run hidden chat channel';
+        $model = new BookingModel();
+    
+        $bookingsMaxWorkDate = $model->findBookingsHidden()->get()->toArray();
+    
+        $bookingHidden       = array_values(array_filter($bookingsMaxWorkDate, function($booking){ return $booking['filter']; } ));
+        $bookingIdsHidden    = array_map(function($booking){ return $booking['id']; }, $bookingHidden);
+    
+        if(!count($bookingIdsHidden)){
+            $description = " Command Run hidden chat channel none booking close";
+            die($description);
+        }
+    
+        try {
+            $action = env("REALTIME_URL") . "/api/hidden-channel";
+    
+            $client = new \GuzzleHttp\Client();
+            $res    = $client->put($action, 
+                array(
+                    'form_params' => array(
+                        'key' => env("KEY_SITTER_PHP"),
+                        'data' => json_encode($bookingIdsHidden)
+                    )
+                ));
+            $status = $res->getStatusCode();
+            if( $status == 200 ){
+                $condition = array(
+                    'less-than-booking' => $bookingHidden
+                );
+                /// update code booking
+                $model->hiddenBookingByCondition($condition);
+                $description .= ' successfully!';
+            }else{
+                /// ghi log 
+                throw new \Error("error call api cron job have error: " . $res->getBody());
+            }
+        } catch (\Throwable $th) {
+            
+            $description = $th->getMessage();
+        }
+        return $description;
+    }
 }

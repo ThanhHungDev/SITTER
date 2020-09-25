@@ -206,13 +206,14 @@ class EmployerController extends Controller
     public function ajaxUploadAvatar(REQUEST $request)
     {
         $res = [
-            'status'     => false,
-            'message'    => 'Upload faild!',
-            'image_name' => ''
+            'status'  => false,
+            'message' => 'Upload faild!',
+            'name'    => '',
+            'path'    => '',
         ];
         $data = $request->all();
         $userId = Auth::user()->id;
-        $uploadData = $this->serviceCommon->RegisterUploadFile($data['file'], config('constant.UPLOAD_FILE.AVATAR'));
+        $uploadData = $this->serviceCommon->uploadFile($data['file'], config('constant.UPLOAD_FILE.AVATAR'));
         $paramsUser = [
             'avatar'     => $uploadData['path'].'thumbnail/'.$uploadData['name']
         ];
@@ -237,6 +238,41 @@ class EmployerController extends Controller
                 'name'    => $uploadData['name']
             ];
         }
+        return response()->json($res);
+    }
+
+    public function ajaxUploadGalleries(REQUEST $request)
+    {
+        $res = [
+            'status'  => false,
+            'message' => 'Upload fail!',
+            'path'    => '',
+            'name'    => ''
+        ];
+        $data = $request->all();
+        $userId = Auth::user()->id;
+        $uploadData = $this->serviceCommon->uploadFile($data['file'], config('constant.UPLOAD_FILE.EMPLOYER'));
+        if(!empty($uploadData)){
+            $dataGalleries = [
+                'user_id' => $userId,
+                'type'    => $data['data-type'],
+                'name'    => $uploadData['name'],
+                'path'    => $uploadData['path'],
+                'deleted' => false
+            ];  
+            $resUpload =(new GalaryModel())->updateOrCreate(
+                ['user_id' => $userId, 'type' => $data['data-type']], $dataGalleries
+            );
+            if($resUpload){
+                $res = [
+                    'status'  => true,
+                    'message' => 'Upload success!',
+                    'path'    => $uploadData['path'].$uploadData['name'],
+                    'name'    => $uploadData['name']
+                ];
+            }
+        }
+        
         return response()->json($res);
     }
 
@@ -345,7 +381,7 @@ class EmployerController extends Controller
     {
         $stripeCustomerId = Auth::user()->stripe_account_id;
         $input     = $request->all();
-        $stripe = new \Stripe\StripeClient(config('constant.STRIPE_SECRET_KEY'));
+        $stripe = new \Stripe\StripeClient(config('app.STRIPE_API_KEY'));
         if($stripeCustomerId){
             // update
             $status = $stripe->customers->update(

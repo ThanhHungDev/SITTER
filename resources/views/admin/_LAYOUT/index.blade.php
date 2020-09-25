@@ -64,7 +64,7 @@
     </div>
 
     <script type="text/javascript" src="{{ asset('js/library/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/app.min.js' . Config::get('app.version')) }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_base.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/modal.jquery.min.js') }}"></script>
     @yield('scripts-admin')

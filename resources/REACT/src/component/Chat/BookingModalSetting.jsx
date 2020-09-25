@@ -247,6 +247,9 @@ class BookingModalSetting extends Component {
                         </div>
                     </div>
                 </div>
+                <div className="error">
+                    { differenceTime <= 0 ? "終了時間は開始時間より後でなければなりません。" : null }
+                </div>
                 <div className="statistical">
                     
                     <div className="session-statistical salary">
@@ -294,10 +297,10 @@ class BookingModalSetting extends Component {
                         <div className="text-value text-color-warning-color-dark">{ total }￥</div>
                     </div>
                     <div className="text-button-question">上記内容でお間違いありませんか？</div>
-                    <div className="wrapper-button-setting">
+                    <div className={ differenceTime < 0 ? "d-none" : "wrapper-button-setting" }>
                         
-                    <a className={ classBtnSitter } onClick= { clickBtnSitter }> { textBtnSitter } </a> 
-                    <a className={ classBtnEmployer } onClick= { clickBtnEmployer }> { textBtnEmployer } </a>
+                        <a className={ classBtnSitter } onClick= { clickBtnSitter }> { textBtnSitter } </a> 
+                        <a className={ classBtnEmployer } onClick= { clickBtnEmployer }> { textBtnEmployer } </a>
                     </div>
                 </div>
             </div>

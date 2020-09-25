@@ -51,9 +51,26 @@
                     <div class="em-wapper-image">
                         
                         @foreach ($galaries as $item_galaries)
-                        <div class="boder-img">
-                            <img src="{{ asset($item_galaries->path.$item_galaries->name) }}" alt="{{$item_galaries->url}}">
-                        </div>
+                            @php
+                                $typeGalaries = config('constant.GALARY_TYPE.EMPLOYER_FILE_FRONT');
+                                $galariesName = "file-front";
+                                if($item_galaries->type == config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK')){
+                                    $typeGalaries = config('constant.GALARY_TYPE.EMPLOYER_FILE_BACK');
+                                    $galariesName = "file-back";
+                                }
+                                // $showDelete = 'active';
+                            @endphp
+                            <div class="boder-img">
+                                <img src="{{ asset('image/icons/icon-upload.png') }}" class="upload-icon" alt="upload avatar">
+                                {{-- delete icon --}}
+                                {{-- <div class="delete_galaries" data-status="{{$showDelete}}">
+                                    <i class="far fa-trash-alt"></i>
+                                </div> --}}
+                                {{-- input file --}}
+                                <input style = "display:none" class="input_file" type="file" accept="image/*" onchange="uploadGalleries(this)" data-type="{{$typeGalaries}}" data-name="{{$galariesName}}">
+                                {{-- image  --}}
+                                <img name="{{$galariesName}}" src="{{ asset($item_galaries->path.$item_galaries->name) }}" data-alt = "{{$item_galaries->name}}" class="imageThumbnail">
+                            </div>
                         @endforeach
                         
                     </div>
@@ -275,8 +292,10 @@
 </div>
 {{-- data hidden upload avatar --}}
 <form action="{{ route('AJAX_UPLOAD_AVATAR') }}" class="form-upload-avatar" method="post"></form>
-<form action="{{ route('REMOVE_FILE') }}" class="form-delete-avatar" method="post"></form>
-<input type="hidden" name="type_upload_file" value="{{config('constant.UPLOAD_FILE.AVATAR')}}">
+<form action="{{ route('AJAX_UPLOAD_GALLERIES') }}" class="form-upload-gallaries" method="post"></form>
+<form action="{{ route('REMOVE_FILE') }}" class="form-delete-img" method="post"></form>
+<input type="hidden" name="type_upload_avatar" value="{{config('constant.UPLOAD_FILE.AVATAR')}}">
+<input type="hidden" name="type_upload_employer" value="{{config('constant.UPLOAD_FILE.EMPLOYER')}}">
 <input type="hidden" name="link_image" value="{{ asset('') }}">
 <input type="hidden" name="gender_hidden" value="{{$profile['gender']}}">
 <input type="hidden" name="link_image_df" value="{{ asset('image').'/'. ($profile['gender'] == config('constant.GENDER.MALE') ? 'df_male.jpg' : 'df_female.jpg' )}}">

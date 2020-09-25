@@ -141,7 +141,11 @@ class CommonService
                 $avatarURL = getAvatarDefault($gender);
                 $path = '/storage/uploads/avatars/thumbnail/'.$file_name;
                 $update = (new UserModel())->where('avatar', $path)->update(['avatar' => $avatarURL]);
-                removeAvatar($file_name);
+                removeFileLocal($file_name, config('constant.UPLOAD_FILE.AVATAR'));
+                break;
+            case config('constant.UPLOAD_FILE.EMPLOYER'):
+                $urlImageDefault = '';
+                removeFileLocal($file_name, config('constant.UPLOAD_FILE.EMPLOYER'));
                 break;
             default:
                 return false;

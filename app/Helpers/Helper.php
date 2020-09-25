@@ -27,7 +27,37 @@
             }
         }
     }
-
+    if(!function_exists('removeFileLocal')){
+        function removeFileLocal($name, $type)
+        {
+            $path = '';
+            $pathThumbnail = '';
+            switch ($type) {
+                case config('constant.UPLOAD_FILE.AVATAR'):
+                    $path = 'uploads/avatars/';
+                    $pathThumbnail = 'uploads/avatars/thumbnail/';
+                    break;
+                case config('constant.UPLOAD_FILE.EMPLOYER'):
+                    $path = 'uploads/employers/';
+                    $pathThumbnail = 'uploads/employers/thumbnail/';
+                    break;
+                case config('constant.UPLOAD_FILE.SITTER'):
+                    $path = 'uploads/sitters/';
+                    $pathThumbnail = 'uploads/sitters/thumbnail/';
+                    break;
+                default:
+                    $path = 'uploads/mixed/';
+                    $pathThumbnail = 'uploads/mixed/thumbnail/';
+                    break;
+            }
+            if (Storage::exists($path.$name)) {
+                Storage::delete($path.$name);
+            }
+            if (Storage::exists($pathThumbnail.$name)) {
+                Storage::delete($pathThumbnail.$name);
+            }
+        }
+    }
     if(!function_exists('ageToString')){
         function ageToString($value) {
             $now = new DateTime();

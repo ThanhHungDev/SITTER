@@ -96,6 +96,9 @@ var CONFIG = {
     ORDER_STATUS: {
         DEFAULT: 0,
         ERROR: 1
+    },
+    BOOKING_CRON_FILTER: {
+        DEFAULT: 0
     }
 }
 module.exports = CONFIG;

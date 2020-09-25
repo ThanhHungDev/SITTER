@@ -42,7 +42,7 @@ function disconnect(socket){
     socket.on( EVENT.DISCONNECT, function () {
         var idUserDisconnect = 0
         // listSocket.splice( listSocket.indexOf(socket.id), 1 )
-        console.log( EVENT.DISCONNECT + " đang set user không online")
+        console.log( EVENT.DISCONNECT + " set user offline")
         socket.leaveAll()
         /// 
         TokenAccess.findOne({ socket : socket.id }).
@@ -104,21 +104,11 @@ function sendMessageChat(socket){
     socket.on( EVENT.SEND_MESSAGE, data => {
         
         /// variable input
-        var { message, style, attachment, channelId, access, browser, browserMajorVersion, 
-            browserVersion, os, osVersion } = data,
-        // { 'user-agent' : userAgent } = socket.request.headers,
-        detectClient = { browser, browserMajorVersion, 
-            browserVersion, os, osVersion } //userAgent
+        var { message, style, attachment, 
+            channelId, access, detect } = data
 
-        /// check user auth
-        var now = new Date
-        var diffTime = now.getTime() - (CONFIG.TimeExpireAccessToken * 1000)
-        // console.log( now )
-        // console.log( diffTime )
-        var gteDate = new Date( diffTime )
-        // console.log( gteDate )
         var userIdSendMessage = null
-        TokenAccess.findOne({ token : access, period: { $gte: gteDate }, detect: JSON.stringify({...detectClient }) })
+        TokenAccess.findOne({ token : access, detect: detect })
         .then( tokenAccess => {
             if(!tokenAccess){
                 console.log(access , "access send message to channel but not select show")
@@ -136,7 +126,16 @@ function sendMessageChat(socket){
             }
             saveMessage(userIdSendMessage, message, style, attachment, channelResult._id)
             console.log(" emit : " + EVENT.RESPONSE_MESSAGE + " / " + channelResult.name)
-            io.in(channelResult.name).emit(EVENT.RESPONSE_MESSAGE, { user : parseInt(userIdSendMessage), token : access, message, style, attachment, channel: channelResult._id, detect: detectClient})
+            var dataEmit = { 
+                user : parseInt(userIdSendMessage), 
+                token : access, 
+                message, 
+                style, 
+                attachment, 
+                channel: channelResult._id, 
+                detect: detect
+            }
+            io.in(channelResult.name).emit(EVENT.RESPONSE_MESSAGE, dataEmit)
         })
         .catch( error => {
             console.log( error )
@@ -147,34 +146,15 @@ function sendMessageChat(socket){
 function listenTyping(socket){
     socket.on( EVENT.SEND_TYPING, data => {
 
-        console.log(`${EVENT.SEND_TYPING} socket` + data)
+        console.log(`${EVENT.SEND_TYPING} socket`, data )
         /// variable input
-        var { channelId, access, browser, browserMajorVersion, 
-            browserVersion, os, osVersion } = data,
-        // { 'user-agent' : userAgent } = socket.request.headers,
-        detectClient = { browser, browserMajorVersion, 
-            browserVersion, os, osVersion } // userAgent
+        var { channelId, channelName, access } = data
 
-        /// check user auth
-        var userIdSendMessage = null
-        TokenAccess.findOne({ token : access, detect: JSON.stringify({...detectClient }) })
-        .then( tokenAccess => {
-            if(!tokenAccess){
-                throw new Error("トークンが失敗する")
-            }
-            //// auth có
-            userIdSendMessage = tokenAccess.user
-            return Channel.findOne({ _id: channelId, user: userIdSendMessage })
-        })
-        .then( channelResult => {
-            if( !channelResult ){
-                throw new Error("チャンネルがありません」")
-            }
-            io.in(channelResult.name).emit(EVENT.RESPONSE_TYPING, { user : parseInt(userIdSendMessage), token : access, channel: channelResult._id })
-        })
-        .catch( error => {
-            console.log( error )
-        })
+        var dataEmit = {
+            token : access, 
+            channel: channelId
+        }
+        io.in(channelName).emit(EVENT.RESPONSE_TYPING, dataEmit )
     })
 }
 
@@ -199,7 +179,7 @@ function listenUserOnline( socket ){
     socket.on( EVENT.USER_ONLINE, data => {
         
         var { id, peer, access } = data
-        console.log( "set 1 user đang online:  " + id + " " + EVENT.USER_ONLINE, access )
+        console.log( "set 1 user online:  " + id + " " + EVENT.USER_ONLINE, access )
         /// update user online
         TokenAccess.findOne({ user : id, token: access })
         .then( token => {
@@ -207,8 +187,8 @@ function listenUserOnline( socket ){
                 throw new Error("トークンが失敗する")
             }
             if(token.duplication){
-                /// trong user online tự dưng có duplication 
-                console.log("trong user online tự dưng có duplication ", token.socket)
+                /// user online have duplication 
+                console.log("user online have duplication ", token.socket)
                 io.sockets.in(token.socket).emit(EVENT.DUPLICATION_TAB, { user: id })
                 
             }
@@ -268,7 +248,6 @@ function listenGetBooking( socket ){
         
         console.log( data , EVENT.USER_GET_BOOKING)
 
-        
         return Postgre.BOOKING.findAll({ 
             where: { 
                 [Op.or]: [
@@ -283,8 +262,8 @@ function listenGetBooking( socket ){
             // Add order conditions here....
             order: [
                 ['sitter_id', 'ASC'],
+                ['employer_id', 'ASC'],
                 ['status', 'ASC'],
-                ['created_at', 'DESC'],
             ],
             attributes : [
                 Postgre.Sequelize.literal('DISTINCT ON("BOOKING"."sitter_id") *'),
@@ -307,8 +286,6 @@ function listenGetBooking( socket ){
 
             var data = bookings.map(booking => {
 
-                console.log(booking.DATE_BOOKING.toJSONFor())
-
                 var start  = booking.DATE_BOOKING.start,
                     finish = booking.DATE_BOOKING.finish
                     start  = start.substring(0, start.length - 3)
@@ -319,7 +296,7 @@ function listenGetBooking( socket ){
             socket.emit(EVENT.RESPONSE_USER_GET_BOOKING, { bookings: data })
         })
         .catch( err => {
-            console.log( err.message)
+            
             socket.emit(EVENT.RESPONSE_USER_GET_BOOKING, { bookings: [] })
         })
     })

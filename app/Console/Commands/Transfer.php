@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\PaymentModel;
 use App\Models\PayoutModel;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 class Transfer extends Command
 {
     /**
@@ -13,7 +14,7 @@ class Transfer extends Command
      *
      * @var string
      */
-    protected $signature = 'command:tranfers';
+    protected $signature = 'command:transfer';
 
     /**
      * The console command description.
@@ -40,16 +41,20 @@ class Transfer extends Command
     public function handle()
     {
         //get data tranfers in payment table
-        $dataTranfer = $this->getDataTransfer();
-        $dataTranfer = [
-            [
-                'stripe_account_id' => 'acct_1HMSAZIl0nAvONsO',
-                'amount' => 2000
-            ]
-        ];//db test
-        foreach ($dataTranfer as $key => $value) {
-            $resTranfer = $this->transfer($value);
-            $resUpdateDB = $this->updateDbTransfer($resTranfer);
+        $dataTransfer = $this->getDataTransfer();
+        //db test
+        foreach ($dataTransfer as $key => $value) {
+            try {
+
+                $resTransfer = $this->transfer($value);
+                $this->LoggingTransfer('HANDEL_TRANSFER_STRIPE',$resTransfer);
+
+                $resUpdateDB = $this->updateDbTransfer($resTransfer);
+                $this->LoggingTransfer('HANDEL_UPDATE_DB_STRIPE',$resUpdateDB);
+
+            } catch (\Throwable $th) {
+                $this->LoggingTransfer('',$th);
+            }
         }
         return 0;
     }
@@ -57,22 +62,24 @@ class Transfer extends Command
     public function getDataTransfer()
     {
         $data = (new PaymentModel())->getListForPayout();
+        if(!empty($data)){
+            $data = $data->toArray();
+        }
         return $data;
     }
 
-    public function calculatorAmountTranfer($data)
+    public function calculatorAmountTransfer($data)
     {
-        $amound = 0;
         if(!empty($data)){
-            if($data['sitter_accept'] == 0 && $data['status'] == 1){
+            if($data['sitter_accept'] == 0 && $data['status_booking'] == 1){
                 return 0;
             }
 
-            if(($data['sitter_accept'] == 1) && ($data['employer_accept'] == 1) && ($data['status'] == 1)){
+            if(($data['sitter_accept'] == 1) && ($data['employer_accept'] == 1) && ($data['status_booking'] == 1)){
                 return (int)$data['price'] - (int)$data['fee_stripe'];
             }
 
-            if( ($data['employer_accept'] == 0) && ($data['status'] == 1)){
+            if( ($data['employer_accept'] == 0) && ($data['status_booking'] == 1)){
                 $dateCancel  = Carbon::parse($data['date_cancel']);
                 $dateBooking = Carbon::parse($data['work_date']);
                 $diffHour    = $dateCancel->diffInHours($dateBooking);
@@ -81,11 +88,11 @@ class Transfer extends Command
                 }
     
                 if(($diffHour >= 24) && ($diffHour <= 48)){
-                    return (int)((int)$data['price'] - (int)$data['fee_stripe'])/2;
+                    return (int)(($data['price'] - $data['fee_stripe'])/2);
                 }
     
                 if($diffHour < 24){
-                    return (int)$data['price'] - (int)$data['fee_stripe'];
+                    return (int)($data['price'] - $data['fee_stripe']);
                 }
             }
         }
@@ -93,9 +100,9 @@ class Transfer extends Command
 
     public function transfer($data)
     {
-        \Stripe\Stripe::setApiKey(config('constant.STRIPE_SECRET_KEY'));
+        \Stripe\Stripe::setApiKey(config('app.STRIPE_API_KEY'));
 
-        $amount = $this->calculatorAmountTranfer($data);
+        $amount = $this->calculatorAmountTransfer($data);
         $res = [
             'transfer_id' => '',
             'status'      => '',
@@ -111,11 +118,13 @@ class Transfer extends Command
                     "currency"    => "jpy",
                     "destination" => $data['stripe_account_id'],
                 ]);
-                $res['transfer_id'] = $transfer->id;
-                $res['status']      = 200;
-                $res['code']        = 'TRANS_SUCCESS';
-                $res['message']     = 'Transfer success!';
-                $res['payment_id']  = $data['payment_id'];
+                if($transfer->id){
+                    $res['transfer_id'] = $transfer->id;
+                    $res['status']      = 200;
+                    $res['code']        = 'TRANS_SUCCESS';
+                    $res['message']     = 'Transfer success!';
+                    $res['payment_id']  = $data['payment_id'];
+                }
             }
             
             return $res;
@@ -145,6 +154,7 @@ class Transfer extends Command
 
     public function updateDbTransfer($data)
     {
+        $res = [];
         if($data['code'] && $data['code'] == 'TRANS_SUCCESS'){
             $paymentModel = new PaymentModel();
             $reqUpdate = $paymentModel::where('id', $data['payment_id'])->update([
@@ -157,8 +167,42 @@ class Transfer extends Command
                 'status'         => $data['status'],
                 'note'           => $data['message'],
             ]);
-        } else {
-            //ghi log baos looix
+            if($reqStore->id){
+                return $data;
+            }
+        }
+        return $res;
+    }
+
+    public function LoggingTransfer($type, $data)
+    {
+        switch ($type) {
+            case 'HANDEL_TRANSFER_STRIPE':
+                if($data['transfer_id'] != ''){
+                    //success
+                    $message = 'TRANSFER_ID: '.$data['transfer_id'] . ' CODE: ' . $data['code']. ' MESSAGE: '. $data['message'];
+                    Log::channel('transfer')->info($message);
+                }else{  
+                    $message = 'TYPE: '.$data['type'] ?? '' . 'STATUS: '. $data['status'] ?? ''.  ' CODE: ' . $data['code']. ' MESSAGE: '. $data['message'];
+                    Log::channel('transfer')->warning($message);
+                    // warning
+                }
+                break;
+            case 'HANDEL_UPDATE_DB_STRIPE':
+                if($data['transfer_id'] != ''){
+                    //success
+                    $message = 'INSERT DB TRANSFER_ID: '.$data['transfer_id'] . ' CODE: '.$data['status']. ' MESSAGE: '. $data['message'];
+                    Log::channel('transfer')->info($message);
+                }else{  
+                    $message = 'INSERT DB TRANSFER_ID: '.$data['transfer_id'] . ' MESSAGE: ERROR';
+                    Log::channel('transfer')->warning($message);
+                    // warning
+                }
+                break;
+            default:
+                $message = "NULL";
+                Log::channel('transfer')->debug($data);
+                break;
         }
     }
     //* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1

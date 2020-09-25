@@ -29,7 +29,11 @@ const MessageSchema = new Schema(
         },
         attachment: [
             { type: Object }
-        ]
+        ],
+        backup: {
+            type   : Boolean,
+            default: false /// message của user
+        },
     }, {
         timestamps: true
     }

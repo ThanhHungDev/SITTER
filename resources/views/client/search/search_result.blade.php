@@ -157,6 +157,29 @@
                 </div>
             </div>
         </div>
+        
+        <div class="nav-bottom">
+            <div class="nav-action">
+                <div class="bottom-action">
+                    <a href="{{ Route('TOP_PAGE')}} ">
+                        <button class="btn btn-home">マイページ</button>
+                    </a>
+                    <a href="{{ Route('search-sitters')}} ">
+                        <button class="btn btn-search">検索</button>
+                    </a>
+                    @if ($is_login)
+                        <a href="{{ Route('EMPLOYER_MYPAGE')}} ">
+                            <button class="btn btn-profile">プロフィール</button>
+                        </a>
+                        {{-- <button class="btn btn-register">登録する</button> --}}
+                        <a href="{{ Route('EMPLOYER_CHAT') }}">
+                            <button class="btn btn-chat"><img src="{{asset('image/icons/icon-message.png')}}" alt="" srcset=""> チャット
+                            </button>
+                        </a>
+                    @endif                    
+                </div>
+            </div>
+        </div>       
     </section>
 </div>
 @endsection

@@ -37,8 +37,15 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['single','transfer'],
             'ignore_exceptions' => false,
+        ],
+
+        'transfer' => [
+            'driver' => 'single',
+            'path' => storage_path('/logs/transfer.log'),
+            'level' => 'debug',
+            'days' => 30
         ],
 
         'single' => [

@@ -1,3 +1,5 @@
+const Booking = require("../model/Booking");
+
 var Channel     = require("../model/Channel"),
     TokenAccess = require("../model/TokenAccess"),
     Message     = require("../model/Message"),
@@ -10,12 +12,10 @@ module.exports.findOneOrCreateChannel = function( req, res ){
 
     /// laravel call to action
     var { localUserId, referenceUserId, refesh, 
-        browser, browserMajorVersion, browserVersion, os, osVersion,
         message, date, type, salary, timeBegin, timeEnd } = req.body,
-
         response = {},
-        detect = { browser, browserMajorVersion, browserVersion, os, osVersion },
-        conditionRefesh = { token: refesh, user_id: localUserId, detect: JSON.stringify(detect) }
+        conditionRefesh = { token: refesh, user_id: localUserId }
+        
     if(req.error){
         response.code    = 422,
         response.message = response.internal_message = "入力エラーがありました"
@@ -25,89 +25,74 @@ module.exports.findOneOrCreateChannel = function( req, res ){
     
     Promise.all([
         Postgre.TOKEN_REFESH.findOne({ where: conditionRefesh }),
-        getNameChanelByUserId( localUserId, referenceUserId )
+        getNameChanelByUserId( localUserId, referenceUserId ),
+        Channel.findOne({ user: [localUserId, CONFIG.ID_ADMIN] })
     ])
-    .then(([refeshData, channelName]) => {
-        // if( !refeshData ){
-        //     throw new Error("トークンが失敗する")
-        // }
+    .then(([refeshData, channelName, channelAdmin ]) => {
+        if( !refeshData ){
+            throw new Error("トークンが失敗する")
+        }
         if(!channelName){
             throw new Error("チャンネル名を作成できません")
+        }
+        if( !channelAdmin ){
+            /// process async because channel admin can create
+            getNameChanelByUserId( localUserId, CONFIG.ID_ADMIN )
+            .then( channelAdminName  => {
+                new Channel({
+                    name : channelAdminName,
+                    user : [ localUserId.toString(), CONFIG.ID_ADMIN.toString() ]
+                }).save()
+            })
         }
         return Promise.all([
             Channel.findOne({ name: channelName }),
             channelName
         ])
     })
-    .then( ([channelData, channelNameTemp]) => {
-        
-        var channel = channelData
-        if( !channelData ){
+    .then( ([channel, channelName]) => {
+
+        if( !channel ){
             /// new channel
-            var channelData = new Channel({
-                name : channelNameTemp,
+            return new Channel({
+                name : channelName,
                 user  : [ localUserId, referenceUserId]
-            })
-            channel = channelData.save()
+            }).save()
         }
-        if( channelData.backup ){
-            channelData.backup = false
-            channel = channelData.save()
+        if( channel.backup ){
+            channel.backup = false
+            
+            return channel.save()
         }
-        
+        return channel
+    })
+    .then( channel => {
         if(message){
-            message = new Message({ channel: channel._id, user: localUserId, body: message, read: false, style: "" }).save()
+            message = {
+
+                channel: channel._id,
+                user: localUserId,
+                body: message,
+                read: false,
+                style: ""
+            }
+            new Message(message).save()
         }
-        return Promise.all([
-            message,
-            channel
-        ])
+        return channel
     })
 
-    .then(([message, dataChannel]) => {
+    .then(channel => {
         
+        if( date ){
+            return upsertBooking({ localUserId, referenceUserId, date, type, salary, timeBegin, timeEnd })
+        }
+        return channel
+    })
+    .then( result => {
+
         response.code    = 200,
         response.message = response.internal_message = "チャンネル成功の設定"
-        response.data    = {
-                name: dataChannel.name,
-                user: dataChannel.user
-            }
-        if( date ){
-            Postgre.SCHEDULE.update(
-                { status: CONFIG.SCHEDULE_STATUS.PICKED },
-                { where: { work_date: [date], user_id: parseInt(referenceUserId) } }
-            )
-            Postgre.BOOKING.upsert({
-                employer_id: localUserId,
-                sitter_id: referenceUserId,
-                status: CONFIG.BOOKING_STATUS.DEFAULT,
-                sitter_accept: CONFIG.BOOKING_STATUS.DEFAULT,
-                employer_accept: CONFIG.BOOKING_STATUS.DEFAULT
-            }, {
-                employer_id: localUserId,
-                sitter_id: referenceUserId,
-                status: CONFIG.BOOKING_STATUS.DEFAULT
-            })
-            .then( booking => {
-                console.log(booking.toJSONFor())
-                Postgre.DATE_BOOKING.desert({
-                    booking_id: booking.id,
-                    salary: salary,
-                    type: type,
-                    work_date: date,
-                    start: timeBegin,
-                    finish: timeEnd,
-                }, {
-                    booking_id: booking.id
-                })
-                return res.end(JSON.stringify(response))
-            })
-            .catch( err => {
-                console.log(err.message, "booking" )
-                return res.end(JSON.stringify(response))
-            })
-        }
-        
+        return res.end(JSON.stringify(response))
     })
     .catch( error => {
         
@@ -120,85 +105,79 @@ module.exports.findOneOrCreateChannel = function( req, res ){
 
 
 
-module.exports.channels = function( req, res ){
+module.exports.channels = async function( req, res ){
 
-    var { userId, idFriends, access, browser, browserMajorVersion, 
-        browserVersion, os, osVersion, userIdActiveChannel } = req.body,
-        // { 'user-agent': userAgent } = req.headers,
-        detect                      = { browser, browserMajorVersion, browserVersion, 
-                                            os, osVersion }, //userAgent
-        response = {}
+    var { userId, access, userIdActiveChannel } = req.body,
+        response  = {}
+
+        userId              = parseInt(userId) || 0
+        userIdActiveChannel = parseInt(userIdActiveChannel) || 0
+
     if(req.error){
         response = { code: 422, message: "入力エラーがありました", internal_message: "入力エラーがありました", 
         errors : [ req.error ] }
         return res.end(JSON.stringify(response))
     }
-    
-    TokenAccess.findOne({ token: access })
-    .then( token => {
+
+    /// code use async - await
+    try {
+        var checkAuth  = TokenAccess.findOne({ token: access })
+        var idsConnect = Channel.idFriendsbyUserId(userId)
+
+        var [ token, idFriends ] = [await checkAuth, await idsConnect]
         if( !token ){
             throw new Error("トークンが失敗する")
         }
-        var now = new Date
-        var diffe = now.getTime() - new Date(token.period).getTime()
-        if( diffe > 1000 * CONFIG.TimeExpireAccessToken ){
-            throw new Error("トークンが失敗する")
-        }
-        userId = token.user
-        return token
-    })
-    .then( token => {
-        return Channel.idFriendsbyUserId(userId)
-        .then( _idFriends => {
-            idFriends = _idFriends
-            return token
-        })
-    })
-    //// get all channel off user
-    //// get list info of friend
-    //// get all user of user has channel is online
-    //// get all message off user limit 1000
-    .then( token => {
-        return Promise.all([
-            Channel.channelsMessageByUser( userId, false ),
-            Channel.informationsFriendbyidFriends( idFriends ),
-            TokenAccess.getUserOnlineByUserIds( idFriends ),
-        ])
-    })
-    .then( ([ channels, friends, onlineFriends ]) => {
-        if( !channels ){
-            throw new Error("チャネルは存在しません")
-        }
-        if( !friends ){
+        if( !idFriends ){
             throw new Error("友達がいない")
         }
-        
+        if(!idFriends.length){
+            console.log("===============================")
+            console.log("add channel admin")
+            var channelAdminName = await getNameChanelByUserId( parseInt(userId), CONFIG.ID_ADMIN )
+            if(!channelAdminName){
+                throw new Error('create channel admin fail')
+            }
+            var adminChannelObject = {
+                name : channelAdminName,
+                user : [ userId.toString(), CONFIG.ID_ADMIN.toString()]
+            }
+            var channelAdmin = await Channel(adminChannelObject).save()
+
+            var channels      = [ channelAdmin ]
+            var friends       = await Channel.informationsFriendbyidFriends( [ CONFIG.ID_ADMIN ] )
+            var onlineFriends = []
+
+        }else{
+
+            var [ channels, friends, onlineFriends ] = await Promise.all([
+                Channel.channelsMessageByUser( userId, false ),
+                Channel.informationsFriendbyidFriends( idFriends ),
+                TokenAccess.getUserOnlineByUserIds( idFriends ),
+            ])
+        }
+
         var dataResult = []
+
         channels.map( (channel, index ) => {
-
-            var json             = {}
-                json._id         = channel._id
-                json.id          = channel._id
-                json.channelName = channel.channelName
-                json.message     = channel.message
-                
-                // json.data        = { x : ( channel.user.id == userIdActiveChannel ), y: channel.user.id, z: userIdActiveChannel,  }
-                json.user        = channel.user ? friends[parseInt(channel.user)] : null
-                if( json.user ){
-                    json.user.online = channel.user ? onlineFriends[parseInt(channel.user)] : false
-                }
-                
-                userIdActiveChannel = parseInt(userIdActiveChannel)
-                if( json.user.id && 
-                    typeof userIdActiveChannel != 'undefined' && 
-                    userIdActiveChannel 
-                    ){
-
-                        json.isActive = ( json.user.id == userIdActiveChannel ) 
-                }else{
-
-                    json.isActive = ( index == 0 )
-                }
+            if(!channel){
+                throw new Error("channel fail")
+            }
+            if(!channel.user){
+                throw new Error("map func channels fail: " + channel._id, channel.channelName)
+            }
+            var activeChannel = friends[parseInt(channel.user)] 
+                                ? (friends[parseInt(channel.user)].id == userIdActiveChannel)
+                                : (index == 0)
+            var online        = onlineFriends[parseInt(channel.user)]
+            var json             = {
+                _id        : channel._id,
+                id         : channel._id,
+                channelName: channel.channelName,
+                message    : channel.message,
+                user       : { ...friends[parseInt(channel.user)], online: online },
+                isActive   : activeChannel
+            }
 
             dataResult.push(json)
         })
@@ -212,13 +191,17 @@ module.exports.channels = function( req, res ){
             friends         : friends
         }
         return res.end(JSON.stringify(response))
-    })
-    .catch( error => {
-        console.log( { error, access, ...detect }, "oject không thể chứng thực fetch channel")
-        response = { code: 500, message: error.message, 
-            internal_message: error.message }
-        return res.end(JSON.stringify(response))
-    })
+        
+        
+    } catch (error) {
+        console.log("channels error : " , error.message)
+        response = { 
+            code            : 500,
+            message         : error.message,
+            internal_message: error.message
+        }
+        return res.end(JSON.stringify(response))   
+    }
 }
 
 
@@ -393,7 +376,7 @@ module.exports.readMessageChat = function( req, res ){
         return res.end(JSON.stringify(response))
     })
     .catch( error => {
-        console.log( "oject không thể chứng thực fetch channel")
+        console.log( "oject fetch channel fail")
         response = { code: 500, message: error.message, 
             internal_message: error.message }
         return res.end(JSON.stringify(response))
@@ -431,7 +414,7 @@ module.exports.adminReadingChannel = function( req, res ){
         return res.end(JSON.stringify(response))
     })
     .catch( error => {
-        console.log( "oject không thể chứng thực fetch channel")
+        console.log( "object fetch channel fail")
         response = { code: 500, message: error.message, 
             internal_message: error.message }
         return res.end(JSON.stringify(response))
@@ -476,7 +459,7 @@ module.exports.adminGetUnreadMessage = function( req, res ){
         return res.end(JSON.stringify(response))
     })
     .catch( error => {
-        console.log( "oject không thể chứng thực fetch channel")
+        console.log( "object fetch channel fail admin read message")
         response = { code: 500, message: error.message, 
             internal_message: error.message }
         return res.end(JSON.stringify(response))
@@ -484,58 +467,64 @@ module.exports.adminGetUnreadMessage = function( req, res ){
 }
 
 function getNameChanelByUserId( userId1, userId2 ){
-    console.log(userId1 + " " + userId2, " begin getNameChanelByUserId")
+    
+    
     return Promise.all([
         Postgre.USER.findOne( { where: { id: userId1 } }), 
         Postgre.USER.findOne( { where: { id: userId2 } })
     ])
     .then( ([ user1, user2 ]) => {
         if( !user1 || !user2 ){
-            console.log(userId1 + " " + userId2, "không tìm thấy user getNameChanelByUserId")
+            
             throw new Error("チャンネル名の作成に失敗しました")
         }
-        var roles = [ 
-            parseInt(CONFIG.CHANNEL.ROLE_USER.sitter), 
-            parseInt(CONFIG.CHANNEL.ROLE_USER.employer),
-            parseInt(CONFIG.CHANNEL.ROLE_USER.admin)
-        ]
-        console.log(roles, "rolle getNameChanelByUserId")
-        var role_user1 = parseInt(user1.role_id),
-            role_user2 = parseInt(user2.role_id)
-
-        console.log(role_user1 + " " + role_user2, "rolle user getNameChanelByUserId")
-        
-        if( !roles.includes(role_user1) ){
-            throw new Error("チャンネル名の作成に失敗しました")
-        }
-        if( !roles.includes(role_user2) ){
-            throw new Error("チャンネル名の作成に失敗しました")
-        }
-        if( role_user1 == role_user2 ){
-            throw new Error("チャンネル名の作成に失敗しました")
-        }
-        var channelName = [ CONFIG.CHANNEL.SINGLE_PREFIX, null, null, null ]
-        /// channel : 0 = prefix, 1 = sitter, 2 = employer, 3 = admin
-        if( role_user1 == CONFIG.CHANNEL.ROLE_USER.sitter ){
-            channelName[1] = user1.id
-        }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.employer ){
-            channelName[2] = user1.id
-        }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.admin ){
-            channelName[3] = user1.id
-        }
-        if( role_user2 == CONFIG.CHANNEL.ROLE_USER.sitter ){
-            channelName[1] = user2.id
-        }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.employer ){
-            channelName[2] = user2.id
-        }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.admin ){
-            channelName[3] = user2.id
-        }
-        return channelName.join("-")
+        return renderNameChannelByUser( user1, user2 )
     })
     .catch( error => {
         return null
     })
 }
+
+
+function renderNameChannelByUser( user1, user2 ){
+    var roles = [ 
+        parseInt(CONFIG.CHANNEL.ROLE_USER.sitter), 
+        parseInt(CONFIG.CHANNEL.ROLE_USER.employer),
+        parseInt(CONFIG.CHANNEL.ROLE_USER.admin)
+    ]
+    
+    var role_user1 = parseInt(user1.role_id),
+        role_user2 = parseInt(user2.role_id)
+    
+    if( !roles.includes(role_user1) ){
+        throw new Error("チャンネル名の作成に失敗しました")
+    }
+    if( !roles.includes(role_user2) ){
+        throw new Error("チャンネル名の作成に失敗しました")
+    }
+    if( role_user1 == role_user2 ){
+        throw new Error("チャンネル名の作成に失敗しました")
+    }
+    
+    var channelName = [ CONFIG.CHANNEL.SINGLE_PREFIX, null, null, null ]
+    /// channel : 0 = prefix, 1 = sitter, 2 = employer, 3 = admin
+    if( role_user1 == CONFIG.CHANNEL.ROLE_USER.sitter ){
+        channelName[1] = user1.id
+    }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.employer ){
+        channelName[2] = user1.id
+    }else if( role_user1 == CONFIG.CHANNEL.ROLE_USER.admin ){
+        channelName[3] = user1.id
+    }
+    if( role_user2 == CONFIG.CHANNEL.ROLE_USER.sitter ){
+        channelName[1] = user2.id
+    }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.employer ){
+        channelName[2] = user2.id
+    }else if( role_user2 == CONFIG.CHANNEL.ROLE_USER.admin ){
+        channelName[3] = user2.id
+    }
+    return channelName.join("-")
+}
+
 
 
 
@@ -583,4 +572,104 @@ module.exports.createPaymentIntent = async function( req, res ){
         data: paymentIntent
     }
     return res.end(JSON.stringify(response))
+}
+
+
+module.exports.hiddenChannel = async function( req, res ){
+
+
+    console.log("START HIDDEN CHANNEL CONTROLLER")
+
+    var status = 200;
+    
+    if(req.error){
+        response = { code: 422, message: "入力エラーがありました",
+        errors : [ req.error ] }
+        return res.end(JSON.stringify(response))
+    }
+    var { data }   = req.body,
+        bookingIds = JSON.parse(data)
+
+    /// lấy booking lên
+    Postgre.BOOKING.findAll({ where: { id: bookingIds }}).then( bookings => {
+        var usersChannel = bookings.map( booking => [ booking.sitter_id, booking.employer_id ])
+        
+        return Channel.findChannelByUsers(usersChannel)
+    })
+    .then(channels => {
+        var channelIdsUpdate = channels.map(channel => {
+            return channel._id
+        })
+        
+        Message.updateMany({channel: { $in : channelIdsUpdate }}, { $set: { backup: true } }, (err, writeResult) => {
+            console.log("đã update message", channelIdsUpdate)
+        })
+        var channelsUpdate = channels.map(_channel => {
+
+            _channel.backup = true
+            return _channel.save()
+        })
+        return Promise.all(channelsUpdate);
+    })
+    .then( updates => {
+        
+        response = { 
+            code: 200, 
+            bookingIds
+        }
+        return res.end(JSON.stringify(response)).status(status)
+    })
+    .catch( err => {
+        response = { 
+            code: 500, 
+            data: bookingIds,
+            error: err.message
+        }
+        return res.end(JSON.stringify(response)).status(status)
+    })
+}
+
+
+//// function create booking from calendar
+function upsertBooking(bookingInput ){
+
+    var { localUserId, referenceUserId, date, type, salary, timeBegin, timeEnd } = bookingInput
+    if( !date ){
+        return null
+    }
+
+    Postgre.SCHEDULE.update(
+        { status: CONFIG.SCHEDULE_STATUS.PICKED },
+        { where: { work_date: [date], user_id: parseInt(referenceUserId) } }
+    )
+    return Postgre.BOOKING.upsert({
+        employer_id    : localUserId,
+        sitter_id      : referenceUserId,
+        status         : CONFIG.BOOKING_STATUS.DEFAULT,
+        sitter_accept  : CONFIG.BOOKING_STATUS.DEFAULT,
+        employer_accept: CONFIG.BOOKING_STATUS.DEFAULT,
+        cron_filter    : CONFIG.BOOKING_CRON_FILTER.DEFAULT
+    }, {
+        employer_id: localUserId,
+        sitter_id  : referenceUserId,
+        status     : CONFIG.BOOKING_STATUS.DEFAULT
+    })
+    .then( booking => {
+        
+        Postgre.DATE_BOOKING.desert({
+            booking_id: booking.id,
+            salary: salary,
+            type: type,
+            work_date: date,
+            start: timeBegin,
+            finish: timeEnd,
+        }, {
+            booking_id: booking.id
+        })
+        return true
+    })
+    .catch( err => {
+        return false
+    })
+    
 }

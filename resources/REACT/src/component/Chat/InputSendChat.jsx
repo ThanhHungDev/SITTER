@@ -83,25 +83,23 @@ class InputSendChat extends Component {
         }
         if (this.props.user) {
             
-            /// là nếu token hết hạn thì phải refesh 
-            // sau đó chưa dispacth ngay mà send chat đã. rồi dispatch 1 lần
+            /// là nếu token hết hạn thì phải f5 trình duyệt
             var { user } = this.props,
-                instance = this,
-                dataRefesh = false
+                instance = this
             var diff = ((new Date).getTime() - new Date(user.tokens.period).getTime()) / 1000
             if (diff >= user.tokens.expire) {
                 /// fetch new token
-                dataRefesh = { userId: user.id, refesh: user.tokens.tokenRefesh, detect: this.props.client }
+                window.location.reload();
             }
             var messageSendToChannel = message
             var channelSend = this.props.userChat.find(channel => {
                 return channel.isActive == true
             })
-            var channelId = channelSend.id
-            var tokenAccess = user.tokens.tokenAccess
-            var detect = this.props.client
+            var channelId   = channelSend.id,
+                tokenAccess = user.tokens.tokenAccess,
+                detect      = this.props.client
             sendMessageToChannel(messageSendToChannel, style, attachment, channelId, 
-                tokenAccess, detect, instance, dataRefesh)
+                tokenAccess, detect, instance)
         }
     }
 
@@ -296,11 +294,11 @@ class InputSendChat extends Component {
         var channelSend = this.props.userChat.find(channel => {
             return channel.isActive == true
         })
-        var channelId = channelSend.id
-        var tokenAccess = user.tokens.tokenAccess
-        var detect = this.props.client
+        var channelId   = channelSend.id,
+            channelName = channelSend.channelName,
+            tokenAccess = user.tokens.tokenAccess
 
-        sendTypingMessageToChannel( channelId, tokenAccess, detect )
+        sendTypingMessageToChannel( channelId, channelName, tokenAccess )
     }
     chooseFile = () => {
         document.getElementById("image-file").click()

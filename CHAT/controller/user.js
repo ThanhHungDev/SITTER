@@ -7,12 +7,9 @@ var Channel     = require("../model/Channel"),
 
 module.exports.refesh = function( req, res ){
 
-    var { userId, refesh, browser, browserMajorVersion, 
-        browserVersion, os, osVersion } = req.body,
-        // { 'user-agent': userAgent } = req.headers,
-        detect                      = { browser, browserMajorVersion, browserVersion, 
-                                            os, osVersion } // userAgent
-    var response = {}
+    var { userId, refesh, detect } = req.body,
+        response                   = {}
+
     if(req.error){
         response = { code: 422, message: "入力エラーがありました", internal_message: "入力エラーがありました", 
         errors : [ req.error ] }
@@ -20,16 +17,16 @@ module.exports.refesh = function( req, res ){
     }
 
     var tokenRefesh = crypto.createHash('md5').update(
-        JSON.stringify({ idUser: userId, ...detect, time: (new Date).getTime() })
+        JSON.stringify({ idUser: userId, detect, time: (new Date).getTime() })
     ).digest('hex')
     var tokenAccess = crypto.createHash('md5').update(
-        JSON.stringify({ ... detect, time: (new Date).getTime() })
+        JSON.stringify({ detect, time: (new Date).getTime() })
     ).digest('hex')
 
     /// kiểm tra token có trong db không
     /// lưu ý khi dùng postgree trong nodejs phải có where theo nguyên tắc của sequelize
     // console.log(userId, " userId không tìm thấy ")
-    Postgre.TOKEN_REFESH.findOne({ where: { user_id: userId } }) ///, token : refesh <---- important
+    Postgre.TOKEN_REFESH.findOne({ where: { user_id: userId, token : refesh } }) ///, token : refesh <---- important
     .then( tokenData => {
         
         if(!tokenData){
@@ -37,13 +34,13 @@ module.exports.refesh = function( req, res ){
             throw new Error("トークンが失敗する")
         }
         /// nếu có token thì tìm token access của user theo devide
-        return TokenAccess.findOne({ user  : userId,  detect: JSON.stringify({ ...detect } ) })
+        return TokenAccess.findOne({ user  : userId,  detect: detect })
     })
     .then( myTokenAccess => {
         if( myTokenAccess ){
             /// nếu có token theo devide thì xem token này có online true không? 
             if(myTokenAccess.online){
-                console.log("token đang đụng cùng 1 trình duyệt mở 2 tab")
+
                 /// lấy socket của token đã có đem emit về client đó cho client đó die
                 var socket_duplication = myTokenAccess.socket
                 console.log( "socket_duplication" , socket_duplication )
@@ -56,7 +53,7 @@ module.exports.refesh = function( req, res ){
                 token : tokenAccess,
                 user  : userId,
                 online: false,
-                detect: JSON.stringify({ ...detect } )
+                detect: detect
             })
         }
         

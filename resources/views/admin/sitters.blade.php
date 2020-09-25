@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{{ asset('css/library/jquery.toast.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/library/slick.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/library/slick-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/library/jquery.jqZoom.css') }}">
 @endsection
 @extends('admin._LAYOUT.index')
 @section('content-admin')
@@ -96,10 +97,10 @@
                                 </div>
                             </div>
                             <div class="avatar-small f-col">
-                                <div class="small-img">
+                                <div class="small-img zoom-box">
                                     <img src="{{ asset($listImage[config('constant.GALARY_TYPE.SITTER_FILE_FRONT')]) }}" alt="">
                                 </div>
-                                <div class="small-img">
+                                <div class="small-img zoom-box">
                                     <img src="{{ asset($listImage[config('constant.GALARY_TYPE.SITTER_FILE_BACK')]) }}" alt="">
                                 </div>
                             </div>
@@ -147,7 +148,8 @@
                                     </label>
                                 </div>
                                 <div class="action-details">
-                                    <button class="btn-details js-detail-sitter fz-b-15"  data-url='{{ route('ADMIN_SITTER_AJAX_VIEW', $item->user_id) }}'>詳細を見る</button>
+                                    {{-- <button class="btn-details js-detail-sitter fz-b-15"  data-url='{{ route('ADMIN_SITTER_AJAX_VIEW', $item->user_id) }}'>詳細を見る</button> --}}
+                                    <a class="btn-details fz-b-15"  href='{{ route('INFO_SITTER', $item->user_id) }}'>詳細を見る</a>
                                 </div>
                                 <div class="action-history-chat">
                                     <button class="btn-history-chat js-history-chat fz-b-15" data-url='{{ route('ADMIN_READ_MESSAGE', [$item->user_id, '']) }}' data-item='{{ $item->user_id }}'>チャット履歴</button>
@@ -225,13 +227,21 @@
 @endsection
 
 @section('scripts-admin')
-    <script>
-        const ADMIN_CONFIRM_ACCEPT = {{config('constant.ADMIN_CONFIRM.ACCEPT')}}
-    </script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.toast.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/datepicker-ja.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_sitter.min.js') }}"></script>
-
+    <script type="text/javascript" src="{{ asset('js/library/jquery.jqZoom.js') }}"></script>
+    <script>
+        const ADMIN_CONFIRM_ACCEPT = {{config('constant.ADMIN_CONFIRM.ACCEPT')}}
+        $(function(){
+            $(".zoom-box img").jqZoom({
+                selectorWidth: 30,
+                selectorHeight: 30,
+                viewerWidth: 400,
+                viewerHeight: 300
+            });
+        })
+    </script>
 @endsection

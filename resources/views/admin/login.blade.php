@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,7 +82,7 @@
     </div>
 
     <script type="text/javascript" src="{{ asset('js/library/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/app.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/app.min.js' . Config::get('app.version')) }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/detect.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/login.min.js') }}"></script>

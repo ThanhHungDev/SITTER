@@ -3,6 +3,7 @@
 @section('stylesheets-admin')
     <link rel="stylesheet" href="{{ asset('css/library/jquery-ui.min.css')}}">
     <link rel="stylesheet" href="{{ asset('css/library/jquery.toast.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/library/jquery.jqZoom.css') }}">
 @endsection
 @extends('admin._LAYOUT.index')
 
@@ -145,7 +146,8 @@
                                 </label>
                             </div> --}}
                             <div class="action-details">
-                                <button type="button" data-action="{{route('ADMIN_AJAX_GET_FAMILY')}}" data-id-profile = "{{$item->id_profile}}" data-user-id = "{{ $item->user_id }}" class="btn-details get-detail fz-b-15">詳細を見る</button>
+                                {{-- <button type="button" data-action="{{route('ADMIN_AJAX_GET_FAMILY')}}" data-id-profile = "{{$item->id_profile}}" data-user-id = "{{ $item->user_id }}" class="btn-details get-detail fz-b-15">詳細を見る</button> --}}
+                                <a href="{{route('INFO_EMPLOYER',['id'=>$item->user_id])}}" class="btn-details fz-b-15">詳細を見る</a>
                             </div>
                             <div class="action-delete">
                                 <button class="btn-delete fz-b-15" data-id="{{$item->user_id}}">削除</button>
@@ -298,6 +300,7 @@
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_employer.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.toast.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/library/jquery.jqZoom.js') }}"></script>
     <script>
         $( function() {
             $( 'input[name="date-reg"]' ).datepicker({
@@ -306,6 +309,14 @@
                 }
             });
         });
+        $(function(){
+            $(".zoom-box img").jqZoom({
+                selectorWidth: 30,
+                selectorHeight: 30,
+                viewerWidth: 400,
+                viewerHeight: 300
+            });
+        })
         const SITTER = "{{config('constant.ROLE.SITTER')}}";
         const EMPLOYER_SEND_SITTER = "{{route('ADMIN_AJAX_EMPLOYER_SEND_SITTER')}}";
         const ADMIN_CONFIRM_ACCEPT = "{{config('constant.ADMIN_CONFIRM.ACCEPT')}}";

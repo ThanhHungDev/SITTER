@@ -234,6 +234,9 @@ return [
     //version css, js
     'VERSION_CSS' => Date('YmdHi'),
     'VERSION_JS' => Date('YmdHi'),
-    'STRIPE_PUBLIC_KEY' => 'pk_test_51HH3fxEkyn0XMKpGPVUghMwsvtR0lktiryL5WUbPkvzhx1Ykw0V5j8w20RPXQLXAnNTlbqShTAiJaQaTwcNMI6Pz00H35guI44',
-    'STRIPE_SECRET_KEY' => 'sk_test_51HH3fxEkyn0XMKpG77QqVE25YW8wxLTAhjbl2rykPI4KHVsy39d2QxF9v37hRM4wpCJVwVPRcr6fNmqigrDzPihD00Gn0FvEI8'
+
+    'BOOKING_HIDDEN_CHANNEL' => [
+        'DEFAULT' => 0, 
+        'FILTERED' => 1
+    ]
 ];

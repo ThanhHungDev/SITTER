@@ -66,6 +66,7 @@ class SearchController extends Controller
         $data['list_items']  = $_list_items;
         $data['jp_locations']  = $this->JP_LOCATION;
         $data['data_params'] = $data_params;
+        $data['is_login'] = false;
         if (Auth::check() && Auth::user()->role_id == config('constant.ROLE.EMPLOYER')) {
             $data['is_login'] = true;
         }

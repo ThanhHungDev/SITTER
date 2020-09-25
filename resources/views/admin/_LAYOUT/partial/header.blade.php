@@ -9,7 +9,7 @@
             <img class="icon-img" src="{{ asset('') }}image/icons/icon-avatar.png">
             <span class="nav-text">管理者</span>
         </div>
-        <a href="{{route('EMPLOYER_LOGIN')}}">
+        <a href="{{route('ADMIN_LOGOUT')}}">
             <div class="nav-button-link login">
                 <span class="nav-text">ログアウト</span>
             </div>

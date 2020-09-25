@@ -1265,6 +1265,9 @@ COPY activity_experiences (id, user_id, experience_id, deleted, created_at, upda
 87	58	10	f	2020-07-30 05:17:24	2020-07-30 05:17:24
 88	60	1	f	2020-07-30 07:16:15	2020-07-30 07:16:15
 89	70	1	f	2020-08-03 08:12:21	2020-08-03 08:12:21
+90	72	2	f	2020-09-18 07:45:54	2020-09-18 07:45:54
+91	72	6	f	2020-09-18 07:45:54	2020-09-18 07:45:54
+92	72	10	f	2020-09-18 07:45:54	2020-09-18 07:45:54
 \.
 
 
@@ -1272,7 +1275,7 @@ COPY activity_experiences (id, user_id, experience_id, deleted, created_at, upda
 -- Name: activity_experiences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('activity_experiences_id_seq', 89, true);
+SELECT pg_catalog.setval('activity_experiences_id_seq', 92, true);
 
 
 --
@@ -1461,6 +1464,10 @@ COPY activity_skills (id, user_id, skill_id, deleted, created_at, updated_at) FR
 2781	36	22	f	2020-09-17 08:16:10	2020-09-17 08:16:10
 2782	36	24	f	2020-09-17 08:16:10	2020-09-17 08:16:10
 2783	36	25	f	2020-09-17 08:16:10	2020-09-17 08:16:10
+2787	72	1	f	2020-09-18 07:51:45	2020-09-18 07:51:45
+2788	72	2	f	2020-09-18 07:51:45	2020-09-18 07:51:45
+2789	72	8	f	2020-09-18 07:51:45	2020-09-18 07:51:45
+2790	72	14	f	2020-09-18 07:51:45	2020-09-18 07:51:45
 \.
 
 
@@ -1468,7 +1475,7 @@ COPY activity_skills (id, user_id, skill_id, deleted, created_at, updated_at) FR
 -- Name: activity_skills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('activity_skills_id_seq', 2783, true);
+SELECT pg_catalog.setval('activity_skills_id_seq', 2790, true);
 
 
 --
@@ -1477,6 +1484,7 @@ SELECT pg_catalog.setval('activity_skills_id_seq', 2783, true);
 
 COPY bookings (id, employer_id, sitter_id, status, sitter_accept, employer_accept, created_at, updated_at, date_cancel) FROM stdin;
 2	22	24	1	1	1	2020-09-11 06:55:33	2020-09-11 08:49:07	\N
+15	26	72	1	1	1	2020-09-18 08:22:27	2020-09-18 08:30:02	\N
 3	22	24	1	1	1	2020-09-11 08:57:15	2020-09-15 00:45:13	\N
 5	22	24	0	0	1	2020-09-15 00:49:25	2020-09-15 00:49:41	\N
 4	37	29	0	0	1	2020-09-15 00:14:50	2020-09-15 01:34:15	\N
@@ -1489,6 +1497,7 @@ COPY bookings (id, employer_id, sitter_id, status, sitter_accept, employer_accep
 11	37	24	1	1	1	2020-09-15 07:22:27	2020-09-15 07:23:30	\N
 12	37	24	0	0	1	2020-09-15 08:46:05	2020-09-16 07:49:26	\N
 13	37	36	1	1	1	2020-09-16 08:36:37	2020-09-16 08:51:00	\N
+14	26	72	1	1	1	2020-09-18 07:53:14	2020-09-18 08:16:56	\N
 \.
 
 
@@ -1496,7 +1505,7 @@ COPY bookings (id, employer_id, sitter_id, status, sitter_accept, employer_accep
 -- Name: bookings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('bookings_id_seq', 13, true);
+SELECT pg_catalog.setval('bookings_id_seq', 15, true);
 
 
 --
@@ -1504,7 +1513,9 @@ SELECT pg_catalog.setval('bookings_id_seq', 13, true);
 --
 
 COPY date_bookings (id, booking_id, work_date, start, finish, type, salary, created_at, updated_at) FROM stdin;
+23	14	2020-09-20	09:30:00	11:00:00	2	1100	\N	\N
 5	2	2020-09-17	13:30:00	23:00:00	2	2700	\N	\N
+24	15	2020-09-21	07:00:00	10:00:00	2	1100	\N	\N
 6	3	2020-09-15	00:30:00	11:00:00	2	2700	\N	\N
 9	5	2020-09-24	00:30:00	13:00:00	2	2700	\N	\N
 8	4	2020-09-16	09:00:00	17:30:00	2	1500	\N	\N
@@ -1524,7 +1535,7 @@ COPY date_bookings (id, booking_id, work_date, start, finish, type, salary, crea
 -- Name: date_bookings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('date_bookings_id_seq', 20, true);
+SELECT pg_catalog.setval('date_bookings_id_seq', 24, true);
 
 
 --
@@ -1683,6 +1694,7 @@ COPY galaries (id, user_id, url, type, deleted, created_at, updated_at, name, pa
 184	31	\N	2	f	2020-07-06 07:27:13	2020-07-06 07:27:13	1594020433chỉ mục.jpg	/storage/uploads/sitters/
 185	31	\N	3	f	2020-07-06 07:27:13	2020-07-06 07:27:13	159402043320160309-061446-14574969743191_520x640.jpg	/storage/uploads/sitters/
 191	24	\N	6	f	2020-07-08 05:00:01	2020-07-08 05:00:01	1594184400mylove.jpg	/storage/uploads/avatars/
+55	26	15936550728071201.jpg	4	f	\N	2020-09-18 07:35:22	1600414522mtruoc.jpg	/storage/uploads/employers/
 115	27	\N	6	f	2020-07-03 08:57:40	2020-07-03 08:57:40	1593766660103757645_923985278067109_6608159161252698823_o.jpg	/storage/uploads/avatars/
 116	27	\N	6	f	2020-07-03 08:57:45	2020-07-03 08:57:45	159376666512_big.jpg	/storage/uploads/avatars/
 192	32	\N	4	f	\N	\N	15941877168071201.jpg	/storage/uploads/employers/
@@ -1702,8 +1714,6 @@ COPY galaries (id, user_id, url, type, deleted, created_at, updated_at, name, pa
 52	24	1593568464FB_IMG_1584191186498.jpg	1	f	2020-07-01 01:54:24	2020-07-01 01:54:24	\N	\N
 53	24	1593568464FB_IMG_1584440490291.jpg	2	f	2020-07-01 01:54:24	2020-07-01 01:54:24	\N	\N
 54	24	1593568464FB_IMG_1587373984482.jpg	3	f	2020-07-01 01:54:24	2020-07-01 01:54:24	\N	\N
-55	26	15936550728071201.jpg	4	f	\N	\N	\N	\N
-56	26	1593655072download.jpg	5	f	\N	\N	\N	\N
 195	33	\N	5	f	\N	\N	1594191647cach-nuoi-day-con-thanh-tai_1_orig.jpg	/storage/uploads/employers/
 196	1	\N	\N	f	\N	\N	1594284830image.png	/storage/uploads/mixed/
 60	27	1593754439103004647_923985341400436_1862382915896680438_o.jpg	1	f	2020-07-03 05:33:59	2020-07-03 05:33:59	\N	\N
@@ -1731,6 +1741,7 @@ COPY galaries (id, user_id, url, type, deleted, created_at, updated_at, name, pa
 200	1	\N	\N	f	\N	\N	1594286239Hùng xã đoàn.pdf	/storage/uploads/mixed/
 201	1	\N	\N	f	\N	\N	1594286252FB_IMG_1590852628041.jpg	/storage/uploads/mixed/
 59	22	15937522267d8623ac7555880bd144.jpg	7	f	2020-07-03 04:57:06	2020-07-22 07:23:12	159540259249808011_1449556311845934_5408048434861047808_n.jpg	/storage/uploads/avatars/
+56	26	1593655072download.jpg	5	f	\N	2020-09-18 07:35:25	1600414525msau.jpg	/storage/uploads/employers/
 166	28	\N	7	f	2020-07-06 00:40:06	2020-07-06 00:41:24	1593996084img_job01.jpg	/storage/uploads/avatars/
 202	34	\N	1	f	2020-07-10 05:38:01	2020-07-10 05:38:01	159435948112_big.jpg	/storage/uploads/sitters/
 203	34	\N	2	f	2020-07-10 05:38:01	2020-07-10 05:38:01	1594359481reactjs-life.png	/storage/uploads/sitters/
@@ -1853,6 +1864,11 @@ COPY galaries (id, user_id, url, type, deleted, created_at, updated_at, name, pa
 359	29	\N	6	f	2020-08-04 06:38:28	2020-08-04 06:38:28	1596523108yss.jpg	/storage/uploads/avatars/
 372	29	\N	6	f	2020-09-03 08:44:03	2020-09-03 08:44:03	1599122643unnamed.jpg	/storage/uploads/avatars/
 373	29	\N	6	f	2020-09-03 08:44:09	2020-09-03 08:44:09	159912264992912542_223204509001080_5437823884051087360_n.jpg	/storage/uploads/avatars/
+374	72	\N	1	f	2020-09-18 07:45:54	2020-09-18 07:45:54	1600415153mtruoc.jpg	/storage/uploads/sitters/
+375	72	\N	2	f	2020-09-18 07:45:54	2020-09-18 07:45:54	1600415154msau.jpg	/storage/uploads/sitters/
+376	72	\N	3	f	2020-09-18 07:45:54	2020-09-18 07:45:54	1600415154msau.jpg	/storage/uploads/sitters/
+377	72	\N	6	f	2020-09-18 07:50:14	2020-09-18 07:50:14	1600415414msau.jpg	/storage/uploads/avatars/
+378	72	\N	6	f	2020-09-18 07:50:16	2020-09-18 07:50:16	1600415416mtruoc.jpg	/storage/uploads/avatars/
 \.
 
 
@@ -1860,7 +1876,7 @@ COPY galaries (id, user_id, url, type, deleted, created_at, updated_at, name, pa
 -- Name: galaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('galaries_id_seq', 373, true);
+SELECT pg_catalog.setval('galaries_id_seq', 378, true);
 
 
 --
@@ -1933,6 +1949,8 @@ COPY orders (id, booking_id, salary, diff_time, price, vat, fee_stripe, profit, 
 12	11	2600	4.5	11700	1170	463	2340	1	You passed an empty string for 'customer'. We assume empty values are an attempt to unset a parameter; however 'customer' cannot be unset. You should remove 'customer' from your request or supply a non-empty value.	2020-09-15 07:23:30	2020-09-15 07:23:30
 13	12	2600	12	31200	3744	1482	6240	1	You passed an empty string for 'customer'. We assume empty values are an attempt to unset a parameter; however 'customer' cannot be unset. You should remove 'customer' from your request or supply a non-empty value.	2020-09-15 08:46:27	2020-09-16 07:49:09
 14	13	2500	4.5	11250	1350	534	2250	1	You passed an empty string for 'customer'. We assume empty values are an attempt to unset a parameter; however 'customer' cannot be unset. You should remove 'customer' from your request or supply a non-empty value.	2020-09-16 08:38:38	2020-09-16 08:50:59
+15	14	1100	1.5	1650	198	78	330	0	\N	2020-09-18 08:16:56	2020-09-18 08:16:56
+16	15	1100	3	3300	396	156	660	0	\N	2020-09-18 08:30:01	2020-09-18 08:30:01
 \.
 
 
@@ -1940,7 +1958,7 @@ COPY orders (id, booking_id, salary, diff_time, price, vat, fee_stripe, profit, 
 -- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('orders_id_seq', 14, true);
+SELECT pg_catalog.setval('orders_id_seq', 16, true);
 
 
 --
@@ -1977,6 +1995,8 @@ SELECT pg_catalog.setval('password_reset_id_seq', 12, true);
 COPY payments (id, user_id, order_id, stripe_payment, created_at, updated_at, is_payout) FROM stdin;
 1	22	1	pi_1HRSIHEkyn0XMKpG0ObCCHR2	2020-09-15 00:45:13	2020-09-15 00:45:13	0
 2	37	14	pi_1HRwLvEkyn0XMKpGhvPL43DO	2020-09-16 08:51:00	2020-09-16 08:51:00	0
+3	26	15	pi_1HSem4Ekyn0XMKpGMhYAgz5m	2020-09-18 08:16:56	2020-09-18 08:16:56	0
+4	26	16	pi_1HSeyjEkyn0XMKpGz4RdsqXa	2020-09-18 08:30:02	2020-09-18 08:30:02	0
 \.
 
 
@@ -1984,7 +2004,7 @@ COPY payments (id, user_id, order_id, stripe_payment, created_at, updated_at, is
 -- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('payments_id_seq', 2, true);
+SELECT pg_catalog.setval('payments_id_seq', 4, true);
 
 
 --
@@ -2048,6 +2068,8 @@ COPY salaries (id, user_id, salary, type, created_at, updated_at) FROM stdin;
 32	38	1600	2	2020-07-31 08:14:21	2020-07-31 08:14:21
 11	29	2800	1	2020-07-04 06:31:46	2020-08-20 06:24:55
 12	29	1500	2	2020-07-04 06:31:46	2020-08-20 06:24:55
+33	72	1100	1	2020-09-18 07:51:45	2020-09-18 07:51:45
+34	72	1100	2	2020-09-18 07:51:45	2020-09-18 07:51:45
 \.
 
 
@@ -2055,7 +2077,7 @@ COPY salaries (id, user_id, salary, type, created_at, updated_at) FROM stdin;
 -- Name: salaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('salaries_id_seq', 32, true);
+SELECT pg_catalog.setval('salaries_id_seq', 34, true);
 
 
 --
@@ -2116,6 +2138,10 @@ COPY schedules (id, user_id, work_date, start, finish, overnight, type, status, 
 2435	36	2020-07-31	09:00:00	21:00:00	f	1	0	2020-09-17 08:16:10	2020-09-17 08:16:10
 2436	36	2020-08-10	10:00:00	13:00:00	f	1	1	2020-09-17 08:16:10	2020-09-17 08:16:10
 2437	36	2020-08-11	11:00:00	17:00:00	f	1	1	2020-09-17 08:16:10	2020-09-17 08:16:10
+2442	72	2020-09-22	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2443	72	2020-09-23	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2444	72	2020-09-24	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2445	72	2020-09-25	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
 953	51	2020-07-23	09:00:00	14:30:00	f	2	0	2020-07-22 05:32:21	2020-07-22 05:32:21
 956	51	2020-07-26	10:00:00	15:00:00	f	2	0	2020-07-22 05:32:21	2020-07-22 05:32:21
 1098	31	2020-08-10	01:34:00	04:05:00	f	2	0	2020-07-28 01:03:22	2020-07-28 01:03:22
@@ -2125,6 +2151,15 @@ COPY schedules (id, user_id, work_date, start, finish, overnight, type, status, 
 1105	31	2020-08-23	01:02:00	03:06:00	f	2	0	2020-07-28 01:03:22	2020-07-28 01:03:22
 1111	31	2020-08-06	01:34:00	04:05:00	f	2	0	2020-07-28 01:03:22	2020-07-28 01:03:22
 1113	31	2020-08-08	01:34:00	04:05:00	f	2	0	2020-07-28 01:03:22	2020-07-28 01:03:22
+2446	72	2020-09-26	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2447	72	2020-09-27	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2448	72	2020-09-28	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2449	72	2020-09-29	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2450	72	2020-09-30	06:00:00	12:00:00	f	2	0	2020-09-18 07:51:45	2020-09-18 07:51:45
+2438	72	2020-09-18	06:00:00	12:00:00	f	2	1	2020-09-18 07:51:45	2020-09-18 07:51:45
+2439	72	2020-09-19	06:00:00	12:00:00	f	2	1	2020-09-18 07:51:45	2020-09-18 07:51:45
+2440	72	2020-09-20	06:00:00	12:00:00	f	2	1	2020-09-18 07:51:45	2020-09-18 07:51:45
+2441	72	2020-09-21	06:00:00	12:00:00	f	2	1	2020-09-18 07:51:45	2020-09-18 07:51:45
 1155	56	2020-07-31	12:00:00	19:00:00	f	1	0	2020-07-30 04:56:22	2020-07-30 04:56:22
 1158	56	2020-08-03	10:00:00	16:00:00	f	1	0	2020-07-30 04:56:22	2020-07-30 04:56:22
 1159	56	2020-08-04	10:00:00	16:00:00	f	1	0	2020-07-30 04:56:22	2020-07-30 04:56:22
@@ -2224,7 +2259,7 @@ COPY schedules (id, user_id, work_date, start, finish, overnight, type, status, 
 -- Name: schedules_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schedules_id_seq', 2437, true);
+SELECT pg_catalog.setval('schedules_id_seq', 2450, true);
 
 
 --
@@ -2248,6 +2283,7 @@ COPY sitter_profiles (id, user_id, type_upload, contact_name, contact_address, c
 18	47	1	武志 MP	東京都千代田区１１１１	0312345678	母	t	f	\N	2020-07-22 00:05:05	2020-07-22 04:17:04
 26	60	1	山田花子	東京都西新宿	0312345678	母	t	f	\N	2020-07-30 07:16:15	2020-09-16 00:53:48
 27	70	1	山田花子	東京都西新宿	0312345678	母	f	f	\N	2020-08-03 08:12:21	2020-09-16 00:53:49
+28	72	2	急時に登録者ご本人様と連絡が取れない場	456546	32423423333	antanochild	t	f	\N	2020-09-18 07:45:54	2020-09-18 07:46:51
 19	50	2	bui toan	北四十条東	9012312331	３２１	t	f	\N	2020-07-22 00:26:11	2020-07-27 01:22:19
 13	31	1	緊急時に登録者ご本人様と連絡が取れない場合	緊急連絡先住	緊急連絡先住	あなたとの関	t	f	\N	2020-07-06 07:27:13	2020-07-28 00:54:01
 10	24	2	緊急時に登録者ご本人様と連絡が取	275817	675435678	4545764353	t	f	\N	2020-07-01 01:54:24	2020-07-28 01:19:52
@@ -2258,7 +2294,7 @@ COPY sitter_profiles (id, user_id, type_upload, contact_name, contact_address, c
 -- Name: sitter_profiles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sitter_profiles_id_seq', 27, true);
+SELECT pg_catalog.setval('sitter_profiles_id_seq', 28, true);
 
 
 --
@@ -2297,6 +2333,7 @@ COPY sitters (id, user_id, age, pref, city, kid_age_start, kid_qty, exp_parentin
 12	53	20	高知県	宿毛市	1	2	t	f	04:00:00	保育士経験が2年あります。\r\n◎コロナで学校、幼稚園、保育園に行けなくてもお家で楽しく過ごせるよう、クッキングや制作活動等行いたいと思います！ご希望の方はお気軽にメッセージ等でご相談ください！◎\r\n★早朝、夜中の時間帯もお気軽にどうぞ！★\r\n\r\nよろしくお願いいたします。	経験を活かして、\r\n絵、製作、折り紙、手遊び、絵本読み聞かせ、簡単な英語、運動、、、など、お子さまの興味や年齢に応じた遊びをしてお子さまと楽しい時間を過ごせたらと、思っております！\r\n安全第一でお母さまとお子さまを笑顔にしたいと思っております！	2020-07-29 05:33:23	2020-08-31 05:20:58	60	丁寧なサービスを心がけます！！	2
 16	38	40	岩手県	qweqwe	4	4	t	t	03:30:00	alo	ali	2020-07-31 08:14:21	2020-08-12 05:22:05	4	test	3
 6	29	40	青森県	shinjuku, nakano	36	5	t	f	05:30:00	※新型コロナウイルス流行中の為、日常生活の中でマスクの装着や手洗いうがいを徹底し\r\n衛生に配慮をしています※\r\n\r\n子育て歴15年以上！ シッター歴3年以上！\r\n子育て支援員、幼保無償化シッターです。\r\n赤ちゃん大好きです！\r\n（乳児保育の経験豊富です！）\r\n認可保育園で保育補助をしながらフリーランスのベビーシッターをしております。\r\n子、孫育ての経験から誠心誠意お手伝いいたします。\r\n\r\n〝お子様にとって人生の大切な時期である幼少期にママ以外に 自分を愛してくれる存在だ\r\nったと大人になってからも 幸せな思い出となる存在 〟\r\n\r\nそんなベビーシッターを目指していきたいです！\r\n\r\nこれまでの子育てや学びの経験が皆さまのお役に立てることがとても嬉しいです！\r\n豊かな経験を有し、お子様に寄り添うように慈しむように、お世話をさせていただきます	ご相談に応じまして夜間や早朝 お泊まりなども可能な時もあります。\r\nお子様の目線に合わせた保育を心がけ 保護者様のお気持ちに添える様なシッターをしたい\r\nと思っています。プロフィールには対応のお子様が1名となっていますが 2名までシッター\r\n可能です。	2020-07-04 06:31:46	2020-09-04 02:37:49	96	※新型コロナウイルス流行中の為、日常生活の中でマスクの装着や手洗いうがいを徹底し衛生に配慮をしています衛生に配慮をしています衛生に配慮をしています衛生に配慮をしています衛生に配慮をしています衛生に	4
+17	72	20	青森県	1250	2	1	f	f	01:30:00	Nội dung 自己紹介	NDDDDDD  サービス内容	2020-09-18 07:51:45	2020-09-18 07:51:45	3	xin chào tôi là xxxxxxxxxxxxxx	\N
 \.
 
 
@@ -2304,7 +2341,7 @@ COPY sitters (id, user_id, age, pref, city, kid_age_start, kid_qty, exp_parentin
 -- Name: sitters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sitters_id_seq', 16, true);
+SELECT pg_catalog.setval('sitters_id_seq', 17, true);
 
 
 --
@@ -2506,6 +2543,7 @@ COPY token_refeshes (id, user_id, token, detect, created_at, updated_at) FROM st
 162	1	c4804022000eeee476faf8492eec54	{"browser":"NetscapeFirefox","browserMajorVersion":"80","browserVersion":"80.0","os":"Windows","osVersion":"10"}	2020-09-16 00:15:07	2020-09-16 00:15:07
 163	36	673e0d5ee759607279f8bb09d723ff	{"browser":"NetscapeMicrosoft Edge","browserMajorVersion":"5","browserVersion":"5.0.564.51","os":"Windows","osVersion":"10"}	2020-09-16 00:15:37	2020-09-16 00:15:37
 164	44	cfc387b20cc0a68407f5285859ba62	{"browser":"NetscapeChrome","browserMajorVersion":"85","browserVersion":"85.0.4183.102","os":"Windows","osVersion":"10"}	2020-09-18 00:23:30	2020-09-18 00:23:30
+165	72	7b6f7b94e39598128307a7f28ffb8e	{"browser":"NetscapeChrome","browserMajorVersion":"85","browserVersion":"85.0.4183.102","os":"Windows","osVersion":"10"}	2020-09-18 07:49:32	2020-09-18 07:49:32
 \.
 
 
@@ -2513,7 +2551,7 @@ COPY token_refeshes (id, user_id, token, detect, created_at, updated_at) FROM st
 -- Name: token_refeshes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('token_refeshes_id_seq', 164, true);
+SELECT pg_catalog.setval('token_refeshes_id_seq', 165, true);
 
 
 --
@@ -2529,7 +2567,6 @@ COPY users (id, avatar, email, password, first_name, last_name, first_name_furig
 27	/storage/uploads/avatars/thumbnail/1593766960104372124_923985051400465_8287591145813158413_o.jpg	pilaf25488@trysubj.com	$2y$10$bYXUdj4sZqGePpT2RbCEa.JT7zTGVchfDEzHnD1/h.m2V/.rCAO2u	Tristina	Do	\N	TN	1970-11-18	2	161-0034	東京都	新宿区, 上落合	上落合	0979477734	2	f	\N	4da0d0245c474a495da136e19a8e14	t	f	mcfLsG9dmFSP36LZkqVoebuloPiJzT2KST0T9fwacszIQVMIIMDgHlFcH0mZ	2020-07-03 05:32:13	2020-07-22 07:50:29	1	\N	f
 41	\N	s_tran1@management-partners.co.jp	$2y$10$BCa72gPj/cZ.c9Ni0207O.7G9hJ0zt8PcfqvqPX8T0DRL867K4hkq	フリガナ	フリガナ	\N	お名前	2020-01-01	2	163-0713	東京都	新宿区, 西新宿小田急第一生命ビル１３階	\N	1111111111	3	f	\N	fa5592eaf728442695d6a8fb6ac86e	f	f	\N	2020-07-20 00:44:58	2020-07-20 00:44:58	0	\N	f
 40	\N	pakizabyo@heisei.be	$2y$10$7rIM1Fuc7hoqdYSP1XALKODu2cVOaxxnqYofuhRTUspBB0h59L/hq	マツウラ	サキ	\N	咲季	1983-10-06	2	259-1302	神奈川県	秦野市, 菩提2-11-12	ザ菩提307	09044958396	3	f	\N	310e638b5b8bb641f48bb120036895	f	f	\N	2020-07-17 04:21:46	2020-07-17 04:21:46	0	\N	f
-26	/storage/uploads/avatars/thumbnail/159494696775567434_171145764084311_5579921296491282432_o.jpg	epsminhtri@gmail.com	$2y$10$P8enPpXeVzhEyzhy6oGO5eH.EOVU5T3Quc4ygr4bn/xnfAHWtDnPS	Tran	Tr	\N	Tr	1993-10-16	1	164-0001	東京都	中野区, 中野	Add 建物名・部屋番号	09072021610	3	f	\N	f335bda11b74ad3ce76a0a725f344f	t	f	\N	2020-07-02 00:33:39	2020-07-17 00:49:27	0	\N	f
 39	/image/df_male.jpg	dgfsolomid3@gmail.com	$2y$10$VacuC3ogvThR0W79bsbfy.359sY7P8VaCI/75xdHRlmwNPfV4zfY2	TR	RR	\N	TRRR	2004-01-02	1	164-0001	東京都	中野区, 中野	・部屋番号	02525252552	3	f	\N	15fd8c07b8e4c30bea3ed2db9f097d	t	f	\N	2020-07-16 04:28:10	2020-07-31 08:11:34	0	\N	f
 43	\N	pyogyozu374@cream.pink	$2y$10$ePrEhXJXAmFSK/DXHTJxbOFmUtSKVNPg/u3gFpydEJJrQ.hUIKdny	キシ	ハルオ	\N	春夫	1982-12-20	1	859-1102	長崎県	雲仙市吾妻町木場名1-13	吾妻町木場名ロイヤル416	0907880251	3	f	\N	9897cf4f146cd493991a4234c05c8f	f	f	\N	2020-07-20 05:44:58	2020-07-20 05:44:58	0	\N	f
 44	\N	dgfsolomid1@gmail.com	$2y$10$gu4sjWluXTYt9j7gnxw4ZO3zGp.MhAk86Ne9fdXzhzcAZ39OuJ8v6	D	V	\N	DEV	1980-02-02	1	164-0001	東京都	中野区中野	009 990 0 番地以降(建物名・部屋番号など)番地以降(建物名・部屋番号など)	02525252552	3	f	\N	cc621d571d66f87532487780c90b3c	t	f	\N	2020-07-20 08:09:28	2020-07-20 08:10:52	0	\N	f
@@ -2540,7 +2577,8 @@ COPY users (id, avatar, email, password, first_name, last_name, first_name_furig
 23	\N	xayifak360@mail35.net	$2y$10$8HPR.cK51F6Nk7gZgYeDPOAX5xAoUndTX/1r6Vhtwc2UL8HOCrKAS	bui	名	\N	名	2017-03-03	2	007-0840	北海道	札幌市東区, 北四十条東	北四十条東	0364975929	2	f	\N	402b42f50fbc294cda25e399a5aa7e	t	f	\N	2020-07-01 01:48:29	2020-09-07 02:54:43	1	acct_1HOa8gLZqoXa6a5N	t
 38	/storage/uploads/avatars/thumbnail/159618328220200627_044602.jpg	buitoan04051995@gmail.com	$2y$10$OJzw9TXtpvWeDGuYkm8AM..2wXAHKNK0RyuBkP0pdScrFOdU5h8NS	フ	名	\N	4	2007-02-04	1	007-0840	北海道	札幌市東区, 北四十条東	北四十条東	0364975929	2	f	\N	539657eb14f91e7fac31648a05a1c2	t	f	\N	2020-07-13 01:31:48	2020-09-14 00:56:54	1	acct_1HR600GCiB92NYuT	f
 37	/storage/uploads/avatars/thumbnail/1595221235MP_ロゴ.png	rda99159@bcaoo.com	$2y$10$H32JEpvMyDVJqX4eKaG/N.r0.8vE3lkMhCh4cgLDlPHnT25N5gyUm	Ya	Kun	\N	Kun	1980-02-02	1	163-0713	東京都	新宿区	西新宿2丁目7-1　小田急第一生命ビル15階	0908562693	3	f	\N	da0379d428d575a9e4b8ce58197d95	t	f	Uiuj03Pv6kuSRU17MBW1C88bPfUhZr89MjQKTYBHu8lHxPFSjKMmLfsqyn7t	2020-07-10 07:24:41	2020-09-16 08:50:49	0	cus_I20M22zV8Vh6S2	f
-1	/uploads/avatar.jpg	admin@gmail.com	$2y$10$q8ksGRpeGlaPHeWsBWkW..RLlOaUjlJQmGqZjIkaELRaRxsCAx4g6	○○○○	○○○○	first_name_furigana	last_name_furigana	1991-06-26	1	900-0012	pref	town	address	08033870674	1	f	\N	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9	t	f	9NfnjFJV1Kg5IsYShLPPzNA2rQddDynY416vZzds6a1lUO6EVwNxJFmGOgrl	2020-06-25 08:27:34	2020-06-25 08:27:34	0	\N	f
+26	/storage/uploads/avatars/thumbnail/159494696775567434_171145764084311_5579921296491282432_o.jpg	epsminhtri@gmail.com	$2y$10$P8enPpXeVzhEyzhy6oGO5eH.EOVU5T3Quc4ygr4bn/xnfAHWtDnPS	Tran	Tr	\N	Tr	1993-10-16	1	164-0001	東京都	中野区, 中野	Add 建物名・部屋番号	09072021610	3	f	\N	f335bda11b74ad3ce76a0a725f344f	t	f	\N	2020-07-02 00:33:39	2020-09-18 07:36:16	0	cus_I2jbsDdV7rkzVK	f
+1	/uploads/avatar.jpg	admin@gmail.com	$2y$10$q8ksGRpeGlaPHeWsBWkW..RLlOaUjlJQmGqZjIkaELRaRxsCAx4g6	○○○○	○○○○	first_name_furigana	last_name_furigana	1991-06-26	1	900-0012	pref	town	address	08033870674	1	f	\N	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9	t	f	ORrLpbLv0oeRRgC3Ui1RcTCjWxky8LDl0I26HDqtmUw3X7TPsDPosOj1mHBi	2020-06-25 08:27:34	2020-06-25 08:27:34	0	\N	f
 56	/storage/uploads/avatars/thumbnail/1596084138水色.jpg	ryurya181@fuwa.be	$2y$10$vWPIyMwR7Mx/qZ0d6wk3buxgn/yKOxhQg6llL1zIEf6EpRaLRrOAW	寺沢	松雄	\N	マツオ	1986-03-30	1	651-2215	兵庫県	神戸市西区	北山台3-5-17	09018681541	2	f	\N	fb5511f05ca1fa587bcb7d9f9c0227	t	f	\N	2020-07-30 04:24:23	2020-07-30 04:58:36	1	\N	f
 42	/image/df_female.jpg	stran.anagerment1.partners@gmail.com	$2y$10$T69Wr062NXYOt0LzOQ3cUeoL7oDasFw4KqLknyoO66ZJCC64tHMhC	担当者	お名前	\N	フリガナ	2005-01-16	2	163-0713	東京都	新宿区, 西新宿小田急第一生命ビル１３階	\N	1111111111	2	f	\N	cedb954f338c6cbc7f34756782bfa7	f	f	\N	2020-07-20 00:47:43	2020-07-20 00:47:43	0	\N	f
 52	/storage/uploads/avatars/thumbnail/1595397316wjmtUmDg_400x400.jpg	meryupamu@fanclub.pm	$2y$10$6BOk1htyiXCQR9jdTLII8.csV1O1KtY6/b7E5afjtfr2agT9JIFPS	ナカオ	ケンイチ	\N	研一	1979-10-10	1	235-0031	神奈川県	横浜市磯子区	新中原町3-20-8	08094998997	3	f	\N	07666b024a7194f54831fd3fab50d4	t	f	\N	2020-07-22 05:42:14	2020-07-29 05:36:31	0	\N	f
@@ -2571,7 +2609,8 @@ COPY users (id, avatar, email, password, first_name, last_name, first_name_furig
 29	/storage/uploads/avatars/thumbnail/159912264992912542_223204509001080_5437823884051087360_n.jpg	buitoan0405@gmail.com	$2y$10$wyP9WvyEUOOwxst3Ngnoq.zsKApXWL5HWlWcURnSSHVLMNA0i6ByK	Bùi	Toàn	\N	Toàn	2014-11-11	1	007-0841	北海道	札幌市東区, 北四十一条東	520 Cách mạng tháng 8, quận 3	0364975929	2	f	\N	a879e5e34a757673d95bd12d69dc3b	t	f	87lV3gACOOrSbgJMVoEhUcYwZNM1CGWPbum5tzyC4L3bsJeyPH92kPQ7MIac	2020-07-04 06:15:39	2020-09-03 08:44:09	1	acct_1HNDtXARyJxhilqB	t
 59	\N	rapapope@cream.pink	$2y$10$KQMu2Z9/cFTeDr.X5PAhluusy7NshnOuOlLmPPl3D8YoAM4kFtgOO	コンノ	トシカツ	\N	利勝	1988-10-17	1	926-0828	石川県	七尾市	白馬町3-4	9061211270	3	f	\N	5eee41ce1ce5e7f98bec4f66ebc22e	t	f	\N	2020-07-30 06:55:06	2020-09-09 00:38:50	1	\N	f
 24	/storage/uploads/avatars/thumbnail/1594803075z1969046783979_4e570b622414266d1f9f577bc0138dbd.jpg	thanhhung.dev@gmail.com	$2y$10$u.b7Uhf7ITCd09SGuCoe0.zh5/dsMi.eCImj48XAmq8PQ8skJEo6y	Têndàidằngdặc đọcxongđừngsặc chỉthíchlairai mặcbạnlàai khôngrảnhđâumà	Tênmìnhngắnlắm nhưngđểgiảithích thànhranómới dàinhưthếnày	\N	Datrắngmặtxinh Thânhìnhcựcchuẩn Nhưnghơingusuẩn TêmìnhlàHùng	2004-11-15	2	900-0012	沖縄県	那覇市, 泊	泊tokyo35443	0907581480	2	f	\N	f6fb2613d4c28355e11b5bde48004c	t	f	\N	2020-07-01 01:51:53	2020-09-11 05:10:26	1	acct_1HOa8gLZqoXa6a5N	t
-36	/storage/uploads/avatars/thumbnail/1594366060images (2).jpg	fewebe7913@pastmao.com	$2y$10$oeTmpuhwcgENKs/.BIB/VeLAdIzdBgiSIDMFGOVpiy9WPBK4Z4xN2	SITTER	TEST	\N	TEST	1973-11-20	2	164-0001	東京都	中野区, 中野	建物名・部屋番号	01354698825	2	f	\N	d082f8a8fc3631904aee28158a3b7b	t	f	sNFNufkZYLq2k3iBAA0RC3aGOomyJZHrPReMzxyEaoj8syPitjuCYxfQpV5f	2020-07-10 07:24:05	2020-09-07 02:41:34	1	acct_1HNTLwHVbwnXcVyU	t
+36	/storage/uploads/avatars/thumbnail/1594366060images (2).jpg	fewebe7913@pastmao.com	$2y$10$oeTmpuhwcgENKs/.BIB/VeLAdIzdBgiSIDMFGOVpiy9WPBK4Z4xN2	SITTER	TEST	\N	TEST	1973-11-20	2	164-0001	東京都	中野区, 中野	建物名・部屋番号	01354698825	2	f	\N	d082f8a8fc3631904aee28158a3b7b	t	f	y5nBfP9V8KV4odcJQRWazcr5WxVhSF9zWJyFsIATYCDXIaLNIURlKHdcCfRp	2020-07-10 07:24:05	2020-09-07 02:41:34	1	acct_1HNTLwHVbwnXcVyU	t
+72	/storage/uploads/avatars/thumbnail/1600415416mtruoc.jpg	dgfsolomid2@gmail.com	$2y$10$ZT5fVkc30pPsFXmQJEzZ6eqFMcTrdJlQoh3nDIidY33Mmg/NWuWdu	DG	F	\N	F	2005-12-19	1	164-0001	東京都	中野区	中野	02525252552	2	f	\N	71de1e92e37d4c98cdd5cc73aa2b67	t	f	\N	2020-09-18 07:43:53	2020-09-18 07:50:16	1	acct_1HSeJLLbFyA74LmQ	t
 \.
 
 
@@ -2579,7 +2618,7 @@ COPY users (id, avatar, email, password, first_name, last_name, first_name_furig
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_id_seq', 71, true);
+SELECT pg_catalog.setval('users_id_seq', 72, true);
 
 
 --
@@ -2637,6 +2676,7 @@ COPY verify_emails (id, user_id, token_verify, email_verified_at, email_expire_a
 66	70	06043dc8467dc307e7a2ddf0abea4b	2020-08-03 08:12:21	2020-08-04 08:09:40	2020-08-03 08:09:40	2020-08-03 08:12:21
 67	71	755621d9f5db747e3a71334f0e2035	\N	2020-08-14 04:55:20	2020-08-13 04:55:20	2020-08-13 04:55:20
 50	54	cef539e8cf5e6b17fa373c8d4940d7	\N	2020-09-17 00:57:38	2020-07-29 05:38:14	2020-09-16 00:57:38
+68	72	71de1e92e37d4c98cdd5cc73aa2b67	\N	2020-09-19 07:46:19	2020-09-18 07:43:53	2020-09-18 07:46:19
 \.
 
 
@@ -2644,7 +2684,7 @@ COPY verify_emails (id, user_id, token_verify, email_verified_at, email_expire_a
 -- Name: verify_emails_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('verify_emails_id_seq', 67, true);
+SELECT pg_catalog.setval('verify_emails_id_seq', 68, true);
 
 
 --

@@ -173,7 +173,6 @@ function eventAfterOpenModel__viewer(_instance, dates){
             
             var data                 = {}
                 data.localUserId     = parseInt(employerID)
-                
                 data.referenceUserId = parseInt(sitterID)
                 data.refesh          = employerRefesh
                 data.message         = messageDatePicked
@@ -182,8 +181,6 @@ function eventAfterOpenModel__viewer(_instance, dates){
                 data.salary          = TYPE_JOB == 1 ? SYSTEM_TEXT_SALARY_SITTER : SYSTEM_TEXT_SALARY_HOUSE,
                 data.timeBegin       = timeBegin ? timeBegin + ":00" : "00:00:00"
                 data.timeEnd         = timeEnd ? timeEnd + ":00" : "01:00:00"
-            var detect               = detectClient()
-            Object.assign(data, detect)
             
             return fetch(SYSTEM_REAL_TIME_URL + '/api/channel', {
                 method: 'POST',

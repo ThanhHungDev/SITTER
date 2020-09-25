@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/404', function(){
@@ -82,6 +83,7 @@ Route::group(['prefix' => 'employer'], function() {
         Route::post('/edit','Client\employer\EmployerController@postEditProfile')->name('EMPLOYER_POST_EDIT_PROFILE');
         Route::post('/ajax-delete-member','Client\employer\EmployerController@ajaxDeleteMember')->name('AJAX_DELETE_MEMBER_FAMILY');
         Route::post('/upload-avatar','Client\employer\EmployerController@ajaxUploadAvatar')->name('AJAX_UPLOAD_AVATAR');
+        Route::post('/upload-galleries','Client\employer\EmployerController@ajaxUploadGalleries')->name('AJAX_UPLOAD_GALLERIES');
         Route::get('/review-sitter','Client\employer\EmployerController@reviewSitter')->name('EMPLOYER_REVIEW');
         Route::post('/review-sitter','Client\employer\EmployerController@postReviewSitter')->name('EMPLOYER_POST_REVIEW');
         Route::get('/booking-sitter','Client\employer\EmployerController@ajaxBookingSitter')->name('AJAX_EMPLOYER_BOOKING_SITTER');

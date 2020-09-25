@@ -64,6 +64,8 @@ return [
 
     'STRIPE_API_URL' => env('STRIPE_API_URL', 'https://api.stripe.com'),
 
+    'STRIPE_PUBLIC_KEY' => env('STRIPE_PUBLIC_KEY','pk_test_51HH3fxEkyn0XMKpGPVUghMwsvtR0lktiryL5WUbPkvzhx1Ykw0V5j8w20RPXQLXAnNTlbqShTAiJaQaTwcNMI6Pz00H35guI44'),
+    
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

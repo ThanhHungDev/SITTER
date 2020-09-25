@@ -52,7 +52,7 @@
 
 @section('scripts')
     <script>
-        STRIPE_PUBLIC_KEY = "{{config('constant.STRIPE_PUBLIC_KEY')}}";
+        STRIPE_PUBLIC_KEY = "{{config('app.STRIPE_PUBLIC_KEY')}}";
     </script>
     <script src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript" src="{{ asset('/js/stripe_index.min.js') }}"></script>

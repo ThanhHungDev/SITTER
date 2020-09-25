@@ -95,6 +95,9 @@
                 margin-right: 5px;
             }
         }
+        .btn-edit{
+            background-color: #c9c9c9;
+        }
         a{
             text-decoration: none;
         }
@@ -280,6 +283,50 @@
     }
     .boder-img{
         border: 2px solid #2dc187;
+        height: 250px;
+        margin-bottom: 15px;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        img{
+            max-width: 100%;
+            height: 100%;
+        }
+        .delete_galaries{
+            top: 0;
+            right: 0;
+            z-index: 99;
+            padding: 0 15px;
+            background: #2dc187;
+            color: #ffffff;
+            position: absolute;
+            border-radius: 0 0 0 12px;
+            cursor: pointer;
+            font-size: 25px;
+            &:hover{
+                .upload-icon{
+                    display: none;
+                }
+            }
+        }
+        .upload-icon{
+            display: none;
+            position: absolute;
+            left: 28%;
+            top: 28%;
+            width: 150px;
+            height: 150px;
+            z-index: 98;
+            margin: 0 auto;
+        }
+        &:hover{
+            .upload-icon{
+                display: block;
+            }
+            div[data-status='active']{
+                display: block;
+            }
+        }
         margin-bottom: 15px;
     }
     .delete_avatar{

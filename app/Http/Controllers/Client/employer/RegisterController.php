@@ -367,7 +367,7 @@ class RegisterController extends Controller
         $dataUser  = (new VerifyEmailModel)->getDataByToken($tokenUser);
 
         if(!empty($dataUser)){
-            $stripe     = new \Stripe\StripeClient(config('constant.STRIPE_SECRET_KEY'));
+            $stripe     = new \Stripe\StripeClient(config('app.STRIPE_API_KEY'));
             $dataStripe = $stripe->customers->create([
                 "description" => 'My First Test Customer (created for API docs)',
                 "source"      => $input['stripeToken'],                                  // obtained with Stripe.js

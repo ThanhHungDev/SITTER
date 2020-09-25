@@ -7,33 +7,19 @@ import { filterSortConversation, setterConversation } from "../../action"
 
 
 class Search extends Component {
-
-    constructor(props){
-        super( props )
-
-        this.state = {
-            hung : null
-        }
-        this.searchUser = this.searchUser.bind(this)
-    }
-
     
-    searchUser(e) {
+    searchUser = () => {
 
-        var _this      = this,
-            backupData = [ ... this.props.conversationBackup ],
+        console.log("searchUser")
+        var backupData = [ ... this.props.conversationBackup ],
             listName   = [],
-            text       = e.target.value,
+            text       = this.search.value,
             output     = text.split('')
 
-        console.log( text , "texttexttexttexttexttext")
         if( !text || !text.trim() ){
 
             this.props.dispatch(setterConversation(this.props.conversationBackup))
             
-            if(this.state.hung){
-                clearTimeout(this.state.hung)
-            }
         }else if( backupData ){
             backupData.map( conv => {
                 var obj = { sort: 0, id: conv.id , text: conv.user.first_name + " " }
@@ -49,22 +35,16 @@ class Search extends Component {
                     }
                 })
             })
-            if(this.state.hung){
-                clearTimeout(this.state.hung)
-            }
-            
-            _this.setState({
-                hung: setTimeout(function(){ 
-                    
-                    listName.sort((a, b) => (a.sort > b.sort) ? 1 : -1)
-                    var lstIdSorted = listName.map( item => item.sort != -1 && item.sort ? item.id : 0 )
-                    _this.props.dispatch(filterSortConversation({ ids : lstIdSorted, data: backupData }))
-                }, 600)
-            })
+            listName.sort((a, b) => (a.sort > b.sort) ? 1 : -1)
+            var lstIdSorted = listName.map( item => item.sort != -1 && item.sort ? item.id : 0 )
+            this.props.dispatch(filterSortConversation({ ids : lstIdSorted, data: backupData }))
         }
-         
-
         
+    }
+    handleSearchUser = event => {
+        if (event.keyCode == 13 ) {
+            this.searchUser()
+        }
     }
 
     render() {
@@ -72,10 +52,14 @@ class Search extends Component {
         return (
             <div className="component-search-user">
                 <i className="hero-icon hero-account-search-outline"></i>
-                <input type="text" className="search-user" 
+                <input type="text" className="search-user"
+                ref={(input) => this.search = input}
+                onKeyUp={this.handleSearchUser}
                 autoComplete="off"
-                onChange={this.searchUser}
                 name="search-user" placeholder='入力して誰かを見つける' />
+                <i className="btn-search hero-icon hero-layers-search-outline"
+                onClick={this.searchUser}
+                ></i>
             </div>
         );
     }
