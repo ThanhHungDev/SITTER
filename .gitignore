@@ -1,12 +1,6 @@
 /node_modules
-/public/hot
-/public/storage
-/public/css/app.css
-/public/js/app.min.js
 /storage/*.key
 /vendor
-.env
-.env.backup
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
