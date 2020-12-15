@@ -86,7 +86,14 @@ class SitterController extends Controller
     {
         $data = $this->getDataCommon();
 
-        return view('client.sitter.edit_mypage', compact('data'));
+        /// get date booking had payment 
+        $bookingModel = $this->model->createBookingModel();
+        $condition = [
+            'sitter' => Auth::user()->id
+        ];
+        $booking = $bookingModel->getBookingPaid($condition)->get();
+
+        return view('client.sitter.edit_mypage', compact('data', 'booking'));
     }
 
     private function getDataCommon(){
@@ -102,6 +109,9 @@ class SitterController extends Controller
         $data['balance'] = $arrBalance;
 
         $skillModel = $this->model->createSkillModel();
+        $experienceModel = $this->model->createExperienceModel();
+
+        $data['experiences'] = $experienceModel::get();
         $data['skills'] = $skillModel::get();
 
         $schedules = $user->schedules;
@@ -110,22 +120,24 @@ class SitterController extends Controller
             $sitter['time_support'] = (new Carbon($sitter['time_support']))->format('H:i');
         }
         $data['sitter']  = $sitter;
-        $data['avatars'] = $user->galaries;
         $salarySitter = $user->salaries()->where('type', config('constant.SALARY_TYPE.SALARY_SITTER'))->first();
         $salaryHouse  = $user->salaries()->where('type', config('constant.SALARY_TYPE.SALARY_HOUSE'))->first();
 
         if(!empty($salarySitter)){
             $data['salarySitter'] = $salarySitter->salary;
         }
-
         if(!empty($salaryHouse)){
             $data['salaryHouse'] = $salaryHouse->salary;
         }
 
         $typeGalaries = config('constant.GALARY_TYPE.SITTER_AVATAR');
-        $data['galaries'] = $user->galaries()->where('type', $typeGalaries)->get();
+        $typeCertify = config('constant.GALARY_TYPE.INPUT_FILE_QUALIFI');
+        $data['certifies'] = $user->galaries()->where('type', $typeCertify)->latest()->get();
+        $data['galaries'] = $user->galaries()->where('type', $typeGalaries)->latest()->get();
+
         $data['jsonSchedules'] = $this->sitterService->convertScheduleDataToJson($schedules);
         $data['skill_actives'] = $user->skills()->get()->pluck('id')->toArray();
+        $data['experience_actives'] = $user->experiences()->get()->pluck('id')->toArray();
 
         return $data;
     }
@@ -147,6 +159,11 @@ class SitterController extends Controller
         try {
             if(!isset($params['exp_kid_qty'])){
                 $params['exp_kid_qty'] = null;
+            }
+
+            $user->experiences()->detach();
+            if(isset($params['experiences']) && $params['experiences']){
+                $user->experiences()->attach($params['experiences']);
             }
 
             $sitterModel->updateOrCreate(['user_id' => $user_id], $params);
@@ -226,6 +243,93 @@ class SitterController extends Controller
         }
     }
 
+    public function ajaxDeleteStripeAccount(Request $request){
+        $data = [
+            'messages' => 'delete fail!',
+            'code'   => 500
+        ];
+
+        $user_id   = Auth::user()->id;
+        $userModel = $this->model->createUserModel();
+        $user      = $userModel::findOrFail($user_id);
+
+        if(!$user) {
+            return response()->json($data);
+        }
+
+        $stripe_account_id = $user->stripe_account_id;
+        $response = Http::withToken(config('app.STRIPE_API_KEY'))->delete(config('app.STRIPE_API_URL').'/v1/accounts/'.$stripe_account_id);
+        $data = $response->json();
+
+        if(!$data['deleted']){
+            return response()->json($data);
+        }
+
+        $user->stripe_account_id = null;
+        $user->stripe_active = false;
+
+        $user->save();
+
+        Auth::logout();
+
+        $data = [
+            'messages' => 'delete success',
+            'code'   => 200
+        ];
+        return response()->json($data);
+    }
+
+    public function ajaxUploadCertify(Request $request){
+        $data = [
+            'messages' => 'upload fail!',
+            'code'   => 500
+        ];
+
+        $userModel = $this->model->createUserModel();
+        $params = $request->except('_token');
+        $user_id = Auth::user()->id;
+        $user = $userModel->findOrFail($user_id);
+        if($user){
+            $arrUpload = $this->commonService->RegisterUploadFile($params['file'], config('constant.UPLOAD_FILE.SITTER'));
+            $params['type'] = config('constant.GALARY_TYPE.INPUT_FILE_QUALIFI');
+            $params['name'] = $arrUpload['name'];
+            $params['path'] = $arrUpload['path'];
+            $galary = $user->galaries()->create($params);
+
+            if($galary->id){
+                $data = [
+                    'messages' => 'upload succesfuly!',
+                    'code'   => 200,
+                    'id'     => $galary->id,
+                    'name'    => $galary->name,
+                ];
+            }
+        }
+
+        return response()->json($data);
+    }
+
+    public function ajaxRemoveCertify(Request $request){
+
+        $data = [
+            'messages' => 'remove errors!',
+            'code'   => 500,
+        ];
+        $galaryModel = $this->model->createGalaryModel();
+        $imgId = $request->input('imageId');
+        $img = $galaryModel->findOrFail($imgId);
+        if($img){
+            $img->delete();
+
+            $data = [
+                'messages' => 'remove succesfuly!',
+                'code'   => 200,
+            ];
+        }
+
+        return response()->json($data);
+    }
+
     public function ajaxUploadAvatar(Request $request){
 
         $data = [
@@ -300,7 +404,6 @@ class SitterController extends Controller
                 'code'   => 200,
             ];
         }
-        
 
         return response()->json($data);
     }
@@ -359,6 +462,120 @@ class SitterController extends Controller
         $data = $bookingModel->getListEmployerBookings(['sitter_id'=>$sitter_id])->paginate(10);
         if ($request->ajax()) {
             return view('client.sitter.list_booking', compact('data'));
+        }
+    }
+
+    public function testAccount1(Request $request){
+        $account = \Stripe\Account::create([
+            'country' => 'jp',
+            'type' => 'custom',
+            'email' => 't_kanazawa@management-partners.co.jp',
+            'business_type' => 'individual',
+            'capabilities' => [
+                'card_payments' => [
+                'requested' => true,
+                ],
+                'transfers' => [
+                'requested' => true,
+                ],
+            ],
+        ]);
+
+        session(['account_id' => $account->id]);
+        $account_link_url = $this->generateAccountLink($account->id);
+        return redirect($account_link_url);
+    }
+
+    public function viewBank(Request $request){
+        $user_id = Auth::user()->id;
+        $userModel = $this->model->createUserModel();
+        $user = $userModel->findOrFail($user_id);
+        $stripe_account_id = $user->stripe_account_id;
+        $data['bankAccount'] = $user->bankAccount;
+        $balance = \Stripe\Balance::retrieve(
+            ['stripe_account' => $stripe_account_id]
+        );
+
+        $account = \Stripe\Account::retrieve(
+            $stripe_account_id,
+        );
+
+        $py_sche_interval = $account->settings->payouts->schedule->interval;
+        switch ($py_sche_interval) {
+            case 'weekly':
+                $py_sche = convertJapanDayInWeek($account->settings->payouts->schedule->weekly_anchor);
+                break;
+            case 'monthly':
+                $py_sche_monthly = $account->settings->payouts->schedule->monthly_anchor;
+                $py_sche = Carbon::create(now()->year, now()->month, $py_sche_monthly)->format('Y/m/d');
+                break;
+            
+            default:
+                $py_sche = $account->settings->payouts->schedule->weekly_anchor;
+                break;
+        }
+        $data['py_sche'] = $py_sche;
+        $data['stripe_acc_stt'] =  $account->details_submitted;
+        $data['balance'] = $balance->available[0]->amount;
+
+        return view('client.sitter.view_bank', $data);
+    }
+
+    public function editBank(Request $request){
+        return view('client.sitter.edit_bank');
+    }
+
+    public function postEditBank(Request $request){
+        DB::beginTransaction();
+        try {
+            $params           = $request->except('_token');
+            $user_id   = Auth::user()->id;
+            $userModel = $this->model->createUserModel();
+            $user      = $userModel::findOrFail($user_id);
+
+            $stripe_acc_id = $user->stripe_account_id;
+            $stripe_bank_id = $user->bankAccount->stripe_bank_id;
+
+            if(!$stripe_acc_id) {
+                return view('errors.404');
+            }
+
+            $tokenObj = \Stripe\Token::create([
+                'bank_account' => [
+                    'country' => 'JP',
+                    'currency' => 'jpy',
+                    'account_holder_name' => $params['account_holder_name'],
+                    'account_holder_type' => 'individual',
+                    'routing_number' => $params['routing_number'],
+                    'account_number' => $params['account_number'],
+                ],
+            ]);
+
+            // save to stripe
+            $bank = \Stripe\Account::createExternalAccount(
+                $stripe_acc_id,
+                [
+                'external_account' => $tokenObj->id,
+                'default_for_currency' => true
+                ]
+            );
+
+            $params['stripe_bank_id'] = $bank->id;
+
+            // save to databases
+            $bank_db = $user->bankAccount()->updateOrCreate(['user_id' => $user_id], $params);
+
+            if($bank && $bank_db){
+                $user->stripe_active = true;
+                $user->save();
+            }
+
+            DB::commit();
+            return redirect(route('SITTER_MYPAGE'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $errors = new MessageBag(['errors' => ['エラーを作成する', 'ストライプテストで実際の銀行口座を登録できません']]);
+            return redirect()->back()->withInput()->withErrors($errors);
         }
     }
 }

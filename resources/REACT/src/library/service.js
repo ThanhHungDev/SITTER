@@ -60,9 +60,9 @@ export function getAccessTokenByRefesh( userId, refesh, detect, instanceComponen
             tokenAccess: response.data.tokenAccess,
             tokenRefesh: response.data.tokenRefesh
         }
-        console.log("getAccessTokenByRefesh setime out  window.location.href = CONFIG.SERVER_PHP.URL" + parseInt(response.data.expire) )
+        console.log("setime out  window.location.href = CONFIG.SERVER_PHP.URL")
         setTimeout(function(){
-            window.location.href = CONFIG.SERVER_PHP.URL
+            location.reload()
         }, parseInt(response.data.expire) * 1000 )
         
         var userLogin = { ... response.data.user, tokens : tokensUser }
@@ -103,7 +103,7 @@ export function socketInitialConnect(socketIOClient, instanceApp) {
         //// set config
         socketListenner(socket, instanceApp)
         instanceApp.props.dispatch(setterSocket(socket))
-        console.log("socket connect nè socketListenner")
+        console.log("socket connect")
     });
     socket.on('disconnect', function () {
         instanceApp.props.dispatch(setterSocket(null))
@@ -119,7 +119,7 @@ export function socketInitialConnect(socketIOClient, instanceApp) {
 // //Caller
 export function caller( channelInfor, user, client ){
     var id = document.getElementById("Application").getAttribute('data-peer' )
-    console.log( id, channelInfor )
+    
     openStream()
     .then(stream => {
         globalStream = stream
@@ -128,7 +128,7 @@ export function caller( channelInfor, user, client ){
         return getPeerUserChannel( channelInfor, user, client )
     })
     .catch(function(error) {
-        console.log("caller")
+        console.log("caller", error)
     })
 }
 
@@ -214,7 +214,7 @@ export function listenScrollMessage(e, messages, channelActive ) {
             })
 
             if( existNoneRead ){
-                console.log(EVENT.READ_MESSAGE_ALL, "listenScrollMessage")
+                // console.log(EVENT.READ_MESSAGE_ALL, "listenScrollMessage")
                 var userLocal = JSON.parse(localStorage.getItem('user'))
                 socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
             }
@@ -234,7 +234,7 @@ export function listenReadMessageNewUser( messages, channelActive ) {
     })
 
     if( existNoneRead ){
-        console.log(EVENT.READ_MESSAGE_ALL, "listenReadMessageNewUser")
+        // console.log(EVENT.READ_MESSAGE_ALL, "listenReadMessageNewUser")
         var userLocal = JSON.parse(localStorage.getItem('user'))
         socket.emit(EVENT.READ_MESSAGE_ALL, { user : userLocal.id, channelId: channelActive.id, channelName: channelActive.channelName })
     }
@@ -247,17 +247,29 @@ export function sendBookingUpdate(bookingUpdate) {
 }
 
 export function calculatorBill(booking, auth ) {
+
+    /// phí sử dụng dịch vụ của sitter là 450 yên + ( 25% của tổng tiền lương )
+    const FEE_DEFAULT_SITTER_MIN = 450
+    const PERCENT_FEE_SITTER = 0.0025
+    /// phí vat 10% 
+    const PERCENT_VAT_DEFAULT = 0.1
+    /// phí của employer 20% 
+    const PERCENT_FEE_EMPLOYER = 0.2
+    /// khi gửi lên stripe thì phí là 3.6%
+    const PERCENT_FEE_STRIPE = 0.036
+
     var work_date = booking.work_date,
         start     = booking.start,
         finish    = booking.finish,
         salary    = booking.salary
 
-    var differenceTime = 0,
-        price          = 0,
-        myServFee      = 0,
-        stripeServFee  = 0,
-        vat            = 0,
-        total          = 0
+    var differenceTime    = 0,
+        price             = 0,
+        myServFeeSitter   = 0,
+        myServFeeEmployer = 0,
+        stripeServFee     = 0,
+        vat               = 0,
+        total             = 0
     
     if( salary && work_date && start && finish ){
         var [ fHour, fMinute ] = finish.split(':'),
@@ -265,19 +277,21 @@ export function calculatorBill(booking, auth ) {
         var dateTimeFinish     = (new Date(1,1,2020, fHour, fMinute, 0)).getTime(),
             dateTimeStart      = (new Date(1,1,2020, sHour, sMinute, 0)).getTime()
 
-            differenceTime = (dateTimeFinish - dateTimeStart)/ 1000 / 60 / 60
-            price          = Math.floor(differenceTime * salary)
-            myServFee      = Math.floor(price * 0.2)
-            vat            = Math.floor((price + myServFee) * 0.1)
-            stripeServFee  = Math.floor((price + myServFee + vat) * 0.036)
+            differenceTime    = (dateTimeFinish - dateTimeStart)/ 1000 / 60 / 60
+            price             = Math.floor(differenceTime * salary)
+            myServFeeEmployer = Math.floor(price * PERCENT_FEE_EMPLOYER)
+            myServFeeSitter   = Math.floor( price * PERCENT_FEE_SITTER ) + FEE_DEFAULT_SITTER_MIN
+            vat               = Math.floor((price + myServFeeEmployer) * PERCENT_VAT_DEFAULT)
+            stripeServFee     = Math.floor((price + myServFeeEmployer + vat) * PERCENT_FEE_STRIPE)
     }
     if( auth.role_id == config.ROLE_USER.sitter ){
         
-        total = price - stripeServFee
+        total = price - stripeServFee - myServFeeSitter
     }else if( auth.role_id == config.ROLE_USER.employer ){
-        total = price + vat + myServFee
+        
+        total = price + vat + myServFeeEmployer
     }
-    return [ work_date, start, finish, salary, differenceTime, price, vat, myServFee, stripeServFee, total ]
+    return [ work_date, start, finish, salary, differenceTime, price, vat, myServFeeSitter, myServFeeEmployer, stripeServFee, total ]
 }
 
 export function calculatorFeeStripe(amount, currency) {
@@ -372,7 +386,7 @@ function fetchChannelMessage( data ) {
     .then(res => res.json())
     .then(response => {
 
-        console.log( response , action)
+        // console.log( response , action)
         if (response.code != 200) {
             
             throw new Error("エラーが発生しました。しばらくしてからもう一度お試しください2")
@@ -472,7 +486,7 @@ function socketListenner( socket, instanceApp ){
 
     socket.on(EVENT.RESPONSE_MESSAGE, data => {
         
-        console.log(EVENT.RESPONSE_MESSAGE, data)
+        // console.log(EVENT.RESPONSE_MESSAGE, data)
         var { user, token, message, style, attachment, channel, detect } = data 
         var userLocal   = JSON.parse(localStorage.getItem('user')),
             detectLocal = localStorage.getItem('detect')
@@ -531,13 +545,13 @@ function socketListenner( socket, instanceApp ){
     socket.on(EVENT.RESPONSE_USER_GET_BOOKING, data => {
 
         var bookings = data.bookings
-        console.log(bookings, EVENT.RESPONSE_USER_GET_BOOKING)
+        // console.log(bookings, EVENT.RESPONSE_USER_GET_BOOKING)
         instanceApp.props.dispatch(setterBookings({ fetch: true, data: bookings }))
     })
 
     socket.on(EVENT.RESPONSE_USER_CHANGE_BOOKING, data => {
         
-        console.log( data, EVENT.RESPONSE_USER_CHANGE_BOOKING)
+        // console.log( data, EVENT.RESPONSE_USER_CHANGE_BOOKING)
 
         var { user, token, message, style, attachment, channel } = data 
         var userLocal = JSON.parse(localStorage.getItem('user'))

@@ -14,7 +14,7 @@
                     @foreach ($list_items as $item)
                         @php
                             $currentDate = \Carbon\Carbon::parse($item->work_date)->add(1, 'day');
-                            $dateNow = \Carbon\Carbon::now();
+                            $dateNow = \Carbon\Carbon::now()->startOfDay();
                             $urlChat = '';
                             if ($currentDate >= $dateNow) {
                                 $urlChat = Route('EMPLOYER_CHAT', ['id'=> $item->sitter_id]);
@@ -30,7 +30,7 @@
                             </td>
                             <td>
                                 @if ($urlChat != '')
-                                    <a href="{{ $urlChat }}">チャットを見る</a>
+                            <a href="{{ $urlChat }}">チャットを見る</a>
                                 @endif
                             </td>
                         </tr>

@@ -26,7 +26,6 @@ php artisan make:migration create_users_table
 
  php artisan db:seed
 
- php artisan storage:link
  php artisan config:cache
  
  composer require jenssegers/mongodb
@@ -42,3 +41,17 @@ $ ssh-add ~/.ssh/id_rsa
 
 
 php artisan cache:clear
+
+setup product crontab
+crontab -e 
+59 23 * * * cd /home/.sites/site17/web && php artisan channel:update > /dev/null 2>&1
+15 00 * * * cd /home/.sites/site17/web && php artisan command:transfer > /dev/null 2>&1
+
+setup server test crontab
+crontab -e 
+59 23 * * * cd /home/.sites/site22/web && php artisan channel:update > /dev/null 2>&1
+15 00 * * * cd /home/.sites/site22/web && php artisan command:transfer > /dev/null 2>&1
+
+setup storage link server 
+php artisan storage:link
+//test

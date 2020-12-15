@@ -282,7 +282,7 @@
                         <div class="group-control w-p100 flex-column">
                             <div class="form-validate">
                                 <div class="w-510">
-                                    <input type="password" class="form-control" name='password' id="password" placeholder="パスワード（半角英数字6文字以上）" value="{{ old('password') }}"/>
+                                    <input type="password" class="form-control" name='password' id="password" placeholder="パスワード（半角英数字6文字以上）" />
                                 </div>
                                 <div class="form-error">
                                     @error('password')
@@ -292,7 +292,7 @@
                             </div>
                             <div class="form-validate p-top-20">
                                 <div class="w-510">
-                                    <input type="password" class="form-control" name='confirm_password' placeholder="確認のためもう一度入れてください" value="{{ old('confirm_password') }}"/>
+                                    <input type="password" class="form-control" name='confirm_password' placeholder="確認のためもう一度入れてください" />
                                 </div>
                                 <div class="form-error">
                                     @error('confirm_password')

@@ -1,7 +1,7 @@
 @section('title', 'Employer Register Success Page')
 @extends('_LAYOUT.index')
 @section('content')
-<div class="sitter-common">
+<div class="employer-success">
     <div class="max-width-780 sitter-after-register">
         
     {{-- <h2 class="text-center">ご登録ありがとうございます。<a href="{{route('EMPLOYER_LOGIN')}}">こちら</a>からログインしてください。</h2> --}}

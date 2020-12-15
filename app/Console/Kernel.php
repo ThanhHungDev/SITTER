@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\HiddenChannelSitters::class,
     ];
 
+
     /**
      * Define the application's command schedule.
      *
@@ -25,7 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:transfer')->lastDayOfMonth('00:00');
+        $schedule->command('command:transfer')->lastDayOfMonth('00:05');
         $schedule->command('channel:update');
     }
 

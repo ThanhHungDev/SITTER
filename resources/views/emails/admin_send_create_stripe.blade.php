@@ -4,19 +4,22 @@
 
 <head>
 
-    <title>【〇〇〇〇〇〇〇〇〇〇】レビュー投稿</title>
+    <title>【家政婦さん・ベビーシッタードットコム】クレジットカード情報登録のお願い</title>
 
 </head>
 
 <body>
     <h2>{{ $dataSendMail['full_name'] }}様</h2>
-    <p>
-        Please click here to register account payment!
-    </p>
-    <p>
-        リンクURL：<a href="{{$dataSendMail['route']}}">url</a>
-    </p>
-    <p>メールアドレス：○○○○＠○○○○○○</p>
+    
+    <p>この度は家政婦さん・ベビーシッタードットコムをご登録いただきまして、誠にありがとうございます。</p>
+    <p>審査の結果、{{ $dataSendMail['full_name'] }}様のご登録を受理いたしました。</p>
+    <p>つきましては、下記URLよりご利用料金決済用のクレジットカード情報をご登録いただきますようお願いいたします。</p>
+    <p>クレジットカードの登録が完了いたしますと、利用者様専用ページにログインできるようになります。</p>
+    <p>クレジットカード情報登録ページ：<a href="{{$dataSendMail['route']}}">{{$dataSendMail['route']}}</a></p>
+    <br>
+    <p>※本メールに心当たりのない方は、本メールを破棄していただきますようお願いいたします。</p>
+    <p>クレジットカード登録に関するお問い合わせやご不明点等は、下記メールアドレスよりお気軽にお問い合わせくださいませ。</p>
+    <p>メールアドレス：info@kaseifu-babysitter.com</p>
     <br/>
     @include('emails.footer')
 </body>

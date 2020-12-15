@@ -67,7 +67,7 @@ class InputSendChat extends Component {
         }
     }
     submitMessageChat = function (message, style, attachment) {
-        console.log({ message, style, attachment })
+        // console.log({ message, style, attachment })
         if (!message) {
             if (style == "IMAGE") {
                 message = style
@@ -89,7 +89,7 @@ class InputSendChat extends Component {
             var diff = ((new Date).getTime() - new Date(user.tokens.period).getTime()) / 1000
             if (diff >= user.tokens.expire) {
                 /// fetch new token
-                window.location.reload();
+                location.reload()
             }
             var messageSendToChannel = message
             var channelSend = this.props.userChat.find(channel => {
@@ -212,7 +212,7 @@ class InputSendChat extends Component {
     }
     retrieveImage = file => {
 
-        console.log( file )
+        // console.log( file )
         var callback = this.imageFileCallback
         // Retrieve image on clipboard as blob
         saveBlobToServer(file)

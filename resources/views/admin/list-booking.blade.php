@@ -52,7 +52,7 @@
                         ?>
                         <td>
                             @if ( $item->employer_accept )
-                                @if ($url_cancel)
+                                @if ($url_cancel && \Carbon\Carbon::parse($item->work_date)->add(1, 'day') >= \Carbon\Carbon::today())
                                     <a href="{{ route('AJAX_BOOKING_CANCEL_ADMIN') }}" class="ajax-cancel-item" data-type="{{config('constant.PERSON_CANCEL.EMPLOYER')}}" data-order="{{ $item->order_id }}" data-id="{{ $item->id }}" data-employer-id="{{ $item->employer_id }}" data-sitter-id="{{ $item->sitter_id }}" data-date="{{ $dateCurrent }}">キャンセル実行</a>
                                 @else 
                                     <span>キャンセル実行</span>
@@ -64,7 +64,7 @@
                         </td>
                         <td>
                             @if ( $item->sitter_accept )
-                                @if ($url_cancel)
+                                @if ($url_cancel && \Carbon\Carbon::parse($item->work_date)->add(1, 'day') >= \Carbon\Carbon::today())
                                 <a href="{{ route('AJAX_BOOKING_CANCEL_ADMIN') }}" class="ajax-cancel-item" data-type="{{config('constant.PERSON_CANCEL.SITTER')}}" data-order="{{ $item->order_id }}" data-id="{{ $item->id }}" data-employer-id="{{ $item->employer_id }}" data-sitter-id="{{ $item->sitter_id }}" data-date="{{ $dateCurrent }}">キャンセル実行</a>
                                 @else 
                                     <span>キャンセル実行</span>
@@ -141,19 +141,19 @@
             <a class="popup-lose" rel="modal:close"></a>
             <div class="title">
                 <span>
-                    Message
+                    アラート
                 </span>
             </div>
             <div class="popup-body">
                 <div class="message-content">
                     <span>
-                        Are you cancel the booking?
+                        予約をキャンセルしますか？
                     </span>
                 </div>
             </div>
             <div class="action">
-                <button class="action-accept">Accept</button>
-                <button class="action-cancel">Cancel</button>
+                <button class="action-accept">はい</button>
+                <button class="action-cancel">いいえ</button>
             </div>
         </div>
         <input type="hidden" class="url" name="url">

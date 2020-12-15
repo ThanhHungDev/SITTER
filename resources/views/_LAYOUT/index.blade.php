@@ -58,10 +58,11 @@
         const ID_VIEW_SITTER    = "{{ $ID_VIEW_SITTER?? null }}";
         const ID_VIEW_USER_CHAT = "{{ $ID_VIEW_USER_CHAT ?? null }}";
 
-        const ROUTE_VIEW_SITTER   = "{{ Route('VIEW_SITTER', [ 'id' => null ]) }}";
-        const ROUTE_VIEW_EMPLOYER = "{{ Route('VIEW_EMPLOYER', [ 'id' => null ]) }}";
-        const LIMIT_RECORD_REVIEW = 3;
-        const ROUTE_LOAD_REVIEWS  = "{{ Route('AJAX_LOAD_REVIEWS') }}";
+        const ROUTE_VIEW_SITTER              = "{{ Route('VIEW_SITTER', [ 'id' => null ]) }}";
+        const ROUTE_VIEW_EMPLOYER            = "{{ Route('VIEW_EMPLOYER', [ 'id' => null ]) }}";
+        const LIMIT_RECORD_REVIEW            = 3;
+        const ROUTE_LOAD_REVIEWS             = "{{ Route('AJAX_LOAD_REVIEWS') }}";
+        const ROUTE_EMPLOYER_REGISTER_STRIPE = "{{ Route('EMPLOYER_EDIT_CARD') }}";
     </script>
 </head>
 <body>
@@ -105,6 +106,19 @@
         {
             document.body.scrollTop = 0; // For Safari
             document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+        // for Menu mobile
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "100vw";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+        function handleMenuAction(e){
+           closeNav();
+            $(".menu-drawer-active").removeClass();
+            e.classList.add("menu-drawer-active");
         }
     </script>
 </body>

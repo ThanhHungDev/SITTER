@@ -15,8 +15,8 @@ class BookingFinish extends Component {
         }
 
         var [ work_date, start, finish, salary, 
-            differenceTime, price, vat, 
-            myServFee, stripeServFee, total ] = calculatorBill(booking, auth)
+            differenceTime, price, vat, myServFeeSitter, myServFeeEmployer,
+            stripeServFee, total ] = calculatorBill(booking, auth)
         
 
         return  (
@@ -63,6 +63,12 @@ class BookingFinish extends Component {
                             <div className="text-value">{ stripeServFee }￥</div>
                         </div>
                         <div className="session-statistical note">※既定の手数料が発生します。</div>
+
+                        <div className="session-statistical myServFee">
+                            <div className="head"><span>サービス利用料</span></div>
+                            <div className="text-value">{ myServFeeSitter }￥</div>
+                        </div>
+                        <div className="session-statistical note">※システム利用料は、450円＋給料の0.25%</div>
                     </div>
                 }  
                 {
@@ -70,7 +76,7 @@ class BookingFinish extends Component {
                     <div className="statistical">
                         <div className="session-statistical myServFee">
                             <div className="head"><span>サービス利用料</span></div>
-                            <div className="text-value">{ myServFee }￥</div>
+                            <div className="text-value">{ myServFeeEmployer }￥</div>
                         </div>
                         <div className="session-statistical note">※シッター/家事代行料金の20％</div>
 

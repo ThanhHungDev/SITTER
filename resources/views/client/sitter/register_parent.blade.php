@@ -79,7 +79,7 @@
 
             <div class="div-form-group">
                 <div class="div-title-form">
-                    <span class="span-title">お持ちの資格・経験 <span class="color-red">※</span></span>
+                    <span class="span-title">お持ちの資格・経験</span>
                 </div>
                 {{-- {{dd(old('experiences'))}} --}}
                 <div class="sitter-upload-info plr-23">
@@ -87,9 +87,9 @@
                         <div class="form-row">
                             @foreach($experiences as $experience)
                                 <div class="cell">
-                                    <label class="checkbox">
+                                    <label class="checkbox" id="experience-check">
                                         {{$experience->name}}
-                                        <input type="checkbox" value={{$experience->id }} @if(is_array(old('experiences')) && in_array($experience->id, old('experiences'))) checked @endif name="experiences[]">
+                                        <input type="checkbox" class="experience-check" value={{$experience->id }} @if(is_array(old('experiences')) && in_array($experience->id, old('experiences'))) checked @endif name="experiences[]" >
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
@@ -104,23 +104,27 @@
                     </div>
 
                     <label class="mt-18">その他、保育に関連する資格をお持ちの場合は以下の資格名をご記入してください。</label>
+
                     <div class="row">
                         <textarea class="col-sm-9 col-12 upload-info" name="remark">{{old('remark')}}</textarea>
                     </div>
 
                     <label class="mt-18">選択した書類をアップロード</label>
-                    <div class="row">
-                        <div class="col-sm-9 col-12 upload-info" data-name="input_file_qualifi">
-                            <img class="icon-upload" src="{{ asset('image/icons/icon-upload.png') }}">
-                            <span class="text-upload">資格証</span>
-                        </div>
+
+                    <div id="upload-certi">
+                        
                     </div>
-                    <div class="form-validate">
-                        <input value="{{old('input_file_qualifi')}}" data-type="upload" type="file" accept="image/*"  name="input_file_qualifi" >
-                        <div class="form-error">
-                            @error('input_file_qualifi')
-                                <label class="error">{{ $message }}</label>
-                            @enderror
+                    <div id="upload-certi-template" style="display: none;">
+                        <div class="row">
+                            <div class="col-sm-9 col-12 upload-info">
+                                <img class="icon-upload" src="{{ asset('image/icons/icon-upload.png') }}">
+                                <span class="text-upload">資格証</span>
+                            </div>
+                        </div>
+                        <div class="form-validate certificate min-height-20">
+                            <input data-type="upload" type="file" accept="image/*">
+                            <div class="form-error">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -147,12 +151,33 @@
 
             <div class="div-form-group">
                 <div class="div-title-form">
+                    <span class="span-title">郵便番号 <span class="color-red">※</span></span>
+                </div>
+                <div class="div-content-form form-validate">
+                    <div class="form-row input-content">
+                        <div class="col-sm-3 col-5">
+                            <input type="text" class="form-control @error('post_code') input-error @enderror" value="{{ old('post_code') }}" placeholder="例）163-0713" name="post_code" id="inp-post-code">
+                            <div class="form-error">
+                                @error('post_code')
+                                    <label class="error">{{ $message }}</label>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <input type="button" class="btn btn-post-code" value='住所検索' id="btn-post-code"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="div-form-group">
+                <div class="div-title-form">
                     <span class="span-title">緊急連絡先住所 <span class="color-red">※</span></span>
                 </div>
                 <div class="div-content-form">
                     <div class="form-row input-content form-validate">
                         <div class="col-sm-9 col-12">
-                            <input type="text" name="contact_address" class="form-control @error('contact_address') input-error @enderror" value="{{ old('contact_address') }}" placeholder="例）東京都新宿区西新宿2-7-1 小田急第一生命ビル13階">
+                            <input type="text" name="contact_address" id="contact_address" class="form-control @error('contact_address') input-error @enderror" value="{{ old('contact_address') }}" placeholder="例）東京都新宿区西新宿2-7-1 小田急第一生命ビル13階">
                             <div class="form-error">
                                 @error('contact_address')
                                     <label class="error">{{ $message }}</label>
@@ -229,7 +254,8 @@
             <div class="checkbox mt-50 ml-1 form-validate">
                 <label>
                     <input type="checkbox" name="check_accept">
-                    <a href="#" class="text-green">利用規約</a>と<a href="#" class="text-green">プライバシーポリシー</a>に同意する
+                    <a href="#sitters-terms" rel="modal:open" class="text-green">利用規約</a>と
+                    <a href="#sitters-privacy" rel="modal:open" class="text-green">プライバシーポリシー</a>に同意する
                     <span class="checkmark"></span>
                 </label>
                 <div class="form-error">
@@ -246,9 +272,12 @@
         </form>
     </div>
 </div>
+@include('modals.sitters.privacy')
+@include('modals.sitters.terms')
 @endsection
 @section('scripts')
     <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/additional-methods.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/jquery.jpostal.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sitter-register-parent.min.js') }}"></script>
 @endsection

@@ -10,6 +10,7 @@ import BookingError from "./BookingError.jsx"
 class Booking extends Component {
     
     render() {
+        console.log(bookings, "bookings..")
         var { bookings } = this.props
         return (
             <div className="wrapper-modal">

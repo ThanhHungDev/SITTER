@@ -40,7 +40,7 @@ class AdminSendLinkCreateStripe extends Mailable
             $dataSendMail['route'] = '';
         }
         return $this->view('emails.admin_send_create_stripe')
-                ->subject('【〇〇〇〇〇〇〇〇〇〇】')
+                ->subject('【家政婦さん・ベビーシッタードットコム】クレジットカード情報登録のお願い')
                 ->with([
                     'dataSendMail' => $dataSendMail,
                 ]);

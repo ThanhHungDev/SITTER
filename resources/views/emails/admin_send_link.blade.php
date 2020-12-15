@@ -16,7 +16,7 @@
     <p>
         リンクURL：<a href="{{route('EMPLOYER_REVIEW').'?token='.$dataSendMail['token']. '&sitter='.$dataSendMail['sitter_id']}}">url</a>
     </p>
-    <p>メールアドレス：○○○○＠○○○○○○</p>
+    <p>メールアドレス：info@kaseifu-babysitter.com</p>
     <br/>
     @include('emails.footer')
 </body>

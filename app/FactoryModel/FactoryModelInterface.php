@@ -34,4 +34,5 @@ interface FactoryModelInterface
     public function createSitterReviewModel();
     public function createBookingModel();
     public function createDateBookingModel();
+    public function createBankAccountModel();
 }

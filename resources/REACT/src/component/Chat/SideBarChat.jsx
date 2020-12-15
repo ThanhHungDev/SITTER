@@ -8,7 +8,7 @@ import CONFIG from "../../config"
 class SideBarChat extends Component {
 
     render() {
-        console.log("render sidebar")
+        
         var infor = { avatar: '', name: '' }
         var { auth } = this.props
         if (auth && auth.id) {

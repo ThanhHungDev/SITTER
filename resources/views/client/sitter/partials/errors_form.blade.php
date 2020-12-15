@@ -1,6 +1,6 @@
 @if (count($errors) > 0)
     <div class="alert alert-danger alert-dismissible fade show mt-18" id="alert_message" role="alert">
-        <strong>入力に問題がありました。</strong><br><br>
+        <strong>入力に問題がありました。</strong><br>
         <ul>
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>

@@ -66,6 +66,23 @@
             return $rs->y; 
         }
     }
+    if(!function_exists('handelImageCertifies')){
+        function handelImageCertifies($str_image)
+        {
+            $res = [];
+            if($str_image != ''){
+                $arrItem = explode(',', $str_image);
+                foreach ($arrItem as $key => $value) {
+                    $item = explode('|', $value);
+                    if ($item[1] == config('constant.GALARY_TYPE.INPUT_FILE_QUALIFI')) {
+                        $res[] = $item[0];
+                    }
+                }
+            }
+            return $res;
+        }
+    }
+
     if(!function_exists('handelImageEmployer')){
         function handelImageEmployer($str_image)
         {
@@ -156,7 +173,7 @@
         function calculatorRatingAvergate($rate, $total)
         {
             $avg = 0;
-            if($total > 0){
+            if($total > 0 && $rate > 0){
                 $avg = round($rate/$total,1);
             }
             return $avg;
@@ -203,5 +220,39 @@
                 'code'        => $e->getError()->code,
                 'message'     => $e->getError()->message
             ];
+        }
+    }
+
+    if(!function_exists('convertJapanDayInWeek')){
+        function convertJapanDayInWeek($value)
+        {
+            $text = '';
+            switch ($value) {
+                case 'monday':
+                    $text = '月曜日';
+                    break;
+                case 'tuesday':
+                    $text = '火曜日';
+                    break;
+                case 'wednesday':
+                    $text = '水曜日';
+                    break;
+                case 'thursday':
+                    $text = '木曜日';
+                    break;
+                case 'friday':
+                    $text = '金曜日';
+                    break;
+                case 'saturday':
+                    $text = '土曜日';
+                    break;
+                case 'sunday':
+                    $text = '日曜日';
+                    break;
+                default:
+                    $text = '月曜日';
+                    break;
+            }
+            return $text;
         }
     }

@@ -12,6 +12,7 @@ class BtnBookingModal extends Component {
     chooseOrder = () => {
 
         var { bookings, userChat } = this.props
+        console.log(bookings, "btn click")
 
         if(!bookings.fetch){
             $("#js-booking-loading").modal({
@@ -54,7 +55,7 @@ class BtnBookingModal extends Component {
                 showClose: true
             });
         } else if(  sitter_accept && employer_accept && status ){
-            console.log("vào finish rồi")
+            
             $("#" + booking.id +"js-booking-finish").modal({
                 escapeClose: false,
                 clickClose: false,

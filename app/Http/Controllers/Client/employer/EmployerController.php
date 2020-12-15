@@ -410,9 +410,4 @@ class EmployerController extends Controller
         }
         return redirect()->route('EMPLOYER_MYPAGE');
     }
-
-    public function registerPaymentSuccess()
-    {
-        return view('client.employer.register_payment_success');
-    }
 }

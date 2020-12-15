@@ -6,7 +6,7 @@
         
     {{-- <h2 class="text-center">ご登録ありがとうございます。<a href="{{route('EMPLOYER_LOGIN')}}">こちら</a>からログインしてください。</h2> --}}
         <h2 class="text-center">
-            ごクレジットカード登録が完了いたしました。<br/>
+            クレジットカード登録が完了いたしました。<br/>
             <a href="{{route('EMPLOYER_LOGIN')}}">利用者ログイン</a> 
         </h2>
     </div>

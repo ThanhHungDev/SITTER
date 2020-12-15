@@ -45,7 +45,6 @@ class Transfer extends Command
         //db test
         foreach ($dataTransfer as $key => $value) {
             try {
-
                 $resTransfer = $this->transfer($value);
                 $this->LoggingTransfer('HANDEL_TRANSFER_STRIPE',$resTransfer);
 
@@ -71,12 +70,12 @@ class Transfer extends Command
     public function calculatorAmountTransfer($data)
     {
         if(!empty($data)){
-            if($data['sitter_accept'] == 0 && $data['status_booking'] == 1){
+            if($data['sitter_accept'] == 0 && $data['status_booking'] == 1){//sitter cancel
                 return 0;
             }
 
             if(($data['sitter_accept'] == 1) && ($data['employer_accept'] == 1) && ($data['status_booking'] == 1)){
-                return (int)$data['price'] - (int)$data['fee_stripe'];
+                return (int)$data['price'] - (int)$data['profit_sitter'];
             }
 
             if( ($data['employer_accept'] == 0) && ($data['status_booking'] == 1)){
@@ -88,11 +87,11 @@ class Transfer extends Command
                 }
     
                 if(($diffHour >= 24) && ($diffHour <= 48)){
-                    return (int)(($data['price'] - $data['fee_stripe'])/2);
+                    return (int)(($data['price'] - $data['profit_sitter'])/2);
                 }
     
                 if($diffHour < 24){
-                    return (int)($data['price'] - $data['fee_stripe']);
+                    return (int)($data['price'] - $data['profit_sitter']);
                 }
             }
         }
@@ -103,13 +102,14 @@ class Transfer extends Command
         \Stripe\Stripe::setApiKey(config('app.STRIPE_API_KEY'));
 
         $amount = $this->calculatorAmountTransfer($data);
+        Log::channel('transfer')->info('PAYMENT ID: '.$data['payment_id'].' AMOUNT: '.$amount);
         $res = [
             'transfer_id' => '',
             'status'      => '',
             'type'        => '',
             'code'        => '',
             'message'     => '',
-            'payment_id'  => ''
+            'payment_id'  => $data['payment_id']
         ];
         try {
             if($amount > 0){
@@ -178,23 +178,24 @@ class Transfer extends Command
     {
         switch ($type) {
             case 'HANDEL_TRANSFER_STRIPE':
-                if($data['transfer_id'] != ''){
+                if(isset($data['transfer_id']) && $data['transfer_id'] != ''){
                     //success
                     $message = 'TRANSFER_ID: '.$data['transfer_id'] . ' CODE: ' . $data['code']. ' MESSAGE: '. $data['message'];
                     Log::channel('transfer')->info($message);
                 }else{  
-                    $message = 'TYPE: '.$data['type'] ?? '' . 'STATUS: '. $data['status'] ?? ''.  ' CODE: ' . $data['code']. ' MESSAGE: '. $data['message'];
+                    $message = 'TYPE: '.($data['type'] ?? '').' STATUS: '. ($data['status'] ?? '').  ' CODE: ' . $data['code']. ' MESSAGE: '. $data['message'];
                     Log::channel('transfer')->warning($message);
                     // warning
                 }
                 break;
             case 'HANDEL_UPDATE_DB_STRIPE':
-                if($data['transfer_id'] != ''){
+                if(isset($data['transfer_id']) && $data['transfer_id'] != ''){
                     //success
                     $message = 'INSERT DB TRANSFER_ID: '.$data['transfer_id'] . ' CODE: '.$data['status']. ' MESSAGE: '. $data['message'];
                     Log::channel('transfer')->info($message);
+                    Log::channel('transfer')->info($data);
                 }else{  
-                    $message = 'INSERT DB TRANSFER_ID: '.$data['transfer_id'] . ' MESSAGE: ERROR';
+                    $message = 'INSERT DB ERROR OR TRANSFER ERROR ';
                     Log::channel('transfer')->warning($message);
                     // warning
                 }
@@ -205,5 +206,5 @@ class Transfer extends Command
                 break;
         }
     }
-    //* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+    //* * * * * cd /home/.sites/site22/web && php artisan command:transfer >> /dev/null 2>&1
 }

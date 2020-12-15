@@ -28,7 +28,10 @@ const DOMAIN        = CONFIG.SERVER.ASSET()
 const IS_PRODUCTION = CONFIG.IS_ENVIROMENT_PRODUCT
 
 //// ============== begin config app ===================
-!IS_PRODUCTION && app.use(cors())
+var corsOptions = {
+    origin: CONFIG.ASSET_PHP_URL
+}
+app.use(cors(corsOptions))
 // Normal express config defaults
 app.use(require('sanitize').middleware)
 
@@ -61,7 +64,7 @@ i18n.configure({
 //// ============== end config app ===================
 
 /// setting directeries asset root 
-app.use(cors());
+
 app.use("", express.static(path.join(__dirname, 'public')))
 /// view engine
 app.set('view engine', 'ejs')
@@ -88,7 +91,11 @@ if(PORT == 443){
     server = http.createServer(app)
     // peerServer = PeerServer({ port: CONFIG.SERVER.PEER_PORT, path: '/myapp' })
 }
-const io     = socket(server)
+var allowedOrigins = CONFIG.ASSET_PHP_URL + ":*"
+console.log(allowedOrigins)
+const io     = socket(server,{
+    origins: allowedOrigins
+})
 server.listen(PORT,  () => {
 
     console.log(`server run: ${DOMAIN}`)

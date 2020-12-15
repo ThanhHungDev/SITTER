@@ -6,10 +6,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Config;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens;
 
 
     /**
@@ -39,4 +41,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function checkStripeActiveEmployer(){
+        if($this->role_id != Config::get('constant.ROLE.EMPLOYER')){
+            return false;
+        }
+        if( !$this->stripe_account_id ){
+            return false;
+        }
+        return true;
+    }
 }

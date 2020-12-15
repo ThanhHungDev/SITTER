@@ -1,15 +1,30 @@
 $(document).ready(function () {
 
     // previewImage();
+    loadExperiences();
+    $('input.experience-check').change(function() {
+        var template = $("#upload-certi-template");
+        var clone = template.clone().removeAttr("id").show();
+        if($(this).is(':checked')){
+            clone.addClass('certify_form_' + $(this).val());
+            clone.find('input[data-type="upload"]').attr('name', 'certifies[certify_' + $(this).val() + '][]');
+            clone.find('.upload-info').attr('data-name', 'certifies[certify_' + $(this).val() + '][]');
+            $('#upload-certi').append(clone);
+        }else{
+            var element = $('#upload-certi').find('.certify_form_' + $(this).val());
+            if(element){
+                element.remove();
+            }
+        }
+    });
 
-    $('.upload-info').click(function () {
+    $('#sitter-register-parent').on('click', '.upload-info', function () {
         let inputName = $(this).attr('data-name');
         let element = 'input[name="'+inputName+'"]';
         $(element).trigger('click');
-        // <span>表面を追加</span>
     })
 
-    $('input[data-type="upload"]').change(function(e) {
+    $('#sitter-register-parent').on('change', 'input[data-type="upload"]',  function(e){
         var input = e.target;  
         var elementInput = $(this);
         $('.validate-image').text('');
@@ -36,11 +51,10 @@ $(document).ready(function () {
 
     function readAndPreview(file, type, elementInput){
         var match = ["image/gif", "image/png", "image/jpg", "image/jpeg"];
-        console.log(type);
-        console.log(file);
         if (type != match[0] && type != match[1] && type != match[2] && type != match[3]) {
-            $('.validate-image').text('サポートされていないファイル');
-            $(elementInput).val('');
+            var element = elementInput.closest('.form-validate').find('.form-error');
+            elementInput.val('');
+            element.html('<label class="error">サポートされていないファイル</label>');
             return;
         }
 
@@ -50,6 +64,7 @@ $(document).ready(function () {
         //show image
         reader.onload = function(e) {
             var inputName = $(elementInput).attr('name');
+            
             // localStorage.setItem(inputName, e.target.result);
             var elementImage = "div[data-name='" + inputName + "'";
             $(elementImage).css('background','unset');
@@ -57,8 +72,8 @@ $(document).ready(function () {
             if(htmlElement){
                 // htmlElement += '<span class="btn-remove" title="trash"><i class="fas fa-trash-alt"></i></span>'
                 $(elementImage).html(htmlElement);
+                hideError(elementInput);
             }
-            
         }
     }
 
@@ -80,13 +95,23 @@ $(document).ready(function () {
                 required: true,
                 accept: "image/jpg,image/jpeg,image/png,image/gif"
             },
-            input_file_qualifi: {
-                accept: "image/jpg,image/jpeg,image/png,image/gif",
-                required: true
-            },
             check_accept: 'required',
             'skills[]': 'required',
-            'experiences[]': 'required',
+            // 'experiences[]': 'required',
+            post_code: {
+                required: {
+                    depends: function () {
+                        let valueText = $.trim($(this).val());
+                        if (!valueText) {
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                        return false;
+                    }
+                },
+                minlength: 1,
+                maxlength: 8
+            },
             contact_name: {
                 required: {
                     depends: function () {
@@ -156,17 +181,18 @@ $(document).ready(function () {
                 accept: 'ファイル形式が異なります。'
             },
 
-            input_file_qualifi: {
-                required: '画像を選択して下さい。',
-                accept: 'ファイル形式が異なります。'
-            },
-
-            'experiences[]': {
-                required: 'お持ちの資格を選択して下さい。',
-            },
+            // 'experiences[]': {
+            //     required: 'お持ちの資格を選択して下さい。',
+            // },
 
             'skills[]': {
                 required: 'サポートの項目は必須です',
+            },
+
+            post_code: {
+                required: '郵便番号を入力して下さい。',
+                minlength: '郵便番号は1桁以上、255桁以下でなければなりません。',
+                maxlength: '郵便番号は1桁以上、255桁以下でなければなりません。'
             },
 
             check_accept: {
@@ -218,6 +244,82 @@ jQuery.validator.addMethod('checkHyphen', function (value) {
     return !checkHyphen(value);
 });
 
-$(document).on('blur', '#contact-phone', function() {
+$('#btn-post-code').on('click',function () {
+    $('#contact_address').val('');
+    $('#inp-post-code').change();
+});
+$('#inp-post-code').jpostal({
+    postcode : [
+        '#inp-post-code'
+    ],
+    address : {
+        '#contact_address': '%3%4%5'
+    }
+});
+
+$('#inp-post-code').focusout(function () {
+    let strPostCode = $(this).val();
+    if (strPostCode.length <= 8 ) {
+        if (strPostCode.length>3 && strPostCode.indexOf('-') < 0) {
+            $(this).val(strPostCode.substr(0,3) + '-' + strPostCode.substr(3))
+        }
+    }else {
+        $(this).val(strPostCode.substr(0,8))
+    }
+});
+
+$(document).on('blur', '#contact-phone, #inp-post-code', function() {
     $(this).val(convertNumberJP($(this).val()));
 });
+
+function loadExperiences(){
+    $('input.experience-check').each(function() {
+        if($(this).is(':checked')){
+            var template = $("#upload-certi-template");
+            var clone = template.clone().show().removeAttr("id");
+            clone.addClass('certify_form_' + $(this).val());
+            clone.find('input[data-type="upload"]').attr('name', 'certifies[certify_' + $(this).val() + '][]');
+            clone.find('.upload-info').attr('data-name', 'certifies[certify_' + $(this).val() + '][]');
+            $('#upload-certi').append(clone);
+        }
+    });
+};
+
+// function hideError(element){
+//     var e = element.closest('.form-validate').find('.form-error');
+//     e.html('');
+// }
+
+// function showErrors(inputError, message){
+//     var element = inputError.closest('.form-validate').find('.form-error');
+//     inputError.val('');
+//     element.html('');
+//     var label = $("<label class='error1'>").text(message);
+//     element.append(label);
+// }
+
+// function validateCerifies(){
+//     var validate = true;
+//     var element = $('#upload-certi').find('input[data-type="upload"]');
+
+//     element.each(function(index){
+//         if($(this).val().isNullOrEmpty()){
+//             showErrors($(this), '画像を選択して下さい。');
+//             validate = false;
+//         }
+//     });
+
+//     return validate;
+// }
+
+// $(document).on('click', '.btn-sitter-register' , function() {
+//     validateCerifies();
+//     if(!validateCerifies()){
+//         $('#sitter-register-parent').find(".form-validate .error1:first").focus();
+//         return false;
+//     }
+// });
+
+// String.prototype.isNullOrEmpty = function (value) {
+//     return (!this || this == undefined || this == "" || this.length == 0);
+// }

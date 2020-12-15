@@ -106,7 +106,8 @@ class BookingModalSetting extends Component {
             differenceTime,
             price,
             vat,
-            myServFee,
+            myServFeeSitter,
+            myServFeeEmployer,
             stripeServFee,
             total
         ] = calculatorBill(this.state, this.props.auth)
@@ -136,7 +137,8 @@ class BookingModalSetting extends Component {
             differenceTime,
             price,
             vat,
-            myServFee,
+            myServFeeSitter,
+            myServFeeEmployer,
             stripeServFee,
             total
         ] = calculatorBill(this.state, this.props.auth)
@@ -168,7 +170,8 @@ class BookingModalSetting extends Component {
             differenceTime,
             price,
             vat,
-            myServFee,
+            myServFeeSitter,
+            myServFeeEmployer,
             stripeServFee,
             total
         ] = calculatorBill(this.state, this.props.auth)
@@ -274,6 +277,12 @@ class BookingModalSetting extends Component {
                             <div className="text-value">{ stripeServFee }￥</div>
                         </div>
                         <div className="session-statistical note">※既定の手数料が発生します。</div>
+
+                        <div className="session-statistical myServFee">
+                            <div className="head"><span>サービス利用料</span></div>
+                            <div className="text-value">{ myServFeeSitter }￥</div>
+                        </div>
+                        <div className="session-statistical note">※システム利用料は、450円＋給料の0.25%</div>
                     </div>
                 }  
                 {
@@ -281,7 +290,7 @@ class BookingModalSetting extends Component {
                     <div className="statistical">
                         <div className="session-statistical myServFee">
                             <div className="head"><span>サービス利用料</span></div>
-                            <div className="text-value">{ myServFee }￥</div>
+                            <div className="text-value">{ myServFeeEmployer }￥</div>
                         </div>
                         <div className="session-statistical note">※シッター/家事代行料金の20％</div>
                         

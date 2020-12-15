@@ -14,12 +14,24 @@
     @endif
     @foreach($data as $value)
         @foreach ($value['dateBookings'] as $k => $v)
+            @php
+                $currentDate = \Carbon\Carbon::parse($v['work_date'])->add(1, 'day');
+                $dateNow = \Carbon\Carbon::now()->startOfDay();
+                $urlChat = '';
+                if ($currentDate >= $dateNow) {
+                    $urlChat = Route('SITTER_CHAT', ['id'=> $value['employer_id']]);
+                }
+            @endphp
             <tr>
                 @if($k == 0)
                     <td class="tb-td-w-stt" rowspan="{{count($value['dateBookings'])}}">{{$value['id']}}</td>
                     <td class="tb-td-w-40" rowspan="{{count($value['dateBookings'])}}"><a href="{{route('VIEW_EMPLOYER', ['id' => $value['employer_id']])}}" target="_blank">{{$value['employer_name']}}</a></td>
                     <td class="tb-td-w-40">{{formatDate($v['work_date']).' '.formatTime($v['start']).'～'.formatTime($v['finish'])}}</td>
-                    <td class="tb-td-w-15" rowspan="{{count($value['dateBookings'])}}"><a href="{{route('SITTER_CHAT', ['id' => $value['employer_id']])}}">チャットを見る</a></td>
+                    <td class="tb-td-w-15" rowspan="{{count($value['dateBookings'])}}">
+                        @if ($urlChat != '')
+                            <a href="{{ $urlChat }}">チャットを見る</a>
+                        @endif
+                    </td>
                 @else
                     <td class="tb-td-w-40">{{formatDate($v['work_date']).' '.formatTime($v['start']).'～'.formatTime($v['finish'])}}</td>
                 @endif

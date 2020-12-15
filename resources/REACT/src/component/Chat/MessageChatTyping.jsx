@@ -8,6 +8,15 @@ class MessageChatTyping extends Component {
         var channelInfor = toUser;
         var userTyping = channelInfor.user
         var typeMessage = 'float-left ';
+
+        var nameTyping = '';
+        if(userTyping.first_name && userTyping.last_name){
+            nameTyping = userTyping.first_name + " " + userTyping.last_name
+            var limitCharacter = 20
+            if(nameTyping.length > limitCharacter)
+            nameTyping = '[' + nameTyping.substring(0 , limitCharacter) + '...] '
+        }
+
         return (
             <div id="js-typing" className="component-message-chat typing-chat-messsage" channel={toUser.id}>
                 <div className={typeMessage + "chat-group"}>
@@ -15,7 +24,7 @@ class MessageChatTyping extends Component {
                     <div className="message-content typing-message">
                         
                         <div className="text">
-                            <span className="typing-text">{userTyping.first_name && userTyping.last_name + " が入力しています "}</span>
+                            <span className="typing-text">{nameTyping + " が入力しています "}</span>
                             <div className="ticontainer">
                                 <div className="tiblock">
                                     <div className="tidot"></div>

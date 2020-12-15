@@ -6,6 +6,7 @@
     padding: 15px;
 
     span{
+        display: inline-block;
         padding-right: 20px;
         vertical-align: middle;
         &:first-child{
@@ -17,7 +18,19 @@
                 height: 15px;
                 display: inline-block;
                 color: transparent;
-                background-color: #06784b;
+                background-color:  #fc6536; 
+            }
+        }
+        &:nth-child(2n + 2 ){
+            &:before{
+                content: '.';
+                vertical-align: middle;
+                margin-bottom: .3em;
+                width: 15px;
+                height: 15px;
+                display: inline-block;
+                color: transparent;
+                background-color:  #4169e1;
             }
         }
         &:last-child{
@@ -29,7 +42,7 @@
                 height: 15px;
                 display: inline-block;
                 color: transparent;
-                background-color: #fc6536;
+                background-color:#06784b;
             }
         }
     }

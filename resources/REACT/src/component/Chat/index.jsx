@@ -50,7 +50,6 @@ class Chat extends Component {
 
 
     render() {
-        console.log("render lại Chat")
 
         return (
             <div className="component-chat">

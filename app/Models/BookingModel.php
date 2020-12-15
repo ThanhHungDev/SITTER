@@ -182,5 +182,18 @@ class BookingModel extends Model
     }
 
 
+    public function getBookingPaid( $condition ){
+
+        $filter = $this ->join('date_bookings', 'bookings.id', '=', 'date_bookings.booking_id')
+                        ->where("$this->table.status", '=', 1)
+                        ->where("$this->table.sitter_accept", '=', 1)
+                        ->where("$this->table.employer_accept", '=', 1);
+        
+        if( isset($condition['sitter']) ){
+
+            $filter = $filter->where("$this->table.sitter_id", '=', $condition['sitter']);
+        }
+        return $filter;
+    }
 
 }

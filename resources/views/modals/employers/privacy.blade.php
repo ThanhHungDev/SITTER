@@ -173,7 +173,7 @@
         </div>
     </div>
     <div class="footer-modal">
-        <a  href="#emp-privacy" rel="modal:close"><button class="btn btn-back">閉じる</button></a>
+        <a  href="#emp-privacy" rel="modal:close"><button class="btn btn-close">閉じる</button></a>
     </div>
 </div>
 {{-- end modal privacy --}}

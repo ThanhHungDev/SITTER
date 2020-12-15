@@ -40,8 +40,9 @@ module.exports.findOneOrCreateChannel = function( req, res ){
             getNameChanelByUserId( localUserId, CONFIG.ID_ADMIN )
             .then( channelAdminName  => {
                 new Channel({
-                    name : channelAdminName,
-                    user : [ localUserId.toString(), CONFIG.ID_ADMIN.toString() ]
+                    name: channelAdminName,
+                    user: [ localUserId.toString(), CONFIG.ID_ADMIN.toString() ],
+                    sort: 0
                 }).save()
             })
         }
@@ -131,7 +132,8 @@ module.exports.channels = async function( req, res ){
         if( !idFriends ){
             throw new Error("友達がいない")
         }
-        if(!idFriends.length){
+        
+        if(!idFriends.length || !idFriends.includes((parseInt(CONFIG.ID_ADMIN) || 0 ))){
             console.log("===============================")
             console.log("add channel admin")
             var channelAdminName = await getNameChanelByUserId( parseInt(userId), CONFIG.ID_ADMIN )
@@ -139,23 +141,18 @@ module.exports.channels = async function( req, res ){
                 throw new Error('create channel admin fail')
             }
             var adminChannelObject = {
-                name : channelAdminName,
-                user : [ userId.toString(), CONFIG.ID_ADMIN.toString()]
+                name: channelAdminName,
+                user: [ userId.toString(), CONFIG.ID_ADMIN.toString()],
+                sort: 0
             }
             var channelAdmin = await Channel(adminChannelObject).save()
-
-            var channels      = [ channelAdmin ]
-            var friends       = await Channel.informationsFriendbyidFriends( [ CONFIG.ID_ADMIN ] )
-            var onlineFriends = []
-
-        }else{
-
-            var [ channels, friends, onlineFriends ] = await Promise.all([
-                Channel.channelsMessageByUser( userId, false ),
-                Channel.informationsFriendbyidFriends( idFriends ),
-                TokenAccess.getUserOnlineByUserIds( idFriends ),
-            ])
+            idFriends.push(parseInt(CONFIG.ID_ADMIN))
         }
+        var [ channels, friends, onlineFriends ] = await Promise.all([
+            Channel.channelsMessageByUser( userId, false ),
+            Channel.informationsFriendbyidFriends( idFriends ),
+            TokenAccess.getUserOnlineByUserIds( idFriends ),
+        ])
 
         var dataResult = []
 
@@ -186,7 +183,6 @@ module.exports.channels = async function( req, res ){
             message         : "チャンネル成功",
             internal_message: "チャンネル成功",
             data            : dataResult,
-            channels        : channels,
             online          : onlineFriends,
             friends         : friends
         }
@@ -655,7 +651,7 @@ function upsertBooking(bookingInput ){
         status     : CONFIG.BOOKING_STATUS.DEFAULT
     })
     .then( booking => {
-        
+        console.log(date, "date desert date boking")
         Postgre.DATE_BOOKING.desert({
             booking_id: booking.id,
             salary: salary,

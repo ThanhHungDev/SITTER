@@ -287,6 +287,7 @@
                     <div class="calendar-page mt-18" id="sitter-mypage-edit">
                         <div class="d-none" id="data"></div>
                         <input type="text" id="js-event-data" name="schedule" hidden value={{ $data['jsonSchedules'] }}>
+                        <input type="text" id="js-booking-data" hidden value={{ $booking }}>
                         <div id="draw-calendar"></div>
                         <div class="form-validate">
                             <input type="text" id="check-time" name="check_time" hidden>
@@ -302,6 +303,38 @@
             </div>
     
             <div class="sitter-content-bottom">
+                <div class="sitter-certifies">
+                    <div class="title">
+                        <label class="fs-20">お持ちの資格・経験</label>
+                        <input type="button" id="btn-chose-certify" class="btn-chose-certify"  value="ファイルを選択してください" >
+                        <input style="display:none" type="file" id="certify" name="certify" onchange="readURLCertify(this , 'showCertifies');" accept="image/*">
+                    </div>
+                    <div class="form-row">
+                        @foreach($data['experiences'] as $experience)
+                            <div class="cell">
+                                <label class="checkbox" id="experience-check">
+                                    {{$experience->name}}
+                                    <input type="checkbox" class="experience-check" value={{$experience->id }} @if(in_array($experience->id, $data['experience_actives'])) checked @endif name="experiences[]" >
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="row">
+                        <div id="showCertifies">
+                            @foreach($data['certifies'] as $certify )
+                            <div class="col-12 col-sm-6 col-lg-3 grid-image" >
+                                <div class="certify">
+                                    <img src="{{ asset('storage/uploads/sitters/thumbnail/'.$certify['name']) }}" />
+                                    <span class="js_remove_img" data-id-image="{{ $certify->id }}">
+                                        <i class="far fa-trash-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
                 <div class="sitter-skills form-validate" id="sitter-skills">
                     <label class="fs-20">サポートの特徴</label>
                     <ul>

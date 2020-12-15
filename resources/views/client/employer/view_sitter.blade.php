@@ -123,6 +123,7 @@
                     data-employer="{{ $employerId ?? null }}"
                     data-sitter="{{ $information->id ?? null }}"
                     data-refesh="{{ $refresh ?? null }}"
+                    data-stripe-active="{{ $activeStripe ?? null }}"
                     >
                     </div>
                     <input type="hidden" name="data-calendar" id="js-event-data">
@@ -145,25 +146,79 @@
                     @endforeach
                 </ul>
             </div>
+            {{-- list review  --}}
             <div class="employer-review">
-            <input type="hidden" name="sitter" value="{{ $ID_VIEW_SITTER ?? 0 }}">
+                <input type="hidden" name="sitter" value="{{ $ID_VIEW_SITTER ?? 0 }}">
                 <div class="header-review">
                     <h3>ご利用者様のレビュー</h3>
-                        @foreach ($rating as $rate)
-                            @php
-                                $avegate = calculatorRatingAvergate($rate->rate_total, $rate->total);
-                            @endphp
-                            @if($avegate > 0)
-                                <span class="review-rate rateit" data-rateit-value="{{$avegate}}"  data-rateit-readonly="true"></span>
-                                <span class="review-soccer">{{$avegate}}</span>
-                            @endif
-                        @endforeach
+                    @foreach ($rating as $rate)
+                        @php
+                            $avegate = calculatorRatingAvergate($rate->rate_total, $rate->total);
+                        @endphp
+                        @if($avegate > 0)
+                            <span class="review-rate rateit" data-rateit-value="{{$avegate}}"  data-rateit-readonly="true"></span>
+                            <span class="review-soccer">{{$avegate}}</span>
+                        @endif
+                    @endforeach
                 </div>
                 <div class="body-review">
-
-
+                    {{-- ajax render content --}}
                 </div>
+                @if(Auth::check() && Auth::user()->role_id == config('constant.ROLE.EMPLOYER'))
+                    <button class="send-review" data-active = "0" data-toggle="collapse" data-target="#employer-post-review">レビューを書く</button>
+                @endif
             </div>
+            {{-- end list review --}}
+            {{-- post review form --}}
+            @if(Auth::check() && Auth::user()->role_id == config('constant.ROLE.EMPLOYER'))
+                <div id="employer-post-review" class="collapse wapper-send-review">
+                    <div class="fs-15 mtb-20">このベビーシッターの評価、感想を入力してください。みんなの役に立つ情報になります。</div>
+                    <div class="wrap-page">
+                        @if (count($errors) > 0)
+                            <div class="alert alert-danger alert-dismissible fade show mt-18" id="alert_message" role="alert">
+                                    <p><b>入力に問題がありました。</b></p>
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                            </div>
+                        @endif
+
+                        <form action="{{ Route('EMPLOYER_SEND_REVIEW') }}" method="POST" id="review-sitter">
+                            @csrf
+                            <div class="title-form">
+                                <span class="span-title fs-18">評価<span class="color-red">※</span></span>
+                            </div>
+                            <div class="content-form form-validate">
+                                <div class="fs-16">わるい　1　2　3　4 　5　よい</div>
+                                <div class="rateit" id="rate-star" data-rateit-mode="font" data-rateit-resetable="false" data-rateit-ispreset="true" data-sitter="24"></div>
+                                <div class="fs-16">☆マークを適切なところでクリックしてください。</div>
+                                <input type="text" name="rate" id="rate" hidden/>
+                                <div class="form-error"></div>
+                            </div>
+                            <div class="title-form">
+                                <span class="span-title fs-18">本文<span class="color-red">※</span></span>
+                            </div>
+                            <div class="content-form form-validate">
+                                <textarea id="comment" name="comment" rows="4" cols="100"></textarea>
+                                <div class="form-error"></div>
+                                <p class="color-red fs-16">
+                                    ※全角500文字以内<br/>
+                                    ※URL、HTMLタグ、メールアドレス、機種依存文字は投稿できません。<br/>
+                                    ※半角カタカナは、自動的に全角カタカナに変換して投稿されます。<br/>
+                                </p>
+                            </div>
+                            <input type="hidden" name="sitter_id" id="sitterId" value="{{ $ID_VIEW_SITTER }}"/>
+                            
+                            <div class="submit-form">
+                                <button class="btn-submit-review" type="submit">投稿内容確認</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+            {{-- end post review form --}}
             <div class="employer-form-filter">
                 <div class="head height-60">
                     <span class="fs-26">他のベビーシッターを探す</span>
@@ -248,8 +303,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 </div>
 @endsection
@@ -278,9 +331,20 @@
         } );
     </script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.rateit.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/review-load-sitter.min.js') }}"></script>
+    
     <script>
-        const SYSTEM_TEXT_SALARY_SITTER = "{{ $salary['salary_sitter'] }}"
-        const SYSTEM_TEXT_SALARY_HOUSE = "{{ $salary['salary_house'] }}"
+        const SYSTEM_TEXT_SALARY_SITTER = "{{ $salary['salary_sitter'] }}";
+        const SYSTEM_TEXT_SALARY_HOUSE = "{{ $salary['salary_house'] }}";
+        const SYSTEM_FULL_NAME_SITTER = "{{ SupportString::limitText( $fullname, 20 ) }}";
+        $(document).ready(function () {
+            $('#rate-star').rateit({min: 1, max: 5, step: 1});
+            $('#rate-star').bind('rated', function (e) {
+                let rateValue = $(this).rateit('value');
+                $('#rate').val(rateValue);
+            });
+        })
+        
     </script>
 @endsection

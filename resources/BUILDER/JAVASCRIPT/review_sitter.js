@@ -4,7 +4,6 @@ $(document).ready(function () {
         let rateValue = $(this).rateit('value');
         $('#rate').val(rateValue);
     });
-
     let formValidate = $('#review-sitter');
     formValidate.validate({
         onfocusout: function (element) {

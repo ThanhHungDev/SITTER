@@ -205,12 +205,20 @@
         .w-40{ 
             width: 40px;
         }
+        select, option{
+            background-color: #fff;
+        }
     }
 }
 
 @include DivResponsive(515px){
     .container-register {
+        margin-top: 0;
         .wrapper-register {
+            .form-header{
+                font-size: 15px;
+                padding: 10px 15px 0;
+            }
             .row{
                 padding: 0 15px;
                 .group-control{
@@ -234,6 +242,28 @@
             }
             .w-510{
                 width: 100%;
+            }
+            .form-policy{
+                margin-top: 25px;
+                margin-left: 15px;
+            }
+            .action-register {
+                padding-top: 25px;
+                padding-bottom: 25px;
+            }
+            .btn{
+                padding: 7px 5px;
+            }
+        }
+    }
+}
+
+@include DivResponsive(320px){
+    .container-register {
+        .wrapper-register {
+            .form-header{
+                font-size: 13px;
+                padding: 10px 5px 0;
             }
         }
     }

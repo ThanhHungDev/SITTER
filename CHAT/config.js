@@ -52,6 +52,7 @@ var CONFIG = {
     salt : 5,
     IS_ENVIROMENT_PRODUCT : true,
     ID_ADMIN : 1,
+    ASSET_PHP_URL: process.env.ASSET_PHP_URL,
     WEBPUSH: { 
         PUBLIC_KEY: 'BIUnprvdEEntYAgrOBaI_MAaWK8qtRtgfM_RKnSGglsI1NAZUcycI7yJ6YL2ZEoqmKG9dSQ3AtX0-2mS6j_7epE',
         PRIVATE_KEY: 'OAGhOjAuZ5WqNOm7hdqNeo-SSJqGApaXivfY5ps0Eiw'

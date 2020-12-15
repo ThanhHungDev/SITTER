@@ -23,7 +23,8 @@ class CreateOrders extends Migration
             $table->string('price', 100)->default('0');
             $table->string('vat', 100)->default('0');
             $table->string('fee_stripe', 100)->default('0');
-            $table->string('profit', 100)->default('0');// 20% của giá tiền * giờ 
+            $table->string('profit_sitter', 100)->default('0');
+            $table->string('profit_employer', 100)->default('0');// 20% của giá tiền * giờ 
             $table->integer('status')->default(0);
             $table->text('note')->nullable();
             $table->timestamps();

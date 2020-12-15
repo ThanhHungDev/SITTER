@@ -28,6 +28,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/info-sitter/{id}','Admin\AdminController@infoSitter')->name('INFO_SITTER');
         Route::get('/info-employer/{id}','Admin\AdminController@infoEmployer')->name('INFO_EMPLOYER');
         Route::get('/test-refund','Admin\AdminController@refundPayment')->name('testRefund');
+        Route::get('/reviews','Admin\AdminController@listReviews')->name('ADMIN_LIST_REVIEWS');
+        Route::post('/delete-review','Admin\AdminController@ajaxDeleteReview')->name('ADMIN_AJAX_DELETE_REVIEW');
 
         /** new thread for crontab linux */
         Route::get("/test-cron", 'Admin\AdminController@testCrontab');

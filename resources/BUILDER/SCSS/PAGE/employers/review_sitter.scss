@@ -187,3 +187,22 @@
         }
     }
 }
+.wapper-send-review{
+    border: 1px solid #388f64;
+    padding: 15px;
+    margin-bottom: 30px;
+    display: none;
+}
+.send-review, .btn-submit-review{
+    margin-top: 15px!important;
+    padding: 5px 15px;
+    background: #06784b;
+    border-radius: 6px;
+    border: unset;
+    color: #fff;
+}
+.content-form textarea{
+    padding: 5px;
+    width: 100%;
+    border: 1px solid #dcdcdc;
+}

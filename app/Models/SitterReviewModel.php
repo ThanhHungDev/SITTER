@@ -26,4 +26,12 @@ class SitterReviewModel extends Model
                 ->orderBy('sr.id', 'desc')
                 ->paginate($condition['limit']);
     }
+
+    public function getListReview($condition)
+    {
+        return DB::table($this->table, 'sr')->select(DB::raw(' sr.id, CONCAT(u.first_name,u.last_name) as employer_fullname, u.avatar, u.gender, sr.rate, sr.comment, sr.created_at '))
+                ->join('users as u', 'sr.employer_id', '=', 'u.id')
+                ->orderBy('sr.id', 'desc')
+                ->paginate($condition['limit']);
+    }
 }

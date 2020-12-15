@@ -55,13 +55,14 @@ class RegisterController extends Controller
 
         switch ($status) {
             case config('constant.TOKEN_VERIFY.WRONG'):
-            case config('constant.TOKEN_VERIFY.EXPIRED'):
+            
                 return view('errors.404');
                 break;
             case config('constant.TOKEN_VERIFY.ACTIVED'):
                 return redirect()->route('EMPLOYER_LOGIN');
                 break;
             case config('constant.TOKEN_VERIFY.NOT_ACTIVE'):
+            case config('constant.TOKEN_VERIFY.EXPIRED')://yêu cầu mới không check hết hạn No 143
                 $data['TYPE_UPLOAD'] = config('constant.TYPE_UPLOAD_EMPLOYER');
                 $data['token_verify'] = $request['token_verify'];
                 return view('client.employer.register_parent',$data);
@@ -369,7 +370,7 @@ class RegisterController extends Controller
         if(!empty($dataUser)){
             $stripe     = new \Stripe\StripeClient(config('app.STRIPE_API_KEY'));
             $dataStripe = $stripe->customers->create([
-                "description" => 'My First Test Customer (created for API docs)',
+                // "description" => 'My First Test Customer (created for API docs)',
                 "source"      => $input['stripeToken'],                                  // obtained with Stripe.js
                 "name"        => $dataUser['first_name']. ' ' .$dataUser['last_name'],
                 "email"       => $dataUser['email']
@@ -394,5 +395,10 @@ class RegisterController extends Controller
                 return redirect()->back();
             }
         }
+    }
+    
+    public function registerPaymentSuccess()
+    {
+        return view('client.employer.register_payment_success');
     }
 }

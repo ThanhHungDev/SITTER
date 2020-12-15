@@ -198,4 +198,55 @@ class CommonService
         }
         return $res;
     }
+
+    public function uploadFileToJPG($fileName, $type = null)
+    {
+        $res = [
+            'name' => '',
+            'path' => ''
+        ];
+        switch ($type) {
+            case config('constant.UPLOAD_FILE.AVATAR'):
+                $originalPath = storage_path('app/public/uploads/avatars/');
+                $thumbnailPath = storage_path('app/public/uploads/avatars/thumbnail/');
+                $res['path'] = '/storage/uploads/avatars/';
+                break;
+            case config('constant.UPLOAD_FILE.SITTER'):
+                $originalPath = storage_path('app/public/uploads/sitters/');
+                $thumbnailPath = storage_path('app/public/uploads/sitters/thumbnail/');
+                $res['path'] = '/storage/uploads/sitters/';
+                break;
+            case config('constant.UPLOAD_FILE.EMPLOYER'):
+                $originalPath = storage_path('app/public/uploads/employers/');
+                $thumbnailPath = storage_path('app/public/uploads/employers/thumbnail/');
+                $res['path'] = '/storage/uploads/employers/';
+                break;
+            default:
+                $originalPath = storage_path('app/public/uploads/');
+                $thumbnailPath = storage_path('app/public/uploads/thumbnail/');
+                $res['path'] = '/storage/uploads/mixed/';
+                break;
+        }
+
+
+        $ImageUpload = Image::make($fileName);
+        if (!file_exists($originalPath)) {
+            mkdir($originalPath, 0755, true);
+        }
+
+        $fileName = pathinfo($fileName, PATHINFO_FILENAME);
+        $fileNameToStore = $fileName.'_'.time().'.jpg';
+        $res['name'] = $fileNameToStore;
+        $ImageUpload->save($originalPath.$fileNameToStore);
+
+        // for save thumnail image
+        $ImageUpload->resize(800, 800, function ($constraint) {
+            $constraint->aspectRatio();
+        })->encode('jpg');
+        if (!file_exists($thumbnailPath)) {
+            mkdir($thumbnailPath, 0755, true);
+        }
+        $ImageUpload = $ImageUpload->save($thumbnailPath.$fileNameToStore);
+        return $res;
+    }
 }

@@ -6,11 +6,13 @@ use App\Models\UserModel;
 use App\Models\FamilyModel;
 use App\Models\GalaryModel;
 use App\Models\RefundModel;
+use App\Models\BookingModel;
 use App\Models\PaymentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Mail\AdminSendLinkRate;
 use App\Services\SitterService;
+use App\Mail\AdminAcceptSendMail;
 use App\Models\SitterReviewModel;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -21,7 +23,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminSendLinkCreateStripe;
 use App\FactoryModel\FactoryModelInterface;
-use App\Models\BookingModel;
 
 class AdminController extends Controller
 {
@@ -38,7 +39,8 @@ class AdminController extends Controller
         $data['jp_locations']  = $this->JP_LOCATION;
         $request['type_galaries'] = [
             config('constant.GALARY_TYPE.SITTER_FILE_FRONT'),
-            config('constant.GALARY_TYPE.SITTER_FILE_BACK')
+            config('constant.GALARY_TYPE.SITTER_FILE_BACK'),
+            config('constant.GALARY_TYPE.INPUT_FILE_QUALIFI'),
         ];
         $request['role_type'] = config('constant.ROLE.SITTER');
         $request['name'] = str_replace(' ', '%', trim($request['name']));
@@ -115,7 +117,7 @@ class AdminController extends Controller
             }, $galaries->toArray());
         }else {
             $rs = [
-                'messages' => 'User has not updated information!',
+                'messages' => 'ユーザーは情報を更新していません',
                 'code'   => 500
             ];
             return response()->json($rs);
@@ -135,13 +137,13 @@ class AdminController extends Controller
         $sitterProfile = $sitterProfileModel->where('user_id', $param['id'])->update(['publish'=> $param['publish']]);
         if ($sitterProfile) {
             $rs = [
-                'messages' => 'Updated complete!',
+                'messages' => '更新に完成しました',
                 'code'   => 200,
             ];
             return response()->json($rs);
         }
         $rs = [
-            'messages' => 'Update fail!',
+            'messages' => '更新に失敗しました',
             'code'   => 500,
         ];
         return response()->json($rs);
@@ -153,14 +155,14 @@ class AdminController extends Controller
         $user = $userModel->where('id', $param['id'])->update(['deleted'=> true]);
         if ($user) {
             $rs = [
-                'messages' => 'Deleted complete!',
+                'messages' => '削除に完成しました',
                 'code'   => 200,
                 'id' => $param['id']
             ];
             return response()->json($rs);
         }
         $rs = [
-            'messages' => 'Delete fail!',
+            'messages' => '削除に失敗しました',
             'code'   => 500,
         ];
         return response()->json($rs);
@@ -169,22 +171,32 @@ class AdminController extends Controller
     {
         $params = $request->except('_token');
         $userModel = $this->model->createUserModel();
-        $user = $userModel->where('id', $params['id'])->update(['admin_confirm'=> $params['admin_confirm']]);
-        if ($user) {
-            $rs = [
-                'messages' => 'Accept complete!',
-                'code'   => 200,
-                'id' => $params['id']
-            ];
+        $user = $userModel->where('id', $params['id']);
+        $userResult = $user->update(['admin_confirm'=> $params['admin_confirm']]);
+        if ($userResult) {
+            $verifyEmailModel = $this->model->createVerifyEmailModel();
             if ($params['admin_confirm'] == config('constant.ADMIN_CONFIRM.UNACCEPT')) {
-                $verifyEmailModel = $this->model->createVerifyEmailModel();
                 $expire_at = Carbon::now()->addDay(config('constant.DAY_EXPIRE'), 'day');
                 $verifyEmailModel->where('user_id', $params['id'])->update(['email_verified_at' => null, 'email_expire_at' => $expire_at]);
             }
+            $verifyResult = $verifyEmailModel->select('token_verify')->where('user_id', $params['id'])->first();
+            if ($params['admin_confirm'] == config('constant.ADMIN_CONFIRM.ACCEPT')) {
+                $dataUser = $user->first();
+                $dataSendMail['name'] = $dataUser->first_name.' '.$dataUser->last_name;
+                $dataSendMail['register_bank_url'] = route('SITTER_REGISTER_BANK').'?token_verify='. $verifyResult->token_verify;
+                // send mail client
+                Mail::to($dataUser->email)->send(new AdminAcceptSendMail($dataSendMail));
+            }
+            $rs = [
+                'messages' => '承認に完成しました',
+                'admin_accept'   => true,
+                'url' =>  Route('EMPLOYER_REGISTER_PARENT') . '?token_verify=' . $verifyResult->token_verify,
+                'id' => $params['id']
+            ];
             return response()->json($rs);
         }
         $rs = [
-            'messages' => 'Accept fail!',
+            'messages' => '承認に失敗しました',
             'code'   => 500,
         ];
         return response()->json($rs);
@@ -199,7 +211,7 @@ class AdminController extends Controller
         
         if($updateStatus){
             $rs = [
-                'messages' => 'Accept complete!',
+                'messages' => '承認に完成しました',
                 'code'     => 200,
                 'id'       => $params['id']
             ];
@@ -212,7 +224,9 @@ class AdminController extends Controller
             }
     
             if ($params['admin_confirm'] == config('constant.ADMIN_CONFIRM.ACCEPT')) {
-    
+                //active user
+                // $userModel->where('id', $params['id'])->update(['active'=> true]);
+                
                 $user         = $userModel->where('id', $params['id'])->first();
                 $token        = $user->verifyEmails()->first()->token_verify;
                 $dataSendMail = [
@@ -222,7 +236,7 @@ class AdminController extends Controller
                 ];
                 Mail::to($user->email)->send( new AdminSendLinkCreateStripe($dataSendMail) );
                 $rs = [
-                    'messages' => 'Send mail complete!',
+                    'messages' => '送信に完成しました',
                     'code'     => 200,
                     'id'       => $params['id']
                 ];
@@ -230,7 +244,7 @@ class AdminController extends Controller
             }
         }
         $rs = [
-            'messages' => 'Accept fail!',
+            'messages' => '承認に失敗しました',
             'code'     => 500,
         ];
         return response()->json($rs);
@@ -254,7 +268,7 @@ class AdminController extends Controller
             if ($status && !Carbon::now()->gt($status->expire_at)) {
                 if ( $status->verified_at == null) {
                     $rs = [
-                        'messages' => 'Mail is send',
+                        'messages' => '送信に完成しました',
                         'code'   => 500,
                     ];
                     return response()->json($rs);
@@ -277,14 +291,14 @@ class AdminController extends Controller
                 $dataSendMail['expire_at'] = $dataVerifyRate['expire_at'];
                 Mail::to($params['email'])->send(new AdminSendLinkRate($dataSendMail));
                 $rs = [
-                    'messages' => 'Send mail complete!',
+                    'messages' => '送信に完成しました',
                     'code'   => 200,
                 ];
                 return response()->json($rs);
             }
         }
         $rs = [
-            'messages' => 'Send mail fail!',
+            'messages' => '送信に失敗しました',
             'code'   => 500,
         ];
         return response()->json($rs);
@@ -411,7 +425,7 @@ class AdminController extends Controller
 
                 $this->sendMailByAdmin($params);
                 $rs = [
-                    'messages' => 'Cancel complete!',
+                    'messages' => 'キャンセルに完成しました',
                     'code'     => 200,
                 ];
                 return response()->json($rs);
@@ -535,7 +549,7 @@ class AdminController extends Controller
     {
         //employer = price + vat +  ussage
         //sitter = price - fee trip
-        $amountPaid = (int)$data['price'] + (int)$data['vat'] + (int)$data['profit'];
+        $amountPaid = (int)$data['price'] + (int)$data['vat'] + (int)$data['profit_employer'];
 
         if($typeRefund == config('constant.TYPE_REFUND.REFUND_HALF')){//refund 50%
             $amountRefund = (int)($amountPaid*config('constant.PERCEN_REFUND.'.config('constant.TYPE_REFUND.REFUND_HALF'))/100);
@@ -576,13 +590,16 @@ class AdminController extends Controller
 
         $modelUser  = $this->model->createUserModel();
         $modelSkill = $this->model->createSkillModel();
-        $user   = $modelUser->where('id', $id)->where('admin_confirm', config('constant.ADMIN_CONFIRM.ACCEPT'))->first();
-        $isPublish = $user->sitterProfile()->where('publish',true)->first();
-        if( !$isPublish ){
-            return abort(404);
-        }
+        $user   = $modelUser->where('id', $id)->first();
         $sitter = $user->sitter;
-
+        if(!$sitter){
+            $sitter = [
+                'isFails' => true,
+                'message' => 'まだ、プロフィール登録が完了していません。'
+            ];
+            return view('admin.info-sitter', $sitter);
+        }
+        
         $sitter['ID_VIEW_SITTER']  = $id;
         $sitter['skills']          = $modelSkill->all(['id', 'name'])->toArray();
         $sitter['skills_activity'] = $user->skills->pluck('id')->toArray();
@@ -677,5 +694,42 @@ class AdminController extends Controller
             $description = $th->getMessage();
         }
         return $description;
+    }
+
+    public function listReviews(Request $request)
+    {
+        $condition = $request->all();
+        $condition['limit'] = 10;
+        $data['reviews'] = (new SitterReviewModel())->getListReview($condition);
+        return view('admin.list-reviews', $data);
+    }
+
+    public function ajaxDeleteReview(Request $request)
+    {
+        $rs = [
+            'messages' => 'キャンセルに失敗しました',
+            'code'     => 200,
+        ];
+        $data = $request->all();
+
+        DB::beginTransaction();
+        
+        try {
+            if($data['id']){
+                $stt = (new SitterReviewModel())::where('id', $data['id'])->delete();
+                if(!$stt){
+                    DB::rollback();
+                }
+                $rs = [
+                    'messages' => 'キャンセルに完成しました',
+                    'code'     => 200,
+                ];
+                DB::commit();
+            }                   
+            return response()->json($rs);
+        }catch(\Exception $e) {
+            DB::rollback();
+            return response()->json($rs);
+        }
     }
 }

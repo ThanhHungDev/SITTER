@@ -26,6 +26,7 @@ function Calendar() {
     this.TEXT_NEXT  = '<i class="fas fa-chevron-right"></i>'
 
     this.data = {}
+    this.booking = []
     this.canPickDrag = true
     this.isDrag      = false
     this.dragBegin   = null 
@@ -40,6 +41,7 @@ function Calendar() {
     this.classInSunday        = 'calendar-sunday'
     this.classInSatday        = 'calendar-satday'
     this.classInHoliday       = 'calendar-holiday'
+    this.classInPaid          = 'calendar-paid'
     this.classHeader          = 'calendar-header'
     this.classTitleDay        = 'calendar-title-day'
     this.classBody            = 'calendar-body'
@@ -84,6 +86,7 @@ function Calendar() {
     this.idModalButtonDelete    = 'js-modal-button-delete'
     this.idModalButtonTimeClose = 'js-modal-button-time-close'
     this.idModalBooking         = 'js-modal-button-booking'
+    this.idModalDatePickedJson  = 'js-modal-date-picked-json'
     this.typeNumber             = 'number'
     this.nameModalHourBegin     = 'hour_begin'
     this.nameModalHourEnd       = 'hour_end'
@@ -91,6 +94,7 @@ function Calendar() {
     this.nameModalMinuteEnd     = 'minute_end'
     /// settter function create modal 
     this.createModal = null
+    this.canOpenEventToday = true
 
     this.eventBeforeOpenModel = null
     this.eventAfterOpenModel  = null
@@ -168,10 +172,20 @@ function Calendar() {
 
         this.data = _event
     }
+    this.setBookingData = function(_event){
+
+        this.booking = _event
+    }
+    this.setCreateEventAtToday = function(_event){
+
+        this.canOpenEventToday = _event
+    }
     this.setInputEventData = function( _inputEvent ){
+
         this.inputEventData = _inputEvent
     }
     this.formatZeroBefore = function(number){
+        
         number = parseInt(number)
         if (isNaN(number)) { return "00" }
 
@@ -206,11 +220,22 @@ function Calendar() {
         }
         return false
     }
-    this.leftThanToday = function (){
+    this.checkBookingPaid = function(){
+
+        if( !this.booking.length ){
+            return false
+        }
+        var theDateLoop = this.selectYear + "-" + this.formatZeroBefore(this.selectMonth + 1) + "-" + this.dateLoop
+
+        return this.booking.some(function(booking){
+            return booking.work_date == theDateLoop
+        })
+    }
+    this.leftEqualThanToday = function (){
         
         var indexDay = new Date(this.selectYear, this.selectMonth, this.dateLoop ).getTime(),
         today = new Date(this.currentYear, this.currentMonth, this.currentDate ).getTime()
-        return indexDay < today
+        return indexDay <= today
     }
     this.setPickDrag = function ( _pick ) {
 
@@ -274,6 +299,10 @@ function Calendar() {
         }
     }
     this.createEventDrag = function(instance, cell ){
+
+        if( !this.canOpenEventToday && this.checkToday()){
+            return cell;
+        }
 
         if( window.innerWidth < 768 ){
 
@@ -545,6 +574,11 @@ function Calendar() {
             cell.appendChild(textCell)
             cell.setAttribute(this.attributeDate, dateDisable.getDate())
             cell = this.drawEventToDate(cell, dateDisable )
+
+            if( this.leftEqualThanToday() ){
+                cell.classList.add(this.classCellDisable)
+                cell.classList.add(this.classCellLessThanToday)
+            }
         }
         else if ( this.dateLoopTemp == 1 || this.dateLoop > this.numDayInMonth(this.selectMonth, this.selectYear)) {
 
@@ -586,7 +620,7 @@ function Calendar() {
             cell = this.drawEventToDate(cell, new Date(this.selectYear, this.selectMonth, this.dateLoop))
             // cell = this.setEventCellOnClick(cell, this.dateLoop)
 
-            if( this.leftThanToday() ){
+            if( this.leftEqualThanToday() ){
                 cell.classList.add(this.classCellDisable)
                 cell.classList.add(this.classCellLessThanToday)
             }
@@ -604,6 +638,10 @@ function Calendar() {
             }
             if(this.checkHoliday() ){
                 cell.classList.add(this.classInHoliday)
+            }
+            if(this.checkBookingPaid() ){
+                
+                cell.classList.add(this.classInPaid)
             }
 
             this.dateLoop++
@@ -667,12 +705,16 @@ function Calendar() {
         footer.className = this.classFooter
 
         var spanFirst = document.createElement("SPAN")
-        spanFirst.innerHTML = '予約可能'
+        spanFirst.innerHTML = '一部の時間で予約可能'
+
+        var spanSecond = document.createElement("SPAN")
+        spanSecond.innerHTML = '家事代行予約可能'
 
         var spanLast = document.createElement("SPAN")
-        spanLast.innerHTML = '一部の日程・時間で可能'
+        spanLast.innerHTML = 'ベビーシッター予約可能'
 
         footer.appendChild( spanFirst )
+        footer.appendChild( spanSecond )
         footer.appendChild( spanLast )
 
         return footer
@@ -687,18 +729,27 @@ function Calendar() {
                 document.getElementById(this.idModalCalendar).classList.add('new')
 
                 this.selector.classList.add('modal-open')
-    
+
                 document.getElementById(this.idModalButtonNew).classList.remove('d-none')
                 document.getElementById(this.idModalButtonEdit).classList.add('d-none')
                 document.getElementById(this.idModalButtonDelete).classList.add('d-none')
+
     
                 var headerText = document.getElementById(this.idModalTextTime)
+
+                var date = new Date(this.selectYear, this.selectMonth, dates[0])
+                var labelTextDay = '' 
+                if(typeof this.labelDays[date.getDay()] != "undefined"){
+
+                    labelTextDay = this.labelDays[date.getDay()]
+                }
+
                 if( headerText ){
                     if( dates[0] == dates[dates.length - 1]){
-                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日(火)"
+                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日("+ labelTextDay + ")"
                     }else{
-                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日(火) - "
-                        + (this.selectMonth + 1) + "月" + dates[dates.length - 1] + "日(火)"
+                        headerText.innerHTML =  (this.selectMonth + 1) + "月" + dates[0] + "日("+ labelTextDay + ") - "
+                        + (this.selectMonth + 1) + "月" + dates[dates.length - 1] + "日("+ labelTextDay + ")"
                     }                 
                 }
             }
@@ -734,20 +785,44 @@ function Calendar() {
                 document.getElementById(this.idModalMinuteEnd).value   = minEnd
     
                 var headerText = document.getElementById(this.idModalTextTime)
+                var date = new Date(this.selectYear, this.selectMonth, dates[0])
+                var labelTextDay = '' 
+                if(typeof this.labelDays[date.getDay()] != "undefined"){
+
+                    labelTextDay = this.labelDays[date.getDay()]
+                }
                 if( headerText ){
     
-                    headerText.innerHTML = numberCurrentDate + "月" + numberCurrentMonth + "日(火)"
+                    headerText.innerHTML = numberCurrentDate + "月" + numberCurrentMonth + "日(" + labelTextDay + ")"
                 }
             }
     
             if( document.getElementById(this.idModalCalendar) ){
 
                 this.selector.classList.add('modal-open')
+
+
                 document.getElementById(this.idModalCalendar).classList.add('update')
-    
+
                 document.getElementById(this.idModalButtonNew).classList.add('d-none')
                 document.getElementById(this.idModalButtonEdit).classList.remove('d-none')
                 document.getElementById(this.idModalButtonDelete).classList.remove('d-none')
+
+                //check booking paid
+                var numberCurrentDate  = this.formatZeroBefore(day),
+                    numberCurrentMonth = this.formatZeroBefore(this.selectMonth + 1),
+                    numberCurrentYear  = this.formatZeroBefore(this.selectYear)
+                var theDateLoop =   numberCurrentYear 
+                                    + "-" + numberCurrentMonth 
+                                    + "-" + numberCurrentDate
+
+                var isPaid = this.booking.some(function(booking){
+                    return booking.work_date == theDateLoop
+                })
+                if(isPaid){
+                    document.getElementById(this.idModalButtonEdit).classList.add('d-none')
+                    document.getElementById(this.idModalButtonDelete).classList.add('d-none')
+                }
             }
         }
         
@@ -812,7 +887,7 @@ function Calendar() {
         }else{
             this.newModalPopup( dates )
         }
-        
+
         document.getElementById(this.idModalCalendar).classList.remove("d-none")
 
 

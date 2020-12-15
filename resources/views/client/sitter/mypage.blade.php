@@ -33,7 +33,7 @@
             <div class="sitter-content-left">
                 <div>
                     <div class="head min-height-85">
-                        <span class="fs-20-16">{{ $data['sitter']['title'] }}</span>
+                        <span class="fs-20-16">{{ $data['sitter']['title'] ?? '' }}</span>
                     </div>
                     <div class="slider-wrap">
                         <div class="slider" id="slider">
@@ -48,7 +48,7 @@
                         <div class="slider-nav" id="slider-nav">
                             @if(!$data['galaries']->isEmpty())
                                 @foreach ($data['galaries'] as $item)
-                                    <img src="{{ asset('storage/uploads/avatars/thumbnail/'.$item['name']) }}"> 
+                                    <img src="{{ asset('storage/uploads/avatars/thumbnail/'.$item['name']) }}">
                                 @endforeach
                             @endif
                         </div>
@@ -82,7 +82,9 @@
             <div class="sitter-content-right">
                 <div class="balance">
                     <span class="fs-20">給料残額: <b>￥{{ moneyFormat($data['balance']) }}</b></span>
-                    <a href="{{ route('SITTER_STRIPE_ACC') }}">未入金残高を確認する</a>
+                    <a href="{{ route('SITTER_VIEW_BANK') }}">未入金残高を確認する</a>
+
+                    <button class="btn-delete" id="btn-delete-stripe">削除</button>
                 </div>
                 <table class="table sitter-info">
                     <tr>
@@ -125,7 +127,11 @@
                     </tr>
                     <tr>
                         <td class="bt-1">最低サポート時間目安</td>
-                    <td class="bt-1">{{ config('constant.TIME_SUPORT')[$data['sitter']['time_support']] ?? ''  }}</td>
+                        <td class="bt-1">
+                            @if(isset($data['sitter']['time_support']))
+                                {{ config('constant.TIME_SUPORT')[$data['sitter']['time_support']] ?? ''  }}
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <td class="bt-1">
@@ -149,6 +155,33 @@
         </div>
 
         <div class="sitter-content-bottom">
+            <div class="sitter-certifies">
+                <div class="title">
+                    <label class="fs-20">お持ちの資格・経験</label>
+                </div>
+                <div class="form-row">
+                    @foreach($data['experiences'] as $experience)
+                        <div class="cell">
+                            <label class="checkbox" id="experience-check">
+                                {{$experience->name}}
+                                <input type="checkbox" class="experience-check" value={{$experience->id }} @if(in_array($experience->id, $data['experience_actives'])) checked @endif disabled>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="row">
+                    <div>
+                        @foreach($data['certifies'] as $certify )
+                        <div class="col-12 col-sm-6 col-lg-3 grid-image" >
+                            <div class="certify">
+                                <img src="{{ asset('storage/uploads/sitters/thumbnail/'.$certify['name']) }}" />
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
             <div class="sitter-skills">
                 <label class="fs-20">サポートの特徴</label>
                 <ul>
@@ -160,16 +193,20 @@
                 </ul>
             </div>
 
-            
+
         </div>
 
         <div class="list-booking-wrapper" id="list-booking">
         </div>
-        
+
     </div>
+    @include('modals.sitters.modal-confirm',['title'=> '削除を確認', 'content'=> '削除しますか','action' => 'deleteStripeAccount()', 'modal_id' =>'deleteStripeAccount'])
 </div>
 @endsection
 @section('scripts')
+    <script type="text/javascript"> 
+        var APP_URL = {!! json_encode(url('/')) !!}
+    </script>
     <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/library/jquery.toast.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/sitter-common.min.js') }}"></script>

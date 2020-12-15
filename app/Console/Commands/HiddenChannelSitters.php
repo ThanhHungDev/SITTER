@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\BookingModel;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class HiddenChannelSitters extends Command
 {
@@ -46,12 +47,15 @@ class HiddenChannelSitters extends Command
         $bookingHidden       = array_values(array_filter($bookingsMaxWorkDate, function($booking){ return $booking['filter']; } ));
         $bookingIdsHidden    = array_map(function($booking){ return $booking['id']; }, $bookingHidden);
 
+        Log::channel('hidden_channel')->info("BEGIN"); 
         if(!count($bookingIdsHidden)){
             $description = " Command Run hidden chat channel none booking close";
+            Log::channel('hidden_channel')->info($description); 
             die($description);
         }
 
         try {
+            Log::channel('hidden_channel')->info("HIDDEN CHANNEL OF BOOKING:" . json_encode($bookingIdsHidden) ); 
             $action = env("REALTIME_URL") . "/api/hidden-channel";
 
             $client = new \GuzzleHttp\Client();
@@ -75,9 +79,10 @@ class HiddenChannelSitters extends Command
                 throw new \Error("error call api cron job have error: " . $res->getBody());
             }
         } catch (\Throwable $th) {
-            
+            Log::channel('hidden_channel')->info("HIDDEN CHANNEL ERRROR:" . $th->getMessage() ); 
             $description = $th->getMessage();
         }
+        Log::channel('hidden_channel')->info("END"); 
         $this->info( $this->signature . $description);
     }
 }

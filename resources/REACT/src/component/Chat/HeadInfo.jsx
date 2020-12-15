@@ -17,7 +17,6 @@ class HeadInfo extends Component {
 	
 	render() {
 
-		console.log("render head chat")
 		var { channels } = this.props
 		var channelActive = channels.find(channel => channel.isActive)
 

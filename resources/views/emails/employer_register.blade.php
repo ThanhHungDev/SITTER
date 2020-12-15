@@ -26,7 +26,7 @@
         ご不明点等は、下記メールアドレスよりお気軽にお問い合わせくださいませ。
     </p>
     <p>
-        メールアドレス：○○○○＠○○○○○○
+        メールアドレス：info@kaseifu-babysitter.com
     </p>
     <br/><br/>
     @include('emails.footer')

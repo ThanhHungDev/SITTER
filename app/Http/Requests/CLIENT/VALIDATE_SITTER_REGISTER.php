@@ -36,6 +36,8 @@ class VALIDATE_SITTER_REGISTER extends FormRequest
             'post_code' =>  'required|min:1|max:8',
             'pref' => 'required|min:1|max:100',
             'town' => 'required|min:1|max:100',
+            'address' => 'required',
+            'line1'   => 'required', 
             'phone' => 'required|numeric|digits_between:10,11',//checkHyphen
             'email' => 'required|email|unique:users',//emailValidate
             'password' => 'required|min:6|max:32',
@@ -66,7 +68,9 @@ class VALIDATE_SITTER_REGISTER extends FormRequest
             'post_code.min' =>  '郵便番号は1桁以上、255桁以下でなければなりません。',
             'post_code.max' =>  '郵便番号は1桁以上、255桁以下でなければなりません。',
             'pref.required' =>  '都道府県を選択して下さい。',
-            'town.required' =>  '市区町村と番地を入力して下さい。',
+            'town.required' =>  '市区町村を入力して下さい。',
+            'address.required' =>  '町域を入力して下さい。',
+            'line1.required' =>  '丁目以降を入力して下さい。',
             'phone.required'  =>  '電話番号を入力して下さい。',
             // 'phone.checkHyphen'  =>  'ハイフンは不要です',
             'phone.numeric'    =>  '電話番号は数字を入力してください。',

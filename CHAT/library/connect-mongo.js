@@ -1,9 +1,7 @@
 var mongoose = require("mongoose"),
-    CONFIG = require("../config"),
-    TokenAccess = require("../model/TokenAccess")
-    
+    CONFIG = require("../config")
+    // TokenAccess = require("../model/TokenAccess")
 
-var IS_PRODUCTION = CONFIG.IS_ENVIROMENT_PRODUCT
 
 /// connect mongodb
 mongoose.connect(CONFIG.database.mongodb, 
@@ -14,7 +12,7 @@ mongoose.connect(CONFIG.database.mongodb,
         useNewUrlParser: true
     }
 )
-!IS_PRODUCTION && mongoose.set('debug', true)
+// mongoose.set('debug', true)
 mongoose.set('useFindAndModify', true);
 
 // CONNECTION EVENTS

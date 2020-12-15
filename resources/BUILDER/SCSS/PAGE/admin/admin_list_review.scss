@@ -1,0 +1,50 @@
+
+#cancel-modal .action .action-accept{
+    color: #fff;
+}
+.container-review{
+    .rateit .rateit-selected {
+        background: url(../image/star.gif) left -48px!important;
+    }
+    .rateit .rateit-range{
+        background: url(../image/star.gif) !important;
+    }
+    .rateit button.rateit-reset {
+        background: unset !important;
+    }
+    .rateit .rateit-hover{
+        background: unset !important;
+    }
+    table{
+        margin: 15px;
+        border-collapse: collapse;
+        thead{
+            td{
+                text-align: center;
+                font-weight: bold;
+                background: #4c4c4c;
+                color: #fff;
+            }
+        }
+        tr{
+            td{
+                border: 1px solid #b2b2b2;
+                padding: 5px;
+            }
+            &:hover{
+                background-color: #dcdcdc;
+            }
+        }
+    }
+    .btn-delete-review{
+        background: #eb0101;
+        color: #fff;
+        padding: 5px 15px;
+        min-width: 80px;
+        border: unset;
+        border-radius: 4px;
+        margin: 10px;
+        box-shadow: 2px 2px 7px 0px #aba0a0;
+    }
+    
+}

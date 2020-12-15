@@ -27,10 +27,12 @@ $(document).ready(function () {
             var selector   = document.getElementById('draw-calendar'),
                 inputEvent = document.getElementById("js-event-data"),
                 dataServer = document.getElementById("js-event-data").value
+                dataBooking = document.getElementById("js-booking-data").value
             if (selector) {
                 var instanceCalendar = new Calendar()
                 instanceCalendar.setNewCalendarSelector(true)
                 instanceCalendar.setEventData(JSON.parse(dataServer))
+                instanceCalendar.setBookingData(JSON.parse(dataBooking))
                 instanceCalendar.setElementDraw(selector)
                 instanceCalendar.setInputEventData(inputEvent)
                 instanceCalendar.setBeforeOpenModel(eventBeforeOpenModel__selector)
@@ -84,16 +86,22 @@ function eventBeforeOpenModel__viewer(_instance){
         var eventMonth   = _instance.data[selectYear][selectMonth]
         var typeDatesEvent = dates.map( function( item ) { return eventMonth[formatZeroBefore( item )].type })
         
-        var typeDateFirst = typeDatesEvent[0]
+        var typeDateFirst = typeDatesEvent[0],
+            titleForm     = 'title popup'
+
         if( typeDateFirst == 1 ){
 
-            var titleForm = 'ベビーシッター：' + SYSTEM_TEXT_SALARY_SITTER + ' / 1時間'
-            document.getElementById(_instance.idModalTextTime).innerHTML = titleForm
-        }else if( typeDateFirst == 2 ){
-
-            var titleForm = '家事代行：' + SYSTEM_TEXT_SALARY_HOUSE + ' / 1時間'
-            document.getElementById(_instance.idModalTextTime).innerHTML = titleForm
+            titleForm = 'ベビーシッター：' + SYSTEM_TEXT_SALARY_SITTER + ' / 1時間'
         }
+        if( typeDateFirst == 2 ){
+
+            titleForm = '家事代行：' + SYSTEM_TEXT_SALARY_HOUSE + ' / 1時間'
+        }
+        if(!_instance.selector.getAttribute("data-stripe-active")){
+
+            titleForm = 'クレジットカード情報登録'
+        }
+        document.getElementById(_instance.idModalTextTime).innerHTML = titleForm
         
     }
    
@@ -123,13 +131,35 @@ function hideProress( ){
     }
 }
 
+function initModalViewerDataSetter(_instance){
+
+    /// reset input data time 
+    var domBegin = document.getElementById(_instance.idBookingBeginTime),
+        domEnd   = document.getElementById(_instance.idBookingEndTime)
+
+    if(domBegin && domEnd){
+        domBegin.value = ''
+        domEnd.value   = ''
+    }
+
+
+    var btnBooking = document.getElementById(_instance.idModalBooking)
+    if(btnBooking && btnBooking.classList.contains('js-settime-booking')){
+        btnBooking.classList.add('disabled')
+    }
+}
+
 function eventAfterOpenModel__viewer(_instance, dates){
+
+    /// init data validate 
+    initModalViewerDataSetter(_instance)
 
     /// do something
     document.getElementById(_instance.idModalButtonTimeClose).onclick = function(event){
         event.preventDefault();
         $( "." + _instance.classPicked ).removeClass(_instance.classPicked)
         _instance.modelClose()
+        hiddenErrorResultSetterBooking(_instance)
     }
     /// do something
     $(".time-close").each(function(){
@@ -137,6 +167,7 @@ function eventAfterOpenModel__viewer(_instance, dates){
             event.preventDefault();
             $( "." + _instance.classPicked ).removeClass(_instance.classPicked)
             _instance.modelClose()
+            hiddenErrorResultSetterBooking(_instance)
         }
     })
     /// do something
@@ -165,9 +196,10 @@ function eventAfterOpenModel__viewer(_instance, dates){
         if( employerID && sitterID){
             /// fetch data to server nodejs
             
-            var date = selectYear + "-" + selectMonth + "-" + selectDate
-            var messageDatePicked = "こんにちは、あなたと一緒に仕事をスケジュールしたいと思います\n " +
-                                    "日：" + date + " \n " + 
+            var date = selectYear + "/" + selectMonth + "/" + selectDate
+            var messageDatePicked = "[" + SYSTEM_FULL_NAME_SITTER + "]さんこんにちは！ \n " + 
+                                    "以下の日時で予約のリクエストがありました。\n " +
+                                    "勤務日：" + date + " \n " + 
                                     "開始時間：" + timeBegin + " \n " + 
                                     "終了時間：" + timeEnd 
             
@@ -176,7 +208,7 @@ function eventAfterOpenModel__viewer(_instance, dates){
                 data.referenceUserId = parseInt(sitterID)
                 data.refesh          = employerRefesh
                 data.message         = messageDatePicked
-                data.date            = date,
+                data.date            = (selectYear + "-" + selectMonth + "-" + selectDate),
                 data.type            = TYPE_JOB,
                 data.salary          = TYPE_JOB == 1 ? SYSTEM_TEXT_SALARY_SITTER : SYSTEM_TEXT_SALARY_HOUSE,
                 data.timeBegin       = timeBegin ? timeBegin + ":00" : "00:00:00"
@@ -215,6 +247,7 @@ function eventAfterOpenModel__viewer(_instance, dates){
 }
 
 function createModelCalendar__viewer( instance ){
+
     var modal           = document.createElement("div")
         modal.className = instance.classModal + " d-none"
         modal.id        = instance.idModalCalendar
@@ -223,7 +256,7 @@ function createModelCalendar__viewer( instance ){
         header.className = instance.classModalHeader
         header.id        = instance.classModalHeader
 
-    var headerText           = document.createElement("span")
+    var headerText    = document.createElement("span")
         headerText.id = instance.idModalTextTime
     header.appendChild(headerText)
         
@@ -236,15 +269,25 @@ function createModelCalendar__viewer( instance ){
 
     
 
-    if(instance.selector.getAttribute("data-employer") && instance.selector.getAttribute("data-sitter")){
+    if(
+        instance.selector.getAttribute("data-employer") && 
+        instance.selector.getAttribute("data-sitter") && 
+        instance.selector.getAttribute("data-stripe-active")
+    ){
         
-        modal = createButtonModelCalendarSettimeBooking__viewer(modal, instance)
-    }else{
+        modal = createButtonModelCalendarSetTimeBooking__viewer(modal, instance)
+    }else if(
+        instance.selector.getAttribute("data-employer") && 
+        instance.selector.getAttribute("data-sitter") && 
+        !instance.selector.getAttribute("data-stripe-active")
+    ){
+        modal = createButtonModelCalendarRegisterStripeNoti__viewer(modal, instance)
+    }else {
         modal = createButtonModelCalendarLoginNoti__viewer(modal, instance)
     }
     return modal
 }
-function createButtonModelCalendarSettimeBooking__viewer(modal, instance){
+function createButtonModelCalendarSetTimeBooking__viewer(modal, instance){
     
     //// create body modal 
     var body           = document.createElement("div")
@@ -286,7 +329,7 @@ function createButtonModelCalendarSettimeBooking__viewer(modal, instance){
 
     var btnBooking           = document.createElement("button")
         btnBooking.id        = instance.idModalBooking
-        btnBooking.className = "booking disabled"
+        btnBooking.className = "booking disabled js-settime-booking"
         btnBooking.innerHTML = 'チャットする'
         wrapperButton.appendChild(btnBooking)
 
@@ -296,14 +339,20 @@ function createButtonModelCalendarSettimeBooking__viewer(modal, instance){
 
 function validateTimeSetterBooking(instanceCalendar){
 
-    checkTimeSetterBookingValid(instanceCalendar).then( isValid => {
+    try {
+        var isValid = checkTimeSetterBookingValid(instanceCalendar)
         if(!isValid){
             throw Error('終了時間は開始時間より後でなければなりません。')
         }
-        return showErrorResultSetterBooking(instanceCalendar, 0)
-    }).catch(err => {
-        return showErrorResultSetterBooking(instanceCalendar, err.message)
-    })
+        var btnBooking = document.getElementById(instanceCalendar.idModalBooking)
+        if(btnBooking){
+            btnBooking.classList.remove('disabled')
+        }
+        hiddenErrorResultSetterBooking(instanceCalendar)
+    } catch (error) {
+        return showErrorResultSetterBooking(instanceCalendar, error.message)
+    }
+    
 }
 function showErrorResultSetterBooking(instanceCalendar, mess){
 
@@ -321,7 +370,12 @@ function showErrorResultSetterBooking(instanceCalendar, mess){
     document.getElementById(instanceCalendar.idModalBooking).classList.add('disabled')
     return true
 }
-async function checkTimeSetterBookingValid(instanceCalendar){
+function hiddenErrorResultSetterBooking(instanceCalendar){
+
+    var domWrapperInputTime = document.getElementById(instanceCalendar.idWrapperViewerChange)
+    $(domWrapperInputTime).find(".error").remove()
+}
+function checkTimeSetterBookingValid(instanceCalendar){
 
     var domBegin = document.getElementById(instanceCalendar.idBookingBeginTime),
         domEnd   = document.getElementById(instanceCalendar.idBookingEndTime)
@@ -340,10 +394,54 @@ async function checkTimeSetterBookingValid(instanceCalendar){
 
     
 
-    if(domBegin.value && domEnd.value && valBegin < valEnd){
-        return true
+    if(!domBegin.value){
+
+        throw Error('終了時間は開始時間より後でなければなりません。')
     }
-    throw Error('終了時間は開始時間より後でなければなりません。')
+    if(!domEnd.value){
+
+        throw Error('終了時間は開始時間より後でなければなりません。')
+    }
+    if(valBegin >= valEnd){
+
+        throw Error('終了時間は開始時間より後でなければなりません。')
+    }
+
+    return true
+    
+}
+function createButtonModelCalendarRegisterStripeNoti__viewer(modal, instance){
+    //// create body modal 
+    var body           = document.createElement("div")
+        body.className = instance.classModalBody
+        body.innerHTML = 'クレジットカード情報を登録してください'
+    modal.appendChild( body )
+
+    /// button
+    var wrapperButton           = document.createElement("div")
+        wrapperButton.className = 'wrapper-button'
+
+    var href = '/employer/edit-card';
+    if(typeof ROUTE_EMPLOYER_REGISTER_STRIPE != "undefined" ){
+        href = ROUTE_EMPLOYER_REGISTER_STRIPE
+    }
+
+    var btnCancel           = document.createElement("a")
+        btnCancel.id        = 'close-model'
+        btnCancel.className = "time-close"
+        btnCancel.innerHTML = 'キャンセル'
+
+    var btnLogin           = document.createElement("a")
+        btnLogin.id        = instance.idModalBooking
+        btnLogin.className = "goto-login"
+        btnLogin.href      = href
+        btnLogin.innerHTML = 'クレジットカード'
+
+    wrapperButton.appendChild( btnCancel )
+    wrapperButton.appendChild( btnLogin )
+
+    modal.appendChild(wrapperButton)
+    return modal
 }
 
 function createButtonModelCalendarLoginNoti__viewer(modal, instance){ 

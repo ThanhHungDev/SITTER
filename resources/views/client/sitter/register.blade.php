@@ -3,7 +3,7 @@
 @section('content')
 <div class="sitter-common">
     <div class="max-width-780 sitter-register">
-        {{-- @include('client.sitter.partials.errors_form') --}}
+        @include('client.sitter.partials.errors_form')
         <form method="post" action="{{ route('SITTER_POST_REGISTER') }}" id="sitter-register">
             {{ csrf_field()}}
             <div class="div-title height-55 back-ground-green">
@@ -226,17 +226,58 @@
 
             <div class="div-form-group">
                 <div class="div-title-form">
-                    <span class="span-title">番地以下（建物名・部屋番号など）</span>
+                    <span class="span-title">町域<span class="color-red">※</span></span>
                 </div>
                 <div class="div-content-form">
                     <div class="form-row input-content">
                         <div class="col-sm-8 col-12 form-validate">
-                            <input type="text" class="form-control @error('address') input-error @enderror" value="{{ old('address') }}" placeholder="番地以降(建物名・部屋番号など)" name="address" id="inp-address">
+                            <input type="text" class="form-control @error('address') input-error @enderror" value="{{ old('address') }}" placeholder="町域" name="address" id="inp-address">
+                            <div class="form-error">
+                                @error('address')
+                                    <label class="error">{{ $message }}</label>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="div-form-group">
+                <div class="div-title-form">
+                    <span class="span-title">丁目以降<span class="color-red">※</span></span>
+                </div>
+                <div class="div-content-form">
+                    <div class="form-row input-content">
+                        <div class="col-sm-8 col-12 form-validate">
+                            <input type="text" class="form-control @error('line1') input-error @enderror" value="{{ old('line1') }}" placeholder="5－8" name="line1" id="line1">
+                            <div class="form-error">
+                                @error('line1')
+                                    <label class="error">{{ $message }}</label>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="div-form-group">
+                <div class="div-title-form">
+                    <span class="span-title">建物名、部屋番号</span>
+                </div>
+                <div class="div-content-form">
+                    <div class="form-row input-content">
+                        <div class="col-sm-8 col-12 form-validate">
+                            <input type="text" class="form-control @error('line2') input-error @enderror" value="{{ old('line2') }}" placeholder="建物名、部屋番号" name="line2" id="line2">
                             <span class="fs-14">建物名・部屋番号がある方は必ずご記入ください</span>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <input type="hidden" name="pref_kana" id="pref-kana">
+            <input type="hidden" name="city_kana" id="city-kana">
+            <input type="hidden" name="town_kana" id="town-kana">
+            <input type="hidden" name="line2_kana" id="line2-kana">
 
             <div class="div-form-group">
                 <div class="div-title-form">
@@ -282,7 +323,7 @@
                     <div class="form-row input-content">
                         <div class="col-sm-8 col-12">
                             <div class="form-validate">
-                                <input type="password" class="form-control @error('password') input-error @enderror" placeholder="パスワード（半角英数字8文字以上）" name="password" id="password">
+                                <input type="password" class="form-control @error('password') input-error @enderror" placeholder="パスワード（半角英数字8文字以上）" name="password" id="password" value="">
                                 <div class="form-error">
                                     @error('password')
                                         <div class="error-message">{{ $message }}</div>
@@ -294,7 +335,7 @@
                     <div class="form-row input-content pt-0">
                         <div class="col-sm-8 col-12">
                             <div class="form-validate">
-                                <input type="password" class="form-control @error('confirm_password') input-error @enderror" placeholder="確認のためもう一度入れてください" name="confirm_password">
+                                <input type="password" class="form-control @error('confirm_password') input-error @enderror" placeholder="確認のためもう一度入れてください" name="confirm_password" value="">
                                 <div class="form-error">
                                     @error('confirm_password')
                                         <div class="error-message">{{ $message }}</div>
@@ -332,5 +373,6 @@
 @section('scripts')
     <script type="text/javascript" src="{{ asset('/js/library/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.jpostal.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/library/wanakana.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/sitter-register.min.js') }}"></script>
 @endsection

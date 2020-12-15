@@ -23,6 +23,7 @@ use App\Models\PasswordResetModel;
 use App\Models\SitterProfileModel;
 use App\Models\EmployerProfileModel;
 use App\Models\DateBookingModel;
+use App\Models\BankAccountModel;
 
 class BaseModel implements FactoryModelInterface{
 
@@ -45,6 +46,7 @@ class BaseModel implements FactoryModelInterface{
     public static $SitterReviewModel;
     public static $BookingModel;
     public static $DateBookingModel;
+    public static $BankAccountModel;
 
     public function createUserModel(){
         
@@ -198,5 +200,12 @@ class BaseModel implements FactoryModelInterface{
             self::$DateBookingModel = new DateBookingModel();
         }
         return new DateBookingModel();
+    }
+
+    public function createBankAccountModel(){
+        if(!self::$BankAccountModel){
+            self::$BankAccountModel = new BankAccountModel();
+        }
+        return new BankAccountModel();
     }
 }

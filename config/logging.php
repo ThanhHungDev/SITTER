@@ -42,10 +42,19 @@ return [
         ],
 
         'transfer' => [
-            'driver' => 'single',
-            'path' => storage_path('/logs/transfer.log'),
+            'driver' => 'daily',
+            'path' => storage_path('log/transfer.log'),
             'level' => 'debug',
-            'days' => 30
+            'days' => 30,
+            'permission' => 0777
+        ],
+
+        'hidden_channel' => [
+            'driver' => 'daily',
+            'path' => storage_path('log/channel.log'),
+            'level' => 'debug',
+            'days' => 14,
+            'permission' => 775
         ],
 
         'single' => [

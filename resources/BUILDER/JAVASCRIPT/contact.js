@@ -108,6 +108,42 @@ $(document).ready(function () {
         },
     });
 
+    let formValidateInfoInquiry = $('.form-info-inquiry');
+    formValidateInfoInquiry.validate({
+        onfocusout: function (element) {
+            $(element).valid();
+        },
+        invalidHandler: function () {
+            $(this).find(".form-validate .error:first").focus();
+        },
+        rules: {
+            info_mail: {
+                required: {
+                     depends: function () {
+                        let valueText = $.trim($(this).val());
+                        if (!valueText) {
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                        return false;
+                    }
+                },
+                emailValidate: true
+            },
+        },
+        messages: {
+            info_mail: {
+                required: 'メールアドレスは必須です。',
+                emailValidate: 'メールアドレスが無効です。'
+            }
+        },
+        errorPlacement: function (error, element) {
+            var element = element.closest('.form-validate').find('.form-error');
+            element.html('');
+            error.appendTo(element);
+        },
+    });
+
 });
 function validate_email(email) {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

@@ -21,7 +21,8 @@ class PaymentModel extends Model
                     'ord.price',
                     'ord.vat',
                     'ord.fee_stripe',
-                    'ord.profit')
+                    'ord.profit_employer',
+                    'ord.profit_sitter')
                     ->join('orders as odr' ,'odr.id', '=', 'payments.order_id')
                     ->leftjoin('date_bookings as dbk', 'dbk.booking_id', '=', 'ord.booking_id')
                     ->where('payments.order_id', $orderId)
@@ -41,6 +42,8 @@ class PaymentModel extends Model
                     'b.date_cancel',
                     'odr.price',
                     'odr.fee_stripe',
+                    'odr.profit_employer',
+                    'odr.profit_sitter',
                     'u.stripe_account_id',
                     'dbk.work_date'
                     )

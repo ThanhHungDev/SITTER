@@ -8,8 +8,7 @@ Postgre     = require("../model/Postgre.js"),
 stripe      = require('stripe')(process.env.STRIPE_SECRET),
 EVENT       = CONFIG.EVENT
 
-var Op       = Postgre.Sequelize.Op;
-// listSocket = []
+// var Op       = Postgre.Sequelize.Op;
 
 module.exports = function(_io) {
     io = _io
@@ -21,7 +20,6 @@ function socketConnecting(){
     io.sockets.on( EVENT.CONNECTTION ,function(socket){ 
 
         console.log("have connect: " + socket.id + " " + CONFIG.EVENT.REQUEST_GET_CHANEL);
-        // listSocket.push( socket.id )
         // /////////////////////////////////////////////////////
         try {
             disconnect(socket)
@@ -39,32 +37,31 @@ function socketConnecting(){
 }
 
 function disconnect(socket){
-    socket.on( EVENT.DISCONNECT, function () {
+    socket.on( EVENT.DISCONNECT, async function () {
+
         var idUserDisconnect = 0
-        // listSocket.splice( listSocket.indexOf(socket.id), 1 )
+        
         console.log( EVENT.DISCONNECT + " set user offline")
         socket.leaveAll()
         /// 
         TokenAccess.findOne({ socket : socket.id }).
         then( token => {
-            if( token ){
-                token.online = false
-                token.socket = ''
-                token.peer = ''
-                return token.save()
+            if( !token ){
+                throw new Error("WARNING : not remove socket id disconnect " + socket.id)
             }
-            console.log("WARNING : not remove socket id disconnect " + socket.id, listSocket )
-            return;
+            token.online = false
+            token.socket = ''
+            token.peer = ''
+            return token.save()
         })
         .then( token => {
             idUserDisconnect = token.user 
             /// user disconnect browser, need check user is online ? ( orther devide more ? )
-            return TokenAccess.find({ user : idUserDisconnect, online : true })
+            return TokenAccess.find({ user: idUserDisconnect, online: true })
         })
         .then( tokens => {
             if( tokens && tokens.length ){
-                /// kiểm tra token còn sống không? nếu còn thì throw err khỏi emit
-                /// nếu không còn sống thì vẫn emit user ngủm rồi và update về false 
+                /// check token period => emit user offline and update online to false 
                 tokens.map( token_item => {
                     if( (new Date).getTime() - new Date(token_item.period).getTime() > 1000 * CONFIG.TimeExpireAccessToken ){
                         token_item.online = false
@@ -80,7 +77,7 @@ function disconnect(socket){
             return true
         })
         .then( () => {
-             /// get all channel of user disconnect
+            /// get all channel of user disconnect
             return Channel.find({ user : idUserDisconnect })
         })
         .then( channels => {
@@ -94,41 +91,40 @@ function disconnect(socket){
             })
         })
         .catch( err => {
-            console.log("error disconnect" + err.message)
+            console.log("error disconnect " + err.message)
         })
     })
 }
 
 
 function sendMessageChat(socket){
-    socket.on( EVENT.SEND_MESSAGE, data => {
+    socket.on( EVENT.SEND_MESSAGE, async data => {
         
         /// variable input
         var { message, style, attachment, 
             channelId, access, detect } = data
 
-        var userIdSendMessage = null
-        TokenAccess.findOne({ token : access, detect: detect })
-        .then( tokenAccess => {
+        try {
+            var [ tokenAccess, channelResult ] = await Promise.all([
+                TokenAccess.findOne({ token : access, detect: detect }),
+                Channel.findOne({ _id: channelId })
+            ])
+
             if(!tokenAccess){
-                console.log(access , "access send message to channel but not select show")
+
                 throw new Error("トークンが失敗する")
             }
-            //// auth có
-            userIdSendMessage = tokenAccess.user
-            return Channel.findOne({ _id: channelId, user: userIdSendMessage })
-        })
-        .then( channelResult => {
-            
+
             if( !channelResult ){
 
                 throw new Error("チャンネルがありません」")
             }
-            saveMessage(userIdSendMessage, message, style, attachment, channelResult._id)
+            
+            
             console.log(" emit : " + EVENT.RESPONSE_MESSAGE + " / " + channelResult.name)
             var dataEmit = { 
-                user : parseInt(userIdSendMessage), 
-                token : access, 
+                user: parseInt(tokenAccess.user), 
+                token: access, 
                 message, 
                 style, 
                 attachment, 
@@ -136,19 +132,20 @@ function sendMessageChat(socket){
                 detect: detect
             }
             io.in(channelResult.name).emit(EVENT.RESPONSE_MESSAGE, dataEmit)
-        })
-        .catch( error => {
-            console.log( error )
-        })
+            return saveMessage(tokenAccess.user, message, style, attachment, channelResult._id)
+        } catch (error) {
+            console.log( error.message, "sendMessageChat" )
+        }
     })
 }
 
 function listenTyping(socket){
     socket.on( EVENT.SEND_TYPING, data => {
 
-        console.log(`${EVENT.SEND_TYPING} socket`, data )
         /// variable input
         var { channelId, channelName, access } = data
+
+        console.log(`${EVENT.SEND_TYPING} socket access ${access}`, channelName )
 
         var dataEmit = {
             token : access, 
@@ -170,19 +167,21 @@ function saveMessage(userId, message, style, attachment, channelId){
         newMessage.readAdmin = true
     }
     return newMessage.save()
-    .then(message => message )
     .catch( err => { console.log(err, "err save new"); return false })
 }
 
 function listenUserOnline( socket ){
 
-    socket.on( EVENT.USER_ONLINE, data => {
+    socket.on( EVENT.USER_ONLINE, async data => {
         
         var { id, peer, access } = data
         console.log( "set 1 user online:  " + id + " " + EVENT.USER_ONLINE, access )
         /// update user online
-        TokenAccess.findOne({ user : id, token: access })
-        .then( token => {
+        try {
+            var [ token, channels ] = await Promise.all([
+                TokenAccess.findOne({ user : id, token: access }),
+                Channel.find({ user : id })
+            ])
             if( !token ){
                 throw new Error("トークンが失敗する")
             }
@@ -196,14 +195,8 @@ function listenUserOnline( socket ){
             token.socket      = socket.id
             token.peer        = peer
             token.duplication = false
-            return token.save()
-        })
-        .then( userToken => {
-            /// get all channel of user
-            return Channel.find({ user : id })
-        })
-        .then( channels => {
-            
+            token = await token.save()
+
             return channels.map( channel => {
                 
                 var roomChannel = socket.adapter.rooms[channel.name]
@@ -212,10 +205,10 @@ function listenUserOnline( socket ){
                 }
                 socket.join( channel.name )
             })
-        })
-        .catch(error => {
+
+        } catch (error) {
             console.log("none setting onl" + id + " " + peer + " " + error.message )
-        })
+        }
     })
 }
 
@@ -223,8 +216,8 @@ function listenReadMesssage( socket ){
 
     socket.on( EVENT.READ_MESSAGE_ALL, data => {
         
-        console.log( data , EVENT.READ_MESSAGE_ALL)
         var { channelId, channelName , user } = data
+        console.log(`${EVENT.READ_MESSAGE_ALL} user ${user}`, channelName )
 
         var objectUpdate = { read: true }
         if( user.toString() == CONFIG.ID_ADMIN.toString() ){
@@ -248,38 +241,15 @@ function listenGetBooking( socket ){
         
         console.log( data , EVENT.USER_GET_BOOKING)
 
-        return Postgre.BOOKING.findAll({ 
-            where: { 
-                [Op.or]: [
-                    {
-                        sitter_id: parseInt(data.id)
-                    }, 
-                    {
-                        employer_id: parseInt(data.id)
-                    }
-                ]
-            },
-            // Add order conditions here....
-            order: [
-                ['sitter_id', 'ASC'],
-                ['employer_id', 'ASC'],
-                ['status', 'ASC'],
-            ],
-            attributes : [
-                Postgre.Sequelize.literal('DISTINCT ON("BOOKING"."sitter_id") *'),
-                'id',
-                'employer_id',
-                'sitter_id',
-                'status',
-                'sitter_accept',
-                'employer_accept',
-                'created_at',
-                'updated_at'
-            ],
-            include: [
-                {model: Postgre.DATE_BOOKING }
-            ]
-        }, {raw: true}).then(bookings => {
+        var { type, id } = data
+        var condition = {
+            type, 
+            id,
+            modelDateBooking: Postgre.DATE_BOOKING,
+            Sequelize: Postgre.Sequelize
+        }
+
+        return Postgre.BOOKING.getBookingsOfUsers(condition).then(bookings => {
             if(!bookings.length){
                 throw Error('dont have booking')
             }
@@ -304,27 +274,35 @@ function listenGetBooking( socket ){
 
 function listenChangeBooking( socket ){
 
-    socket.on( EVENT.USER_CHANGE_BOOKING, data => {
+    socket.on( EVENT.USER_CHANGE_BOOKING, async data => {
         
         console.log( data , EVENT.USER_CHANGE_BOOKING)
         
-        var { booking_id, status, sitter_accept, employer_accept, start, finish, work_date, tokenAccess, userId, channelName } = data
+        var { 
+            booking_id, 
+            status, 
+            sitter_accept, 
+            employer_accept, 
+            start, 
+            finish, 
+            work_date, 
+            tokenAccess, 
+            userId, 
+            channelName 
+        } = data
+
 
         var saccept = 0,
             eaccept = 0,
             isEdit  = 0
 
-        var messageBody = "message default",
-        channelId = null
-
-        Promise.all([
-            Channel.findOne({ name: channelName }),
-            TokenAccess.findOne({ token: tokenAccess, user: userId+"" }),
-            Postgre.BOOKING.findOne({ where: { id: booking_id } }),
-            Postgre.DATE_BOOKING.findOne({ where: { booking_id } }),
-            Postgre.USER.findOne({ where: { id: (parseInt(userId) || 0) } })
-        ]).then(([ channel, tokenAccess, booking, date_booking, user ]) => {
+        try {
             
+            var [ channel, tokenAccess, booking ] = await Promise.all([
+                Channel.findOne({ name: channelName }), /// check channel chat
+                TokenAccess.findOne({ token: tokenAccess, user: userId.toString() }), // check auth
+                Postgre.BOOKING.getBookingByCondition({ booking_id, modelDateBooking: Postgre.DATE_BOOKING, modelUser: Postgre.USER })
+            ])
             if(!channel){
                 throw Error('channel not found')
             }
@@ -334,15 +312,12 @@ function listenChangeBooking( socket ){
             if(!booking){
                 throw Error('booking not found')
             }
-            if( !user ){
-                throw Error('user not found')
-            }
             
-            channelId = channel._id
-
             saccept = booking.sitter_accept
             eaccept = booking.employer_accept
-            isEdit  = date_booking.start != start + ":00" || date_booking.finish != finish + ":00" || date_booking.work_date != work_date
+            isEdit  = ( booking.DATE_BOOKING.start != start + ":00" || 
+                        booking.DATE_BOOKING.finish != finish + ":00" || 
+                        booking.DATE_BOOKING.work_date != work_date )
             
             if(isEdit){
                 if(sitter_accept){
@@ -363,48 +338,50 @@ function listenChangeBooking( socket ){
                 status  = 1
             }
 
-            if( saccept ){
-                messageBody = "シッターは仕事に受け入れられました \n " +
-                                    "日：" + work_date + " \n " + 
-                                    "開始時間：" + start + " \n " + 
-                                    "終了時間：" + finish 
-            }else  if( eaccept ){
-                messageBody = "雇用主は求人リクエストを送信しました \n " +
-                                    "日：" + work_date + " \n " + 
-                                    "開始時間：" + start + " \n " + 
-                                    "終了時間：" + finish 
-            }else if( status ){
-                messageBody = "雇用主はちょうど雇用を確認しました \n "
-                                    "日：" + work_date + " \n " + 
-                                    "開始時間：" + start + " \n " + 
-                                    "終了時間：" + finish 
+            
+            if(eaccept){
+                var nameReceive = booking.sitter.first_name + " " + booking.sitter.last_name
+            }else{
+                var nameReceive = booking.employer.first_name + " " + booking.employer.last_name
             }
             
 
-            
-            if(!status || !saccept || !eaccept){
-                // none add payment
-                var iterables = [
-                    Postgre.DATE_BOOKING.update({start, finish, work_date}, { where: { booking_id } }),
-                    Postgre.BOOKING.update({ status: status, sitter_accept: saccept, employer_accept: eaccept }, { where: { id: booking_id } }),
-                    saveMessage(userId,messageBody, "", [], channel._id)
-                ]
-                return Promise.all(iterables)
+            /// get message by condition
+            var conditionCreateMessage = {
+                sitter_accept: saccept, 
+                employer_accept: eaccept,
+                status: status,
+                name: nameReceive,
+                work_date,
+                start,
+                finish
             }
-            
-            return paymentEmployer(user, date_booking.toJSONFor()).then( payResult => {
+            var messageBody = createMessageBookingChat(conditionCreateMessage)
+
+            if(status && saccept && eaccept){
+                if( userId.toString() == booking.sitter.id.toString()){
+                    var user = booking.sitter 
+                }else {
+                    var user = booking.employer
+                }
+                var date_booking = booking.DATE_BOOKING.toJSONFor()
+
+                var payResult = await paymentEmployer(user, date_booking)
                 if(!payResult){
                     throw Error("支払いが失敗しました")
                 }
-                var iterables = [
-                    Postgre.DATE_BOOKING.update({start, finish, work_date}, { where: { booking_id } }),
-                    Postgre.BOOKING.update({ status: status, sitter_accept: saccept, employer_accept: eaccept }, { where: { id: booking_id } }),
-                    saveMessage(userId,messageBody, "", [], channel._id)
-                ]
-                return Promise.all(iterables)
-            })
-        })
-        .then(([update_date_booking, update_booking, message ]) => {
+            }
+            
+            var iterables = [
+                saveMessage(userId,messageBody, "", [], channel._id),
+                Postgre.BOOKING.update({ status: status, sitter_accept: saccept, employer_accept: eaccept }, { where: { id: booking_id } }),
+            ]
+            if( isEdit ){
+                iterables.push(
+                    Postgre.DATE_BOOKING.update({start, finish, work_date}, { where: { booking_id } })
+                )
+            }
+            var [ storeMessage, updateBooking, updateDateBooking ] = await Promise.all(iterables)
 
             var bookingUpdate = {
                 booking_id, 
@@ -415,65 +392,121 @@ function listenChangeBooking( socket ){
                 finish, 
                 work_date
             }
-            // socket.broadcast.to(channelName).emit(EVENT.RESPONSE_USER_CHANGE_BOOKING, bookingUpdate); 
-            io.in(channelName).emit(EVENT.RESPONSE_USER_CHANGE_BOOKING, { user: parseInt(userId), token: tokenAccess, message: messageBody, style: "", attachment: [], channel: channelId, booking: bookingUpdate })
-        })
-        .catch( error => {
+            var dataEmit = { 
+                user: parseInt(userId), 
+                token: tokenAccess, 
+                message: messageBody, 
+                style: "", 
+                attachment: [], 
+                channel: channel._id, 
+                booking: bookingUpdate 
+            }
+            io.in(channelName).emit(EVENT.RESPONSE_USER_CHANGE_BOOKING, dataEmit)
+            
+        } catch (error) {
             console.log(error.message)
-            socket.emit(EVENT.RESPONSE_USER_CHANGE_BOOKING_ERROR, { message : error.message , data: error })
-        })
+            socket.emit(EVENT.RESPONSE_USER_CHANGE_BOOKING_ERROR, { message: error.message, data: error })
+        }
     })
 }
 
+function createMessageBookingChat(condition){
 
-function paymentEmployer(user, booking){
+    if( condition.sitter_accept ){
+
+        return "["+ condition.name + "]さんに承認リクエストを送信しました。 \n " +
+                "勤務日：" + condition.work_date + " \n " + 
+                "開始時間：" + condition.start + " \n " + 
+                "終了時間：" + condition.finish 
+    }else if( condition.employer_accept || condition.status ){
+        
+        return "["+ condition.name + "]さんこんにちは！ \n " +
+                "以下の日時で予約のリクエストがありました。 \n " +
+                "勤務日：" + condition.work_date + " \n " + 
+                "開始時間：" + condition.start + " \n " + 
+                "終了時間：" + condition.finish 
+    }
+    return "○○○○ ○○○○"
+}
+
+async function paymentEmployer(user, booking){
     
-    var  [ differenceTime, price, vat, profit, stripeServFee ] = calculatorBill(booking)
+    var  [ differenceTime, price, vat, 
+        profitSit, profitEmp, stripeServFee ] = calculatorBill(booking)
     var order = {
-        booking_id: booking.booking_id,
-        salary    : booking.salary,
-        diff_time : differenceTime,
-        price     : price,
-        vat       : vat,
-        fee_stripe: stripeServFee,
-        profit    : profit
+        booking_id     : booking.booking_id,
+        salary         : booking.salary,
+        diff_time      : differenceTime,
+        price          : price,
+        vat            : vat,
+        fee_stripe     : stripeServFee,
+        profit_sitter  : profitSit,
+        profit_employer: profitEmp
     }
-    var amount = (parseInt(order.price) || 0) + (parseInt(order.vat) || 0)
-    var payIntent = {
-        amount              : amount,
-        currency            : 'jpy',
-        payment_method_types: ['card'],
-        customer            : user.stripe_account_id
-    }
+    
+    try {
+        var paymentMethod = await stripe.paymentMethods.list({
+        
+            customer: user.stripe_account_id,
+            type    : 'card',
+        });
+        /// create payment method
+        var amount =    (parseInt(order.price) || 0) + 
+                        (parseInt(order.vat) || 0) + 
+                        (parseInt(order.profitEmployer) || 0)
 
+        var paymentMethodData = paymentMethod.data[0]
+        var payIntent = {
+            
+            payment_method_types: ['card'],
+            amount              : amount,
+            currency            : 'jpy',
+            customer            : user.stripe_account_id,
+            payment_method      : paymentMethodData.id,
+            off_session         : true,
+            confirm             : true,
+        }
 
-    return Promise.all([
-        stripe.paymentIntents.create(payIntent),
-        Postgre.ORDER.upsert(order, { booking_id: order.booking_id })
-    ]).then( ([ paymentIntent, _order ]) => {
+        var [ paymentIntent, _order ] = await Promise.all([
+            stripe.paymentIntents.create(payIntent),
+            Postgre.ORDER.upsert(order, { booking_id: order.booking_id })
+        ])
         var payment = {
             user_id       : user.id,
             order_id      : _order.id,
-            stripe_payment: paymentIntent.id
+            stripe_payment: paymentIntent.id,
         }
         return Postgre.PAYMENT.create(payment)
-    })
-    .catch( err => {
-        var orderUpdate = { ...order, note: err.message, status: CONFIG.ORDER_STATUS.ERROR }
+
+    } catch (error) {
+        var orderUpdate = { ...order, note: error.message, status: CONFIG.ORDER_STATUS.ERROR }
         Postgre.ORDER.upsert(orderUpdate, { booking_id: order.booking_id })
         return false
-    })
+    }
 }
 
 
 function calculatorBill(booking ) {
+
+
+    /// phí sử dụng dịch vụ của sitter là 450 yên + ( 25% của tổng tiền lương )
+    const FEE_DEFAULT_SITTER_MIN = 450
+    const PERCENT_FEE_SITTER = 0.0025
+    /// phí vat 10% 
+    const PERCENT_VAT_DEFAULT = 0.1
+    /// phí của employer 20% 
+    const PERCENT_FEE_EMPLOYER = 0.2
+    /// khi gửi lên stripe thì phí là 3.6%
+    const PERCENT_FEE_STRIPE = 0.036
+
     var start     = booking.start,
         finish    = booking.finish,
         salary    = booking.salary
 
     var differenceTime = 0,
         price          = 0,
-        profit         = 0,
+        profitSit      = 0,
+        profitEmp      = 0,
         stripeServFee  = 0,
         vat            = 0
     
@@ -484,9 +517,10 @@ function calculatorBill(booking ) {
 
     differenceTime = (dateTimeFinish - dateTimeStart)/ 1000 / 60 / 60
     price          = Math.floor(differenceTime * salary)
-    profit         = Math.floor(price * 0.2)
-    vat            = Math.floor((price + profit) * 0.1)
-    stripeServFee  = Math.floor((price + profit + vat) * 0.036)
+    profitEmp      = Math.floor(price * PERCENT_FEE_EMPLOYER)
+    profitSit      = Math.floor( price * PERCENT_FEE_SITTER ) + FEE_DEFAULT_SITTER_MIN
+    vat            = Math.floor((price + profitEmp) * PERCENT_VAT_DEFAULT)
+    stripeServFee  = Math.floor((price + profitEmp + vat) * PERCENT_FEE_STRIPE)
 
-    return [ differenceTime, price, vat, profit, stripeServFee ] 
+    return [ differenceTime, price, vat, profitSit, profitEmp, stripeServFee ] 
 }

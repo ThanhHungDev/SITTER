@@ -6,22 +6,21 @@
 @import "proress.scss";
 @import "animate.scss";
 @import "spinner.scss";
-@import "gradient.scss"; 
+@import "gradient.scss";
 @import "icon.scss";
 @import "awesome.scss";
 @import "modal.jquery.scss";
 // Layout & components
 @import "select2/core.scss";
-
 @import "LAYOUT/header.scss";
 @import "LAYOUT/body.scss";
 @import "LAYOUT/footer.scss";
 @import "LAYOUT/menu_left.scss";
-
 @import "PAGE/top_page.scss";
+
 @import "PAGE/login.scss";
 @import "PAGE/forgot.scss";
-@import "PAGE/sitters/sitter_common.scss"; 
+@import "PAGE/sitters/sitter_common.scss";
 @import "PAGE/employers/employer_register_parent.scss";
 @import "PAGE/employers/employer_register.scss";
 @import "PAGE/employers/employer_comfirm.scss";
@@ -32,17 +31,17 @@
 @import "PAGE/advance_search_page.scss";
 @import "PAGE/employers/employer_mypage.scss";
 @import "PAGE/employers/employer_collect_card.scss";
-
-@import "PAGE/admin/admin_sitter.scss"; 
-@import "PAGE/admin/admin_employer.scss"; 
-@import "PAGE/admin/admin_chat.scss"; 
-@import "PAGE/admin/admin_booking.scss"; 
-
+@import "PAGE/admin/admin_sitter.scss";
+@import "PAGE/admin/admin_employer.scss";
+@import "PAGE/admin/admin_chat.scss";
+@import "PAGE/admin/admin_booking.scss";
+@import "PAGE/admin/admin_list_review.scss";
 @import "PAGE/common.scss";
 @import "PAGE/policy.scss";
 @import "PAGE/tokuteisho.scss";
 @import "PAGE/stripe_form.scss";
 
 /** calendar root*/
+
 @import "_calendar";
 @import "datepicker.scss";

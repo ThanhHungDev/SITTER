@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login </title>
-    <link rel="icon" href="http://sitters.jp/favicon.ico" type="image/png">
+    <link rel="icon" href="http://babysitter.trust-growth.co.jp/favicon.ico" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/app.css?'.config('constant.VERSION_CSS'))}}">
 </head>
 <body>

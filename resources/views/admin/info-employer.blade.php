@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="employer" style="margin: auto; padding-top: 20px;">
-    <div class="max-width-1080 emp-mypage">
+    <div class="emp-mypage" style="width: 1024px;">
         <div class="body-mypage ">
             <div class="wapper-mypage">
                 <div class="left-mypage">

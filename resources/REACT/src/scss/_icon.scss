@@ -5147,15 +5147,15 @@ $hero-icons: (
   "zodiac-taurus": F0A87,
   "zodiac-virgo": F0A88
 );
-
+$siteurl: "";
 @font-face {
 	font-family: "HERO Icons";
-	src: url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.eot?v=1.4.57");
-  src: url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), 
-  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.woff2?v=1.4.57") format("woff2"), 
-  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.woff?v=1.4.57") format("woff"), 
-  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.ttf?v=1.4.57") format("truetype"), 
-  url("http://babysitter.trust-growth.co.jp/font/IconFont/webfont.svg?v=1.4.57") format("svg");
+	src: url(#{$siteurl}#{"/font/IconFont/webfont.eot?v=1.4.57"});
+  src: url(#{$siteurl}#{"/font/IconFont/webfont.eot?#iefix&v=1.4.57"}) format("embedded-opentype"), 
+  url(#{$siteurl}#{"/font/IconFont/webfont.woff2?v=1.4.57"}) format("woff2"), 
+  url(#{$siteurl}#{"/font/IconFont/webfont.woff?v=1.4.57"}) format("woff"), 
+  url(#{$siteurl}#{"/font/IconFont/webfont.ttf?v=1.4.57"}) format("truetype"), 
+  url(#{$siteurl}#{"/font/IconFont/webfont.svg?v=1.4.57"}) format("svg");
 	font-weight: normal;
 	font-style: normal;
 }

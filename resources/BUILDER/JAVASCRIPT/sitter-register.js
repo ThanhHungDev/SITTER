@@ -32,7 +32,7 @@ $(document).ready(function () {
                     }
                 },
                 minlength: 1,
-                maxlength: 255
+                maxlength: 255,
             },
             first_name_furigana: {
                 required: {
@@ -45,7 +45,8 @@ $(document).ready(function () {
                     }
                 },
                 minlength: 1,
-                maxlength: 255
+                maxlength: 255,
+                checkKatakana: true
             },
             last_name_furigana: {
                 required: {
@@ -58,20 +59,24 @@ $(document).ready(function () {
                     }
                 },
                 minlength: 1,
-                maxlength: 255
+                maxlength: 255,
+                checkKatakana: true
             },
             gender: 'required',
             birth_year: {
                 checkBirthDay : true,
-                required: true
+                required: true,
+                checkAge: true
             },
             birth_month: {
                 checkBirthDay: true,
-                required: true
+                required: true,
+                checkAge: true
             },
             birth_day: {
                 checkBirthDay: true,
-                required: true
+                required: true,
+                checkAge: true
             },
             post_code: {
                 required: {
@@ -114,6 +119,32 @@ $(document).ready(function () {
                 },
                 minlength: 1,
                 maxlength: 100
+            },
+            address: {
+                required: {
+                    depends: function () {
+                        let valueText = $.trim($(this).val());
+                        if (!valueText) {
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                        return false;
+                    }
+                },
+                minlength: 1,
+                maxlength: 100
+            },
+            line1: {
+                required: {
+                    depends: function () {
+                        let valueText = $.trim($(this).val());
+                        if (!valueText) {
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                        return false;
+                    }
+                },
             },
             phone: {
                 required: {
@@ -173,27 +204,32 @@ $(document).ready(function () {
             first_name_furigana: {
                 required: '苗字（フリガナ）を入力して下さい。',
                 minlength: '苗字（フリガナ）は1桁以上、255桁以下でなければなりません。',
-                maxlength: '苗字（フリガナ）は1桁以上、255桁以下でなければなりません。'
+                maxlength: '苗字（フリガナ）は1桁以上、255桁以下でなければなりません。',
+                checkKatakana: 'このフィールドにはカタカナのみを使用してください。'
             },
             last_name_furigana: {
                 required: '名前（フリガナ）を入力して下さい。',
                 minlength: '名前（フリガナ）は1桁以上、255桁以下でなければなりません。',
-                maxlength: '名前（フリガナ）は1桁以上、255桁以下でなければなりません。'
+                maxlength: '名前（フリガナ）は1桁以上、255桁以下でなければなりません。',
+                checkKatakana: 'このフィールドにはカタカナのみを使用してください。'
             },
             gender: {
                 required: '性別を選択して下さい。'
             },
             birth_year: {
                 checkBirthDay: '生年月日が不正です。',
-                required: '年を入力して下さい'
+                required: '年を入力して下さい',
+                checkAge: '年齢は13歳以上である必要があります'
             },
             birth_month: {
                 checkBirthDay: '生年月日が不正です。',
-                required: '月を入力して下さい'
+                required: '月を入力して下さい',
+                checkAge: '年齢は13歳以上である必要があります'
             },
             birth_day: {
                 checkBirthDay: '生年月日が不正です。',
-                required: '日を入力して下さい'
+                required: '日を入力して下さい',
+                checkAge: '年齢は13歳以上である必要があります'
             },
             post_code: {
                 required: '郵便番号を入力して下さい。',
@@ -204,7 +240,13 @@ $(document).ready(function () {
                 required: '都道府県を選択して下さい。'
             },
             town: {
-                required: '市区町村と番地を入力して下さい。'
+                required: '市区町村を入力して下さい。'
+            },
+            address: {
+                required: '町域を入力して下さい。'
+            },
+            line1: {
+                required : '丁目以降を入力して下さい。',
             },
             phone: {
                 required : '電話番号を入力して下さい。',
@@ -258,6 +300,31 @@ function check_birthday() {
     
 }
 
+function check_age() {
+    let year = $('#sl-box-year').val();
+    let month = $('#sl-box-month').val();
+    let day = $('#sl-box-day').val();
+
+    if ( year == '' || month == '' || day == '' ) {
+        return true;
+    } else {
+        let date = new Date(year + '/' + month + '/ '+ day);
+        if (date.getDate() != day) {
+            return false;
+        }
+        let date_current = Date.now();
+        let ageDifMs = date_current - date.getTime();
+        let ageDate = new Date(ageDifMs);
+        let age = Math.abs(ageDate.getUTCFullYear() - 1970);
+
+        if(age <= 13) {
+            return false;
+        }
+
+        return true;
+    }   
+}
+
 function validate_email(email) {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
@@ -272,6 +339,13 @@ function checkHyphen(text){
 jQuery.validator.addMethod('checkBirthDay', function () {
     return check_birthday();
 })
+jQuery.validator.addMethod('checkBirthDay', function () {
+    return check_birthday();
+})
+
+jQuery.validator.addMethod('checkAge', function () {
+    return check_age();
+})
 
 jQuery.validator.addMethod('emailValidate', function (value) {
     return validate_email(value);
@@ -279,10 +353,18 @@ jQuery.validator.addMethod('emailValidate', function (value) {
 jQuery.validator.addMethod('checkHyphen', function (value) {
     return !checkHyphen(value);
 });
+
+jQuery.validator.addMethod('checkKatakana', function (value) {
+    return wanakana.isKatakana(value);
+})
+
 $('#btn-post-code').on('click',function () {
     $('#sl-box-pref').val('');
     $('#inp-town').val('');
     $('#inp-address').val('');
+    $('#pref-kana').val('');
+    $('#city-kana').val('');
+    $('#town-kana').val('');
     $('#inp-post-code').change();
 });
 $('#inp-post-code').jpostal({
@@ -290,9 +372,12 @@ $('#inp-post-code').jpostal({
         '#inp-post-code'
     ],
     address : {
-        '#sl-box-pref'  : '%3',
-        '#inp-town'  : '%4',
+        '#sl-box-pref': '%3',
+        '#inp-town'   : '%4',
         '#inp-address': '%5',
+        '#pref-kana'  : '%8',
+        '#city-kana'  : '%9',
+        '#town-kana'  : '%10',
     }
 });
 $('#inp-post-code').focusout(function () {
@@ -306,6 +391,35 @@ $('#inp-post-code').focusout(function () {
     }
 });
 
-$(document).on('blur', '#reg-phone, #inp-post-code', function() {
+$('#line2').focusout(function () {
+    let line2 = $(this).val().trim();
+    if (line2.length > 0 ) {
+        $('#line2-kana').val(wanakana.toKatakana(line2));
+    }
+});
+
+$(document).on('blur', '#reg-phone, #inp-post-code, #line1', function() {
     $(this).val(convertNumberJP($(this).val()));
+});
+
+function checkLine1(){
+    let value = $("#line1").val().trim();
+    if(!value) return;
+    let arr = ['0','1','2','3','4','5','6','7','8','9','-','０','１','２','３','４','５','６','７','８','９','ー'];
+    let arr_input = value.split('');        
+    
+    let remove_char = "";
+    for(let i = 0; i < arr_input.length; i++){
+        
+        if(!arr.includes(arr_input[i])){
+            $("#line1").val(remove_char.trim());
+            return;
+        }
+        remove_char = remove_char+arr_input[i];
+    }
+    $("#line1").val(remove_char.trim());
+}
+
+$('#line1').on('blur',function(){
+    checkLine1();
 });

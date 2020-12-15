@@ -1,4 +1,8 @@
 .employer-common {
+    .error-message{
+        padding: 20px;
+        min-height: calc(100vh - 110px);
+    }
     .max-width-780 {
         max-width: 780px;
         margin-left: auto;
@@ -876,6 +880,11 @@
 
 @include DivResponsive(768px){
     .employer-common{
+        .employer{
+            .employer-mypage{
+                margin-top: 10px;
+            }
+        }
         .employer-filter{
             height: 150px !important;
             background-image: none !important;
@@ -888,6 +897,7 @@
 @include DivResponsive(515px){
     .employer-common {
         .employer .employer-mypage {
+            margin-top: 0;
             .employer-content-left {
                 .slider img {
                     height: 280px;
@@ -896,6 +906,11 @@
             }
         }
         .employer{
+            .head{
+                span{
+                    font-size: .9rem !important;
+                }
+            }
             .employer-content-bottom{
                 .employer-review{
                     .header-review{
@@ -915,6 +930,9 @@
                     }
                 }
             }
+        }
+        .height-85 {
+            height: 130px;
         }
     }
     

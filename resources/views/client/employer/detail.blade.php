@@ -17,7 +17,7 @@
         </div>
         <div class="body-mypage mt-3">
             <div class="wapper-mypage">
-                <div class="left-mypage">
+                <!--<div class="left-mypage">
                     <div class="em-wapper-image">
                         <div class="em-avatar boder-img">
                             @if($profile['avatar'] != '')
@@ -40,8 +40,8 @@
                     {{-- <div class="em-note">
                         <p>身分証は公開されません</p>
                     </div> --}}
-                </div>
-                <div class="right-mypage">
+                </div>-->
+                <div class="" style="width:100%">
                     <div class="em-wapper-info">
                         {{-- nick name --}}
                         <div class="em-title-info">
@@ -225,6 +225,6 @@
 @endsection
 
 @section('scripts')
-    <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('/js/employer-mypage.min.js') }}"></script>
+    {{-- <script type="text/javascript" src="{{ asset('/js/library/slick.min.js') }}"></script> --}}
+    {{-- <script type="text/javascript" src="{{ asset('/js/employer-mypage.min.js') }}"></script> --}}
 @endsection

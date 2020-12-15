@@ -3,7 +3,6 @@
 @section('stylesheets-admin')
     <link rel="stylesheet" href="{{ asset('css/library/jquery-ui.min.css')}}">
     <link rel="stylesheet" href="{{ asset('css/library/jquery.toast.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/library/jquery.jqZoom.css') }}">
 @endsection
 @extends('admin._LAYOUT.index')
 
@@ -288,7 +287,16 @@
         </div>
     </div>
 </section>
-
+{{-- modal avatar  --}}
+<div id="avatar-modal" class="modal avatar-popup">
+    <a class="popup-lose" rel="modal:close">
+    </a>
+    <div class="popup-body f-col"> 
+        <div class="content-avatar" id="content-avatar">
+            
+        </div>
+    </div>
+</div>
 {{-- end child default --}}
 @endsection
 
@@ -300,7 +308,6 @@
     <script type="text/javascript" src="{{ asset('js/library/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/admin_employer.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/library/jquery.toast.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('/js/library/jquery.jqZoom.js') }}"></script>
     <script>
         $( function() {
             $( 'input[name="date-reg"]' ).datepicker({
@@ -309,14 +316,6 @@
                 }
             });
         });
-        $(function(){
-            $(".zoom-box img").jqZoom({
-                selectorWidth: 30,
-                selectorHeight: 30,
-                viewerWidth: 400,
-                viewerHeight: 300
-            });
-        })
         const SITTER = "{{config('constant.ROLE.SITTER')}}";
         const EMPLOYER_SEND_SITTER = "{{route('ADMIN_AJAX_EMPLOYER_SEND_SITTER')}}";
         const ADMIN_CONFIRM_ACCEPT = "{{config('constant.ADMIN_CONFIRM.ACCEPT')}}";

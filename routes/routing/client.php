@@ -21,6 +21,10 @@ Route::get('/reviews','Client\TopPageController@ajaxLoadreviews')->name('AJAX_LO
 Route::get('/contact','Client\ContactPageController@contact')->name('VIEW_CONTACT_PAGE');
 Route::post('/contact','Client\ContactPageController@sendEmail')->name('POST_CONTACT');
 Route::get('/contact-success/{tittle?}/{ms1?}','Client\ContactPageController@contactSuccess')->name('CONTACT_SUCCESS');
+Route::post('/send-review-sitter','Client\TopPageController@postReviewSitter')->name('EMPLOYER_SEND_REVIEW');
+Route::get('/info-inquiry','Client\TopPageController@infoInquiry')->name('VIEW_INFO_INQUIRY');
+Route::post('/info-inquiry','Client\TopPageController@sendEmailInfoInquiry')->name('POST_INFO_INQUIRY');
+Route::get('/info-inquiry-success/{tittle?}/{ms1?}','Client\TopPageController@infoInquirySuccess')->name('INFO_INQUIRY_SUCCESS');
 
 Route::group(['prefix' => 'sitter'], function() {
     Route::get('/login','Client\Sitter\AuthController@login')->name('SITTER_LOGIN');
@@ -37,11 +41,8 @@ Route::group(['prefix' => 'sitter'], function() {
     Route::get('/register-confirm','Client\Sitter\RegisterController@registerConfirm')->name('SITTER_REGISTER_CONFIRM');
     Route::get('/register-parent','Client\Sitter\RegisterController@registerParent')->name('SITTER_REGISTER_NEXT_STEP');
     Route::post('/register-parent','Client\Sitter\RegisterController@postRegisterParent')->name('SITTER_POST_REGISTER_NEXT_STEP');
-    Route::get('/create-stripe-account','Client\Sitter\RegisterController@regStripeAccount')->name('SITTER_REG_STRIPE_ACC');
-    Route::get('/register-stripe-success/{stripe_acc_id}','Client\Sitter\RegisterController@registerStripeSuccess')->name('SITTER_REGISTER_STRIPE_SUCCESS');
-    Route::get('/payout','Client\Sitter\RegisterController@payoutTest')->name('SITTER_PAYOUT');
-    Route::get('/reauth','Client\Sitter\RegisterController@reauth')->name('SITTER_REAUTH');
-    Route::get('/payment','Client\Sitter\RegisterController@payment')->name('SITTER_payment');
+    Route::get('/register-bank','Client\Sitter\RegisterController@registerBankAccount')->name('SITTER_REGISTER_BANK');
+    Route::post('/register-bank','Client\Sitter\RegisterController@postRegBankAccount')->name('SITTER_POST_REGISTER_BANK');
 
     Route::group(['middleware' => 'SITTER_LOGGED'], function() {
         Route::get('/chat/{id?}','Client\Sitter\SitterController@chat')->name('SITTER_CHAT');
@@ -54,6 +55,12 @@ Route::group(['prefix' => 'sitter'], function() {
         Route::get('/publish-profile','Client\Sitter\SitterController@ajaxPublishProfile')->name('SITTER_AJAX_PUBLISH_PROFILE');
         Route::get('/load-list-bookings','Client\Sitter\SitterController@ajaxLoadListBookings')->name('SITTER_AJAX_LOAD_LIST_BOOKINGS');
         Route::get('/stripe-account','Client\Sitter\SitterController@getStripeAccount')->name('SITTER_STRIPE_ACC');
+        Route::delete('/delete-stripe-account','Client\Sitter\SitterController@ajaxDeleteStripeAccount')->name('SITTER_DELETE_STRIPE_ACC');
+        Route::get('/view-bank','Client\Sitter\SitterController@viewBank')->name('SITTER_VIEW_BANK');
+        Route::get('/edit-bank','Client\Sitter\SitterController@editBank')->name('SITTER_EDIT_BANK');
+        Route::post('/edit-bank','Client\Sitter\SitterController@postEditBank')->name('SITTER_POST_EDIT_BANK');
+        Route::post('/remove-certify','Client\Sitter\SitterController@ajaxRemoveCertify')->name('SITTER_AJAX_REMOVE_CERTIFY');
+        Route::post('/upload-certify','Client\Sitter\SitterController@ajaxUploadCertify')->name('SITTER_AJAX_UPLOAD_CERTIFY');
     });
 });
 
@@ -77,6 +84,7 @@ Route::group(['prefix' => 'employer'], function() {
     Route::get('/collect-card-success','Client\employer\RegisterController@registerPaymentSuccess')->name('EMPLOYER_COLLECT_CARD_SUCCESS');
 
     Route::group(['middleware' => 'EMPLOYER_LOGGED'], function() {
+        //test
         Route::get('/','Client\employer\EmployerController@myPage')->name('EMPLOYER_MYPAGE');
         Route::get('/chat/{id?}','Client\employer\EmployerController@chat')->name('EMPLOYER_CHAT');
         Route::get('/edit','Client\employer\EmployerController@editProfile')->name('EMPLOYER_EDIT_PROFILE');

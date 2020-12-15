@@ -36,5 +36,7 @@ db.ORDER        = require("./Order.js")(sequelize, Sequelize)
 db.PAYMENT      = require("./Payment.js")(sequelize, Sequelize)
 
 db.BOOKING.hasOne(db.DATE_BOOKING, {foreignKey: 'booking_id'})
+db.BOOKING.belongsTo(db.USER, { as: 'sitter', foreignKey: 'sitter_id' });
+db.BOOKING.belongsTo(db.USER, { as: 'employer', foreignKey: 'employer_id' });
 db.DATE_BOOKING.belongsTo(db.BOOKING, {foreignKey: 'booking_id'})
 module.exports = db

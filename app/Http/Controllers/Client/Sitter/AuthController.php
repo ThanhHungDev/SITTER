@@ -56,12 +56,6 @@ class AuthController extends Controller
             return redirect()->back()->withInput()->withErrors($errors);
         }
 
-        // check stripe is active?
-        if(!$user_temp->stripe_active){
-            $token_stripe = $this->model->createVerifyEmailModel()->getTokenById($user_temp->id);
-            return redirect(route('SITTER_REG_STRIPE_ACC').'?token='.$token_stripe);
-        }
-
         if (Auth::attempt($data, $remember)){
             $user         = Auth::user();
 

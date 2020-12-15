@@ -374,3 +374,14 @@ function ajaxApproveProfileEmployer(action, data, e) {
         }
     });
 }
+$('.small-img').on('click', function () {
+    let img = $(this).find('img').clone();
+    $('#content-avatar').append(img);
+    $('#avatar-modal').modal({
+        escapeClose: false,
+        showClose: false
+    });
+});
+$('#avatar-modal').on($.modal.CLOSE, function () {
+    $('#content-avatar').empty();
+})

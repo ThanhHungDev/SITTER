@@ -13,7 +13,7 @@ class App extends Component {
             sendUserOnline : false
         }
 
-        console.log(JSON.stringify(this.props.client))
+        // console.log(JSON.stringify(this.props.client))
         var instanceApp = this
         socketInitialConnect(socketIOClient, instanceApp)
     }
@@ -32,14 +32,13 @@ class App extends Component {
                             peer  : "1234567890",
                             access: this.props.auth.tokens.tokenAccess
                         })
-                        this.props.socket.emit(EVENT.USER_GET_BOOKING, { id: this.props.auth.id })
+                        this.props.socket.emit(EVENT.USER_GET_BOOKING, { id: this.props.auth.id, type: this.props.auth.role_id })
                     })
                 }
             }
         }
     }
     render() {
-        console.log("draw app")
         return (
             <div className="AppComponent" id="Application">
                 <Chat />

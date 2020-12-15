@@ -52,9 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://sitters.jp'),
+    'url' => env('APP_URL', 'http://babysitter.trust-growth.co.jp'),
 
-    'version' => env('APP_VERSION', "?v=12345678"),
+    'version' => env('APP_VERSION', "?v=123456789"),
     
     'realtime_url' => env('REALTIME_URL', 'http://153.126.149.63:9999'),
 
@@ -66,6 +66,8 @@ return [
 
     'STRIPE_PUBLIC_KEY' => env('STRIPE_PUBLIC_KEY','pk_test_51HH3fxEkyn0XMKpGPVUghMwsvtR0lktiryL5WUbPkvzhx1Ykw0V5j8w20RPXQLXAnNTlbqShTAiJaQaTwcNMI6Pz00H35guI44'),
     
+    'BANK_CODE_API_URL' => env('BANK_CODE_API', 'https://bankcode-api.appspot.com/api/bank/JP'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -172,6 +174,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -244,6 +247,7 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
 
         'Stripe' => Cartalyst\Stripe\Laravel\Facades\Stripe::class,
+        'SupportString' => App\Helpers\SupportString::class,
     ],
 
 ];

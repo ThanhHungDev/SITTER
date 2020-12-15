@@ -47,6 +47,7 @@ class LoginController extends Controller
 
         $data['active']  = 1;
         $data['role_id'] = config('constant.ROLE.EMPLOYER');
+        $data['deleted']  = 0;
         
         if (Auth::attempt($data, $remember)){
 

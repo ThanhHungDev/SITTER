@@ -18,9 +18,13 @@ const ChannelSchema = new Schema(
             }
         ],
         backup: {
-            type   : Boolean,
+            type: Boolean,
             default: false /// channel xóa thì không xóa hẳn, thông thường là cột delete
         },
+        sort: {
+            type: Number,
+            default: 1
+        }
     }, {
     timestamps: true
 })
@@ -48,8 +52,8 @@ ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgn
     return this
     .aggregate([
         { $match: conditionChannel },
-        { $sort : { updatedAt : 1 } },
         { $limit : 100 },
+        { $sort: { sort: 1 } },
         { $unwind: "$user" },
         { $match: { user: { $nin : _idIgnore }} },
         {
@@ -82,7 +86,6 @@ ChannelSchema.statics.channelsMessageByUser = function( _userId, _backup, _idIgn
                 ]
             }
         },
-        { $sort: { "_id": -1 } },
         {   
             $project: {
                 id : "$_id",
@@ -147,7 +150,7 @@ ChannelSchema.statics.AdminGetInformationChannels = function( _limit, _offset ){
     return this
     .aggregate([
         { $match: { user: { $ne : CONFIG.ID_ADMIN.toString() } } },
-        { $sort: { "_id": 1 } },
+        { $sort: { sort: 1 } },
         { $skip: _offset },
         { $limit : _limit },
         {

@@ -1,6 +1,7 @@
 html {
     scroll-behavior: smooth;
 }
+
 body {
     margin: 0;
     padding: 0;
@@ -9,28 +10,36 @@ body {
     font-size: $font-size-default;
     font-weight: $font-weight-default;
 }
+
 .main-wrapper {
     margin: 0 auto;
     max-width: $max-screen-width;
-    .main-wrapper-header, .main-wrapper-footer, .main-wrapper-body-content{
+    @media only screen and (min-width: $xs_screen) and (max-width: $container-2) {
+        //width: $container-2;
+        max-width: $container-2;
+    }
+    .main-wrapper-header,
+    .main-wrapper-footer,
+    .main-wrapper-body-content {
         width: 100%;
         margin: 0;
         padding: 0;
     }
-    .main-wrapper-body-content.admin{
+    .main-wrapper-body-content.admin {
         display: flex;
-        .left-side-menu{
+        .left-side-menu {
             min-height: calc(100vh - 140px);
             width: 200px;
             background-color: #3d3d3d;
         }
-        .right-side-admin{
+        .right-side-admin {
             width: calc(100% - 200px);
             min-height: calc(100vh - 140px);
         }
     }
 }
-#scroll-btn{
+
+#scroll-btn {
     background: url('../image/icons/icon-scroll-top.png') no-repeat;
     background-size: contain;
     width: 50px;
@@ -42,9 +51,14 @@ body {
     right: 30px;
     bottom: 30px;
     z-index: 99;
+    @media only screen and (max-width: $xs_screen) {
+        width: 40px;
+        height: 40px;
+    }
 }
-@include DivResponsive(575px){
-    #scroll-btn{
+
+@include DivResponsive(575px) {
+    #scroll-btn {
         right: 15px;
         bottom: 50px;
         opacity: 0.8;

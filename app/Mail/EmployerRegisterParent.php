@@ -35,7 +35,7 @@ class EmployerRegisterParent extends Mailable
         );
         
         return $this->view('emails.employer_register_parent')
-                    ->subject('利用者登録ありがとうございます')
+                    ->subject('【家政婦さん・ベビーシッタードットコム】仮登録が完了いたしました')
                     ->with([
                         'dataSendMail' => $dataSendMail,
                     ]);

@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use Stripe\BankAccount;
 
 class UserModel extends Model
 {
     protected $table = 'users';
 
-    protected $fillable = ['avatar','email','password','first_name','last_name','last_name_furigana','birth_date','gender','post_code','pref','town','address','phone','role_id','token_verify','active','deleted','order','stripe_account_id','stripe_active','created_at','updated_at'];
+    protected $fillable = ['avatar','email','password','first_name','last_name','first_name_furigana','last_name_furigana','birth_date','gender','post_code','pref','town','address','phone','role_id','token_verify','active','deleted','order','stripe_account_id','stripe_active','created_at','updated_at'];
     public function sitterProfile(){
 
         return $this->hasOne( SitterProfileModel::class, 'user_id', 'id' );
@@ -127,6 +128,15 @@ class UserModel extends Model
     public function families(){
 
         return null;
+    }
+
+    public function bankAccount( $condition = array()){
+
+        if( empty($condition ) ){
+            return $this->hasOne( BankAccountModel::class, 'user_id', 'id' );
+        }
+        return $this->hasOne( BankAccountModel::class, 'user_id', 'id' )
+        ->where( $condition );
     }
 
 
@@ -442,8 +452,9 @@ class UserModel extends Model
     public function checkSitterIsactiveByParams($value, $field)
     {
         $adminConfirm = config('constant.ADMIN_CONFIRM.ACCEPT');
+        $sitterRole = config('constant.ROLE.SITTER');
         return $this->select('id', 'first_name', 'last_name', 'stripe_account_id', 'stripe_active')
-                    ->where([$field => $value, 'active' => true, 'admin_confirm' => $adminConfirm])
+                    ->where([$field => $value, 'active' => true, 'stripe_active' => true, 'role_id' => $sitterRole, 'admin_confirm' => $adminConfirm, 'deleted' => false])
                     ->first();
     }
 
@@ -542,7 +553,8 @@ class UserModel extends Model
     private function handleFindSitters($builder, $condition = array())
     {
         $builder->join('sitter_profiles as s', 's.user_id', '=', 'u.id')
-                ->leftjoin('galaries as g', 'g.user_id', '=', 'u.id');
+                ->leftjoin('galaries as g', 'g.user_id', '=', 'u.id')
+                ->leftjoin('verify_emails as v', 'v.user_id', '=', 'u.id');
 
         if(isset($condition['type_galaries']) && !empty($condition['type_galaries'])){
             $builder->whereIn('g.type', $condition['type_galaries']);
@@ -560,7 +572,7 @@ class UserModel extends Model
         $builder->where('u.role_id', $condition['role_type'])
                 ->where('u.active', true)
                 ->where('u.deleted', false)
-                ->groupByRaw('u.id, s.user_id');
+                ->groupByRaw('u.id, s.user_id, v.token_verify, v.email_verified_at');
 
         return $builder;
     }
@@ -588,6 +600,8 @@ class UserModel extends Model
                 u.created_at,
                 bool_and(s.publish) as publish,
                 admin_confirm,
+                v.token_verify,
+                v.email_verified_at,
                 string_agg(DISTINCT concat(g.path,'/',g.name::text,'|',g.type),',') as url";
     }
 }

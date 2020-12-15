@@ -26,7 +26,7 @@ class UserChat extends Component {
                         <img src={CONFIG.SERVER_PHP.URL + channel.user.avatar} alt="" />
                     </figure>
                     <div className="text-info">
-                        <span className="name">{channel.user.first_name + " " + channel.user.last_name}</span>
+                        <span className="name">{channel.user.first_name + channel.user.last_name}</span>
                         { lastItem &&
                             <span className="last-message">{lastItem.content}</span>
                         }

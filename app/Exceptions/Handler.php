@@ -58,6 +58,16 @@ class Handler extends ExceptionHandler
         // } else if ($exception instanceof Exception) {
         //     return response()->json(['error' => 'External API call failed.' . $exception->getMessage() ], 500);
         // }
+        if (  substr($request->path(), 0, 3) == 'api' ){
+            $res = [
+                'code'      => 400,
+                'status'    => false,
+                'data'      => [],
+                'errors'    => [],
+                'message'   => '認証されていないユーザー'
+            ];
+            return response()->json($res);
+        }
         return parent::render($request, $exception);
     }
 }

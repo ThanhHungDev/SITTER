@@ -30,7 +30,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             default: '0'
         },
-        profit: {
+        profit_sitter: {
+            type: DataTypes.STRING,
+            default: '0'
+        },
+        profit_employer: {
             type: DataTypes.STRING,
             default: '0'
         },
@@ -49,17 +53,18 @@ module.exports = (sequelize, DataTypes) => {
     })
     ORDER.prototype.toJSONFor = function () {
         return {
-            id         : this.id,
-            booking_id : this.booking_id,
-            date_export: this.date_export,
-            salary     : this.salary,
-            diff_time  : this.diff_time,
-            price      : this.price,
-            vat        : this.vat,
-            fee_stripe : this.fee_stripe,
-            profit     : this.profit,
-            status     : this.status,
-            note       : this.note,
+            id             : this.id,
+            booking_id     : this.booking_id,
+            date_export    : this.date_export,
+            salary         : this.salary,
+            diff_time      : this.diff_time,
+            price          : this.price,
+            vat            : this.vat,
+            fee_stripe     : this.fee_stripe,
+            profit_sitter  : this.profit_sitter,
+            profit_employer: this.profit_employer,
+            status         : this.status,
+            note           : this.note,
         }
     }
     // Class Method

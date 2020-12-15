@@ -1,5 +1,106 @@
 
 $(document).ready(function () {
+    $('.slider').show();
+    $('.slider-nav').show();
+    $('.slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        fade: true,
+        // asNavFor: '.slider-nav',
+        pauseOnHover: true,
+        swipe: true,
+        arrows: false,
+    });
+    $('.slider-nav').slick({
+        asNavFor: '.slider',
+        dots: true,
+        infinite: true,
+        slidesToScroll: 1,
+        centerMode: true,
+        variableWidth: true,
+        autoplay: false,
+        focusOnSelect: true  
+    });
+    
+      
+    $('.slider').on('click', function () {
+        let imgTag = $(this).find('img');
+        let rowCurrent = $(this).slick('slickCurrentSlide');
+        let modalSlider = $('#modal-slider');
+        for (let index = 0; index < imgTag.length; index++) {
+            let element = imgTag[index];
+            let img = $('<img/>');
+            img.attr('src', element.src);
+            modalSlider.append(img);
+        }
+        $('#modal-slider').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            fade: true,
+            pauseOnHover: true,
+            swipe: true,
+            autoplay: true,
+            arrows: false,
+        });
+        $('#modal-slider-nav').slick({
+            asNavFor: '#modal-slider',
+            dots: true,
+            infinite: true,
+            slidesToScroll: 1,
+            centerMode: true,
+            variableWidth: true,
+            autoplay: true,
+            focusOnSelect: true  
+        });
+
+        $('#modal-slider').slick('slickGoTo', rowCurrent, true);
+        $('strong.current-item').text(rowCurrent + 1);
+        $('strong.total-item').text(imgTag.length);
+        $('#certifies-modal').modal({
+            escapeClose: false,
+            showClose: false
+        });
+    });
+
+    $('#certifies-modal').on($.modal.CLOSE, function () {
+        $('#modal-slider').slick('unslick');
+        $('#modal-slider-nav').slick('unslick');
+        $('#modal-slider').empty();
+        $('#modal-slider-nav').empty();
+    })
+
+    $('#modal-slider').on('afterChange', function(event, slick, currentSlide){
+        $('strong.current-item').text(currentSlide + 1);
+    });
+
+    $('.modal-prev-nav').on('click', function () {
+        $('#modal-slider').slick('slickPrev');
+    })
+    
+    $('.modal-next-nav').on('click', function () {
+        $('#modal-slider').slick('slickNext');
+    })
+
+    $('.prev-nav').on('click', function () {
+        let pageNav = $(this).parent();
+        let currentWrap = pageNav.parent();
+        let currentSlider = currentWrap.find('.slider');
+        currentSlider.slick('slickPrev');
+    })
+    
+    $('.next-nav').on('click', function () {
+        let pageNav = $(this).parent();
+        let currentWrap = pageNav.parent();
+        let currentSlider = currentWrap.find('.slider');
+        currentSlider.slick('slickNext');
+    })
+
+    $('.slider').on('afterChange', function(event, slick, currentSlide){
+        let parentItem = $(this).parent();
+        let currentItem = parentItem.find('strong.row-current-item');
+        currentItem.text(currentSlide + 1);
+    });
+
     $( "#slt_datepicker" ).multiDatesPicker({
         beforeShow: function(input, inst) {
             $('#ui-datepicker-div').addClass('single-picker');
@@ -38,14 +139,38 @@ $(document).ready(function () {
         })    
     })
     //activity sitter
-    $('.js-activity-sitter, .js-unactivity-sitter').on('click', function () {
+    $('.js-activity-sitter').on('click', function () {
         let action = $(this).attr('data-url') 
-        let data = {
-            id : $(this).attr('data-item'),
-            admin_confirm : $(this).attr('data-confirm')
+            let data = {
+                id : $(this).attr('data-item'),
+                admin_confirm : $(this).attr('data-confirm')
+            }
+            ajaxConfirmSitter(action, data, $(this))
+    })
+    $('.js-unactivity-sitter').on('click', function () {
+        if ($(this).hasClass('js-unactivity-sitter')) {
+            let action = $(this).attr('data-url') 
+            let data = {
+                id : $(this).attr('data-item'),
+                admin_confirm : $(this).attr('data-confirm')
+            }
+            ajaxConfirmSitter(action, data, $(this))
         }
-        $(this).prop('disabled', true)
-        ajaxConfirmSitter(action, data)
+        if ($(this).hasClass('js-link-update')) {
+            let copyText = $('.js-link-update').attr('data-url')
+            let temp = $('<input>') //create input 
+            $(this).append(temp)
+            temp.val(copyText).select() //select text
+            document.execCommand("copy")
+            temp.remove() //remove
+            $.toast({
+                // heading: '成功しました',
+                text: 'コピーしました', 
+                showHideTransition: 'slide',
+                icon: 'success',
+                position: 'top-right',
+            });
+        }
     })
     //view chat
     $('.js-history-chat').on('click', function () {
@@ -53,15 +178,15 @@ $(document).ready(function () {
         location.assign(action)
     })
     //copy clipboard
-    $('#link-update').on('click', function () {
-        let copyText = $(this).val()
+    $('.js-link-update').on('click', function () {
+        let copyText = $(this).attr('data-url')
         let temp = $('<input>') //create input 
         $(this).append(temp)
         temp.val(copyText).select() //select text
         document.execCommand("copy")
         temp.remove() //remove
         $.toast({
-            // heading: 'Success!',
+            // heading: '成功しました',
             text: 'コピーしました', 
             showHideTransition: 'slide',
             icon: 'success',
@@ -90,7 +215,7 @@ function ajaxGetDetailsSitter(action, emlemnt) {
                 });
             }else{
                 $.toast({
-                    heading: 'Error!',
+                    heading: 'エラー',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'Error',
@@ -101,8 +226,8 @@ function ajaxGetDetailsSitter(action, emlemnt) {
         },
         error: function (err) {
             $.toast({
-                heading: 'Error!',
-                text: "User has not updated information!",
+                heading: 'エラー',
+                text: "更新に失敗しました",
                 showHideTransition: 'slide',
                 icon: 'error',
                 position: 'top-right',
@@ -152,7 +277,7 @@ function ajaxUpdatePublish(action, data, emlement) {
         success: function( rs ){
             if (rs.code == 200) {
                 $.toast({
-                    heading: 'Success!',
+                    heading: '成功しました',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'success',
@@ -160,7 +285,7 @@ function ajaxUpdatePublish(action, data, emlement) {
                 });
             }else{
                 $.toast({
-                    heading: 'Error!',
+                    heading: 'エラー',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'error',
@@ -171,7 +296,7 @@ function ajaxUpdatePublish(action, data, emlement) {
         },
         error: function (err) {
             $.toast({
-                heading: 'Error!',
+                heading: 'エラー',
                 text: "update fail!",
                 showHideTransition: 'slide',
                 icon: 'error',
@@ -195,7 +320,7 @@ function ajaxDeleteSitter(action, data) {
         success: function( rs ){
             if (rs.code == 200) {
                 $.toast({
-                    heading: 'Success!',
+                    heading: '成功しました',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'success',
@@ -206,7 +331,7 @@ function ajaxDeleteSitter(action, data) {
                 },500)
             }else{
                 $.toast({
-                    heading: 'Error!',
+                    heading: 'エラー',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'error',
@@ -216,8 +341,8 @@ function ajaxDeleteSitter(action, data) {
         },
         error: function (err) {
             $.toast({
-                heading: 'Error!',
-                text: "Delete fail!",
+                heading: 'エラー',
+                text: "削除失敗",
                 showHideTransition: 'slide',
                 icon: 'error',
                 position: 'top-right',
@@ -226,7 +351,7 @@ function ajaxDeleteSitter(action, data) {
     });
 }
 
-function ajaxConfirmSitter(action, data) {
+function ajaxConfirmSitter(action, data, event) {
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -237,13 +362,18 @@ function ajaxConfirmSitter(action, data) {
         data    : data, 
         type    : 'post',
         success: function( rs ){
-            if (rs.code == 200) {
+            if (rs.admin_accept == true) {
                 if (data.admin_confirm == ADMIN_CONFIRM_ACCEPT ) {
                     deleteHTMLItemSitter('action-confrim-', rs.id)
                 }
-                
+                if (data.admin_confirm != ADMIN_CONFIRM_ACCEPT) {
+                    event.addClass('js-link-update');
+                    event.attr('data-url', rs.url)
+                    event.text('ンクをコピーする');
+                    event.removeClass('js-unactivity-sitter');
+                }                
                 $.toast({
-                    heading: 'Success!',
+                    heading: '成功しました',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'success',
@@ -251,24 +381,22 @@ function ajaxConfirmSitter(action, data) {
                 });
             }else{
                 $.toast({
-                    heading: 'Error!',
+                    heading: 'エラー',
                     text: rs.messages,
                     showHideTransition: 'slide',
                     icon: 'error',
                     position: 'top-right',
                 });
             }  
-            $(this).prop('disabled', false)          
         },
         error: function (err) {
             $.toast({
-                heading: 'Error!',
-                text: "Accept fail!",
+                heading: 'エラー',
+                text: "承認に失敗しました",
                 showHideTransition: 'slide',
                 icon: 'error',
                 position: 'top-right',
             });
-            $(this).prop('disabled', false)     
         }
     });
 }
@@ -285,3 +413,15 @@ function deleteSitter() {
     }
     ajaxDeleteSitter(action, data)
 }
+
+$('.small-img').on('click', function () {
+    let img = $(this).find('img').clone();
+    $('#content-avatar').append(img);
+    $('#avatar-modal').modal({
+        escapeClose: false,
+        showClose: false
+    });
+});
+$('#avatar-modal').on($.modal.CLOSE, function () {
+    $('#content-avatar').empty();
+})

@@ -21,4 +21,5 @@ $(document).ready(function(){
         autoplay: true,
         focusOnSelect: true
     });
+
 });
